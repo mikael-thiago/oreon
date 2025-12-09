@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "Oreon API",
+    "description": "API collection for Oreon school management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Turmas",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/unidade/:unidadeId/anoLetivo/:anoLetivoId/turmas",
+          "host": ["{{apiUrl}}"],
+          "path": ["unidade", ":unidadeId", "anoLetivo", ":anoLetivoId", "turmas"],
+          "variable": [
+            {
+              "key": "unidadeId",
+              "value": "1",
+              "description": "ID da unidade escolar"
+            },
+            {
+              "key": "anoLetivoId",
+              "value": "1",
+              "description": "ID do ano letivo"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Bases",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/unidade/:unidadeId/bases",
+          "host": ["{{apiUrl}}"],
+          "path": ["unidade", ":unidadeId", "bases"],
+          "variable": [
+            {
+              "key": "unidadeId",
+              "value": "1",
+              "description": "ID da unidade escolar"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get Base by ID",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/bases/:id",
+          "host": ["{{apiUrl}}"],
+          "path": ["bases", ":id"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "ID da base curricular"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Units",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/escolas/:escolaId/unidades",
+          "host": ["{{apiUrl}}"],
+          "path": ["escolas", ":escolaId", "unidades"],
+          "variable": [
+            {
+              "key": "escolaId",
+              "value": "1",
+              "description": "ID da escola/instituição"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Register Turma",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"anoLetivoId\": 1,\n  \"baseId\": 1,\n  \"etapaId\": 1,\n  \"letra\": \"A\",\n  \"unidadeId\": 1\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/turmas",
+          "host": ["{{apiUrl}}"],
+          "path": ["turmas"]
+        }
+      }
+    },
+    {
+      "name": "List Modalidades",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/modalidades",
+          "host": ["{{apiUrl}}"],
+          "path": ["modalidades"]
+        }
+      }
+    },
+    {
+      "name": "List Etapas by Modalidade",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/modalidades/:id/etapas",
+          "host": ["{{apiUrl}}"],
+          "path": ["modalidades", ":id", "etapas"],
+          "variable": [
+            {
+              "key": "id",
+              "value": "1",
+              "description": "ID da modalidade"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "List Anos Letivos",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/anos-letivos",
+          "host": ["{{apiUrl}}"],
+          "path": ["anos-letivos"]
+        },
+        "description": "Lista todos os anos letivos da escola do usuário autenticado"
+      }
+    },
+    {
+      "name": "Register Ano Letivo",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"anoReferencia\": 2024,\n  \"dataInicio\": \"2024-02-01T00:00:00.000Z\",\n  \"dataFim\": \"2024-12-20T23:59:59.999Z\"\n}"
+        },
+        "url": {
+          "raw": "{{apiUrl}}/anos-letivos",
+          "host": ["{{apiUrl}}"],
+          "path": ["anos-letivos"]
+        },
+        "description": "Cadastra um novo ano letivo para a escola do usuário autenticado. Valida se já não existe ano letivo com o mesmo ano de referência ou com datas conflitantes."
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "apiUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
