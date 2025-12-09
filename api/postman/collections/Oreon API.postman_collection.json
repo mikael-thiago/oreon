@@ -1,0 +1,623 @@
+{
+  "info": {
+    "_postman_id": "da6ad142-e54c-4c77-9613-170fc1942ca1",
+    "name": "Oreon API",
+    "description": "Sistema educacional - Endpoints de autenticação",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Autenticação",
+      "item": [
+        {
+          "name": "Cadastrar Usuário",
+          "id": "e742d8fe-4cae-4fca-b400-7bbd1a500fc1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Usuário 1\",\n  \"email\": \"usuario@mail.com\",\n  \"senha\": \"senha123\",\n  \"telefone\": \"11999999999\",\n  \"escolaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/usuarios",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            },
+            "description": "Cria um novo usuário no sistema"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "4c7a2ed6-3b93-41cd-baf5-2fcc622d7b10",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "if (response.token) {",
+                  "    pm.environment.set(\"token\", response.token);",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "8c4064f2-5f8b-4481-b8bb-74b5291bfed8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n//   \"email\": \"escola3@mail.com\",\n//   \"senha\": \"UznFcD3MDbAc\"\n    \"email\": \"{{emailAdmin}}\",\n    \"senha\": \"{{senhaAdmin}}\"\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/login",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Autentica um usuário e retorna um token JWT"
+          },
+          "response": []
+        },
+        {
+          "name": "Obter meus dados",
+          "id": "b5345ec3-2e83-46fc-b72d-efdaadeaac5e",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/me",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": "Retorna os dados do usuário autenticado"
+          },
+          "response": []
+        }
+      ],
+      "id": "15051f27-b0b4-4294-a312-efe32beeb38c"
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Cadastrar Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "7bf5224f-991f-4ac0-9f51-b4ed5fb69d18",
+                "exec": [
+                  "const response = pm.response.json();\r",
+                  "const request = JSON.parse(pm.request.body.raw);\r",
+                  "\r",
+                  "pm.environment.set(\"emailAdmin\", response.email);\r",
+                  "pm.environment.set(\"senhaAdmin\", request.senha);\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "id": "1b4ca4a0-d2d4-4bb8-9218-cd8a8daea368",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Oreon Admin\",\r\n    \"email\": \"oreon@mail.com\",\r\n    \"senha\": \"senha123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar Escola",
+          "id": "0192fb5f-4d61-43bb-8f9f-e7566bbb982d",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Escola 1\",\r\n    \"email\": \"escola3@mail.com\",\r\n    \"cnpjMatriz\": \"86242056000178\",\r\n    \"telefone1\": \"79999999999\",\r\n    \"endereco\": {\r\n        \"rua\": \"24\",\r\n        \"numero\": \"5\",\r\n        \"cidade\": \"Nossa Senhora do Socorro\",\r\n        \"estado\": \"SE\"\r\n    }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/escolas",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "escolas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "17f157a6-aea9-415b-bdd8-a8461ddcf93e"
+    },
+    {
+      "name": "Base Curricular",
+      "item": [
+        {
+          "name": "Cadastrar Base Curricular",
+          "id": "ef39eee9-cf0a-46eb-8c91-af61df0af547",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"etapaId\": 2,\r\n    \"escolaId\": 2,\r\n    \"disciplinas\": [\r\n        { \"nome\": \"Português\", \"codigo\": \"LNG10\", \"cargaHorariaAnual\": 500 }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{apiUrl}}/bases",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "bases"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar bases Curriculares",
+          "id": "630789db-704c-468e-b3f1-5096466232d5",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/unidade/:unidadeId/bases",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "unidade",
+                ":unidadeId",
+                "bases"
+              ],
+              "variable": [
+                {
+                  "key": "unidadeId",
+                  "value": "2",
+                  "description": "ID da unidade escolar"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obter base por ID",
+          "id": "0c0a806a-3ba0-491c-8044-08bb773fe1ae",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/bases/:id",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "bases",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID da base curricular"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "56e9afe7-b998-4b85-bafc-aef416569670"
+    },
+    {
+      "name": "Disciplina",
+      "item": [
+        {
+          "name": "Cadastrar Disciplina",
+          "id": "70df2217-3b63-4cc2-bce5-40ffda4f97eb",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"nome\": \"Inglês\",\r\n    \"cargaHorariaAnual\": 300\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "/bases/1/disciplinas",
+              "path": [
+                "bases",
+                "1",
+                "disciplinas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "5917ecf2-2ae3-41a4-95eb-4b478e694838"
+    },
+    {
+      "name": "Turmas",
+      "item": [
+        {
+          "name": "Listar Turmas",
+          "id": "8b9945f9-8111-4786-970d-52c45ba73328",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/unidade/:unidadeId/anoLetivo/:anoLetivoId/turmass",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "unidade",
+                ":unidadeId",
+                "anoLetivo",
+                ":anoLetivoId",
+                "turmass"
+              ],
+              "variable": [
+                {
+                  "key": "unidadeId",
+                  "value": "2",
+                  "description": "ID da unidade escolar"
+                },
+                {
+                  "key": "anoLetivoId",
+                  "value": "1",
+                  "description": "ID do ano letivo"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar Turma",
+          "id": "6fcde2ce-adf9-4ec1-bd85-ddf7095be877",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anoLetivoId\": 1,\n  \"baseId\": 1,\n  \"etapaId\": 2,\n  \"letra\": \"A\",\n  \"unidadeId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/turmas",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "turmas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "3eee1a30-450e-46a7-9873-580fd02842db"
+    },
+    {
+      "name": "Instituição",
+      "item": [
+        {
+          "name": "Listar Unidades Escolares",
+          "id": "e68a538f-d079-4608-873c-2cfdcb4e84af",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/escolas/:escolaId/unidades",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "escolas",
+                ":escolaId",
+                "unidades"
+              ],
+              "variable": [
+                {
+                  "key": "escolaId",
+                  "value": "1",
+                  "description": "ID da escola/instituição"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "42af8180-eca9-40d1-8d10-173c8c29de37"
+    },
+    {
+      "name": "Anos Letivos",
+      "item": [
+        {
+          "name": "Listar Anos Letivos",
+          "id": "6ee72ac3-db05-4e9c-ab70-201a04810005",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{apiUrl}}/anos-letivos",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "anos-letivos"
+              ]
+            },
+            "description": "Lista todos os anos letivos da escola do usuário autenticado"
+          },
+          "response": []
+        },
+        {
+          "name": "Registrar Ano Letivo",
+          "id": "14c302c6-7719-42d3-9ff9-ccd613541e90",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"anoReferencia\": 2024,\n  \"dataInicio\": \"2024-02-01T00:00:00.000Z\",\n  \"dataFim\": \"2024-12-20T23:59:59.999Z\"\n}"
+            },
+            "url": {
+              "raw": "{{apiUrl}}/anos-letivos",
+              "host": [
+                "{{apiUrl}}"
+              ],
+              "path": [
+                "anos-letivos"
+              ]
+            },
+            "description": "Cadastra um novo ano letivo para a escola do usuário autenticado. Valida se já não existe ano letivo com o mesmo ano de referência ou com datas conflitantes."
+          },
+          "response": []
+        }
+      ],
+      "id": "ec8912d8-51dc-4f93-b363-e8417ae7c41b"
+    },
+    {
+      "name": "Listar Modalidades",
+      "id": "54081aab-d9c8-494e-b84e-dd58e1e9d1de",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/modalidades",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "modalidades"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar etapas por Modalidade",
+      "id": "4456240d-073e-4864-93d2-a4ae176c11a7",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{apiUrl}}/modalidades/:id/etapas",
+          "host": [
+            "{{apiUrl}}"
+          ],
+          "path": [
+            "modalidades",
+            ":id",
+            "etapas"
+          ],
+          "variable": [
+            {
+              "key": "id",
+              "value": "2",
+              "description": "ID da modalidade"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "30cbc818-529b-47f5-87ed-d56be3616132",
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
