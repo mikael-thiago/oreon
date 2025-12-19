@@ -95,10 +95,10 @@ export const disciplinaRelations = relations(disciplinaTable, ({ one }) => ({
 
 export const usuarioTable = pgTable("users", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  nome: varchar({ length: 100 }).notNull(),
+  name: varchar({ length: 100 }).notNull(),
   email: varchar({ length: 100 }).notNull().unique(),
-  senha: varchar({ length: 255 }).notNull(),
-  telefone: varchar({ length: 20 }),
+  password: varchar({ length: 255 }).notNull(),
+  phone: varchar({ length: 20 }),
   escolaId: integer("school_id").references(() => escolaTable.id),
   createdAt: timestamp().notNull().defaultNow(),
   isAdmin: boolean().notNull().default(false),

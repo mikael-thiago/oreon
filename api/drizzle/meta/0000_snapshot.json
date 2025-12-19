@@ -1,5 +1,5 @@
 {
-  "id": "30c8e62a-cf7c-4df3-9ed3-fb0de3ebe6ca",
+  "id": "4355c538-aa06-4f19-898e-f63a137123cf",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -650,8 +650,8 @@
             "cycle": false
           }
         },
-        "nome": {
-          "name": "nome",
+        "name": {
+          "name": "name",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
@@ -662,14 +662,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "senha": {
-          "name": "senha",
+        "password": {
+          "name": "password",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "telefone": {
-          "name": "telefone",
+        "phone": {
+          "name": "phone",
           "type": "varchar(20)",
           "primaryKey": false,
           "notNull": false

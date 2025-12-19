@@ -21,10 +21,10 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
 
     return new Usuario({
       id: usuarioModel.id,
-      nome: usuarioModel.nome,
+      nome: usuarioModel.name,
       email: usuarioModel.email,
-      senha: usuarioModel.senha,
-      telefone: usuarioModel.telefone ?? undefined,
+      senha: usuarioModel.password,
+      telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
     });
@@ -43,10 +43,10 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
 
     return new Usuario({
       id: usuarioModel.id,
-      nome: usuarioModel.nome,
+      nome: usuarioModel.name,
       email: usuarioModel.email,
-      senha: usuarioModel.senha,
-      telefone: usuarioModel.telefone ?? undefined,
+      senha: usuarioModel.password,
+      telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
     });
@@ -57,10 +57,10 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       .getTransaction()
       .insert(usuarioTable)
       .values({
-        nome: data.nome,
+        name: data.nome,
         email: data.email,
-        senha: data.senha,
-        telefone: data.telefone,
+        password: data.senha,
+        phone: data.telefone,
         escolaId: data.escolaId,
       })
       .returning();
@@ -71,10 +71,10 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
 
     return new Usuario({
       id: usuarioModel.id,
-      nome: usuarioModel.nome,
+      nome: usuarioModel.name,
       email: usuarioModel.email,
-      senha: usuarioModel.senha,
-      telefone: usuarioModel.telefone ?? undefined,
+      senha: usuarioModel.password,
+      telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
     });

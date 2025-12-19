@@ -123,6 +123,7 @@
             {
               "listen": "test",
               "script": {
+                "id": "3569b9a5-be6a-40d2-8acc-c82e64a610f4",
                 "exec": [
                   "const response = pm.response.json();\r",
                   "const request = JSON.parse(pm.request.body.raw);\r",
@@ -133,8 +134,19 @@
                 ],
                 "type": "text/javascript",
                 "packages": {},
-                "requests": {},
-                "id": "3569b9a5-be6a-40d2-8acc-c82e64a610f4"
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "6921e040-9b33-4e93-b73c-13ef1e3cb743",
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
               }
             }
           ],
@@ -144,7 +156,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"nome\": \"Oreon Admin\",\r\n    \"email\": \"oreon@mail.com\",\r\n    \"senha\": \"senha123\"\r\n}",
+              "raw": "{\r\n    \"nome\": \"Oreon Admin\",\r\n    \"email\": \"{{emailAdmin}}\",\r\n    \"senha\": \"{{senhaAdmin}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -152,9 +164,9 @@
               }
             },
             "url": {
-              "raw": "{{baseUrl}}/admin",
+              "raw": "{{apiUrl}}/admin",
               "host": [
-                "{{baseUrl}}"
+                "{{apiUrl}}"
               ],
               "path": [
                 "admin"
@@ -614,7 +626,7 @@
   ],
   "variable": [
     {
-      "id": "c7a802d1-8a49-4685-809f-5826a2042356",
+      "id": "a73ecb1b-446f-4a8a-879d-d3f5ce2e2ac8",
       "key": "baseUrl",
       "value": "http://localhost:3000",
       "type": "string"
