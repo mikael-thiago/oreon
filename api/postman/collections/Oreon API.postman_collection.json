@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "da6ad142-e54c-4c77-9613-170fc1942ca1",
+    "_postman_id": "83ea6257-0211-4edf-a238-9a9f245b9387",
     "name": "Oreon API",
     "description": "Sistema educacional - Endpoints de autenticação",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
@@ -11,7 +11,7 @@
       "item": [
         {
           "name": "Cadastrar Usuário",
-          "id": "e742d8fe-4cae-4fca-b400-7bbd1a500fc1",
+          "id": "84cedcb9-20e9-435a-a8e8-f032d8ef6383",
           "request": {
             "method": "POST",
             "header": [
@@ -43,7 +43,6 @@
             {
               "listen": "test",
               "script": {
-                "id": "4c7a2ed6-3b93-41cd-baf5-2fcc622d7b10",
                 "exec": [
                   "const response = pm.response.json();",
                   "if (response.token) {",
@@ -52,11 +51,12 @@
                 ],
                 "type": "text/javascript",
                 "packages": {},
-                "requests": {}
+                "requests": {},
+                "id": "15a93f28-2918-4966-ab8b-23633b14310b"
               }
             }
           ],
-          "id": "8c4064f2-5f8b-4481-b8bb-74b5291bfed8",
+          "id": "4e3cec31-fb67-41ce-a70a-40e30594d800",
           "request": {
             "method": "POST",
             "header": [
@@ -84,7 +84,7 @@
         },
         {
           "name": "Obter meus dados",
-          "id": "b5345ec3-2e83-46fc-b72d-efdaadeaac5e",
+          "id": "8195a793-863c-4de6-b8c4-9317df91c198",
           "request": {
             "auth": {
               "type": "bearer",
@@ -112,7 +112,7 @@
           "response": []
         }
       ],
-      "id": "15051f27-b0b4-4294-a312-efe32beeb38c"
+      "id": "9f553e88-15a7-4ad4-a05c-d502f9ec361a"
     },
     {
       "name": "Admin",
@@ -123,7 +123,6 @@
             {
               "listen": "test",
               "script": {
-                "id": "7bf5224f-991f-4ac0-9f51-b4ed5fb69d18",
                 "exec": [
                   "const response = pm.response.json();\r",
                   "const request = JSON.parse(pm.request.body.raw);\r",
@@ -134,11 +133,12 @@
                 ],
                 "type": "text/javascript",
                 "packages": {},
-                "requests": {}
+                "requests": {},
+                "id": "3569b9a5-be6a-40d2-8acc-c82e64a610f4"
               }
             }
           ],
-          "id": "1b4ca4a0-d2d4-4bb8-9218-cd8a8daea368",
+          "id": "ff2955e7-f4f9-4ae3-9498-5443a470d8da",
           "request": {
             "method": "POST",
             "header": [],
@@ -165,7 +165,7 @@
         },
         {
           "name": "Cadastrar Escola",
-          "id": "0192fb5f-4d61-43bb-8f9f-e7566bbb982d",
+          "id": "b4589143-561b-43cc-89c8-c90f8fee3ca1",
           "request": {
             "method": "POST",
             "header": [],
@@ -191,14 +191,14 @@
           "response": []
         }
       ],
-      "id": "17f157a6-aea9-415b-bdd8-a8461ddcf93e"
+      "id": "1fd3e399-aef6-4183-ba1f-288164116f28"
     },
     {
       "name": "Base Curricular",
       "item": [
         {
           "name": "Cadastrar Base Curricular",
-          "id": "ef39eee9-cf0a-46eb-8c91-af61df0af547",
+          "id": "c33feff1-539e-46e3-b729-26f57a291f07",
           "request": {
             "auth": {
               "type": "bearer",
@@ -235,7 +235,7 @@
         },
         {
           "name": "Listar bases Curriculares",
-          "id": "630789db-704c-468e-b3f1-5096466232d5",
+          "id": "9dca1c7a-b0ab-47b4-8bc6-44eca489fa1e",
           "request": {
             "auth": {
               "type": "bearer",
@@ -272,7 +272,7 @@
         },
         {
           "name": "Obter base por ID",
-          "id": "0c0a806a-3ba0-491c-8044-08bb773fe1ae",
+          "id": "379fe5b4-dc40-4785-a68c-06f6901154d0",
           "request": {
             "auth": {
               "type": "bearer",
@@ -307,14 +307,14 @@
           "response": []
         }
       ],
-      "id": "56e9afe7-b998-4b85-bafc-aef416569670"
+      "id": "4d163fa6-d260-4337-a3da-172eacff1a82"
     },
     {
       "name": "Disciplina",
       "item": [
         {
           "name": "Cadastrar Disciplina",
-          "id": "70df2217-3b63-4cc2-bce5-40ffda4f97eb",
+          "id": "567671cf-01c9-4bb6-9f4f-91502a4f6918",
           "request": {
             "auth": {
               "type": "bearer",
@@ -349,14 +349,14 @@
           "response": []
         }
       ],
-      "id": "5917ecf2-2ae3-41a4-95eb-4b478e694838"
+      "id": "7280e287-5bde-480c-96b0-989016df441e"
     },
     {
       "name": "Turmas",
       "item": [
         {
           "name": "Listar Turmas",
-          "id": "8b9945f9-8111-4786-970d-52c45ba73328",
+          "id": "0d392ad5-8958-4418-be05-799dfd9a8f38",
           "request": {
             "auth": {
               "type": "bearer",
@@ -400,7 +400,7 @@
         },
         {
           "name": "Cadastrar Turma",
-          "id": "6fcde2ce-adf9-4ec1-bd85-ddf7095be877",
+          "id": "eaa634e1-446a-4cde-b394-5c333e86275b",
           "request": {
             "auth": {
               "type": "bearer",
@@ -437,14 +437,14 @@
           "response": []
         }
       ],
-      "id": "3eee1a30-450e-46a7-9873-580fd02842db"
+      "id": "a714838d-13d4-4009-ad18-27450ca8e354"
     },
     {
       "name": "Instituição",
       "item": [
         {
           "name": "Listar Unidades Escolares",
-          "id": "e68a538f-d079-4608-873c-2cfdcb4e84af",
+          "id": "ed8f7dd4-ef33-429e-9bc6-55d257a0e63e",
           "request": {
             "auth": {
               "type": "bearer",
@@ -480,14 +480,14 @@
           "response": []
         }
       ],
-      "id": "42af8180-eca9-40d1-8d10-173c8c29de37"
+      "id": "ddd12841-13ce-4db7-a7c5-286f9970cdf8"
     },
     {
       "name": "Anos Letivos",
       "item": [
         {
           "name": "Listar Anos Letivos",
-          "id": "6ee72ac3-db05-4e9c-ab70-201a04810005",
+          "id": "ea7b1414-015b-4f52-9aff-c27ca3cfd09e",
           "request": {
             "auth": {
               "type": "bearer",
@@ -516,7 +516,7 @@
         },
         {
           "name": "Registrar Ano Letivo",
-          "id": "14c302c6-7719-42d3-9ff9-ccd613541e90",
+          "id": "492890a0-7981-4735-8538-b04133fecd1c",
           "request": {
             "auth": {
               "type": "bearer",
@@ -554,11 +554,11 @@
           "response": []
         }
       ],
-      "id": "ec8912d8-51dc-4f93-b363-e8417ae7c41b"
+      "id": "b9979539-0838-4db9-84e8-a53a1810fa4c"
     },
     {
       "name": "Listar Modalidades",
-      "id": "54081aab-d9c8-494e-b84e-dd58e1e9d1de",
+      "id": "ee821b07-ed22-4531-9295-773c902dc710",
       "request": {
         "auth": {
           "type": "bearer",
@@ -586,7 +586,7 @@
     },
     {
       "name": "Listar etapas por Modalidade",
-      "id": "4456240d-073e-4864-93d2-a4ae176c11a7",
+      "id": "a7cc5fec-4294-4814-bc52-a7b07785dec9",
       "request": {
         "method": "GET",
         "header": [],
@@ -614,7 +614,7 @@
   ],
   "variable": [
     {
-      "id": "30cbc818-529b-47f5-87ed-d56be3616132",
+      "id": "c7a802d1-8a49-4685-809f-5826a2042356",
       "key": "baseUrl",
       "value": "http://localhost:3000",
       "type": "string"

@@ -23,18 +23,18 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
     if (model.length === 0) return null;
 
     return new BaseCurricular({
-      id: model[0]!.base_class.id,
-      codigo: model[0]!.base_class.code,
-      dataCriacao: model[0]!.base_class.creationDate,
-      etapaId: model[0]!.base_class.stepId,
-      unidadeId: model[0]!.base_class.unitId,
+      id: model[0]!.base_classes.id,
+      codigo: model[0]!.base_classes.code,
+      dataCriacao: model[0]!.base_classes.creationDate,
+      etapaId: model[0]!.base_classes.stepId,
+      unidadeId: model[0]!.base_classes.unitId,
       disciplinas: model.map(
         (m) =>
           new Disciplina({
-            id: m.discipline.id,
-            nome: m.discipline.name,
+            id: m.disciplines.id,
+            nome: m.disciplines.name,
             codigo: "",
-            cargaHorariaAnual: m.discipline.annual_workload,
+            cargaHorariaAnual: m.disciplines.annual_workload,
           })
       ),
     });

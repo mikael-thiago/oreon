@@ -8,10 +8,19 @@
   "main": "index.ts",
   "scripts": {
     "start": "tsx --env-file=.env --watch src/infra/http/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "migrate": "tsx --env-file=.env database/migrate.ts up",
+    "migrate:down": "tsx --env-file=.env database/migrate.ts down",
+    "migrate:pending": "tsx --env-file=.env database/migrate.ts pending",
+    "migrate:executed": "tsx --env-file=.env database/migrate.ts executed",
+    "seed": "tsx --env-file=.env database/seed.ts up",
+    "seed:down": "tsx --env-file=.env database/seed.ts down",
+    "seed:pending": "tsx --env-file=.env database/seed.ts pending",
+    "seed:executed": "tsx --env-file=.env database/seed.ts executed"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.16.0",
     "drizzle-kit": "^0.31.7",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
@@ -27,6 +36,7 @@
     "fastify-type-provider-zod": "^6.1.0",
     "inversify": "^7.10.4",
     "pg": "^8.16.3",
+    "umzug": "^3.8.2",
     "zod": "^4.1.13"
   }
 }

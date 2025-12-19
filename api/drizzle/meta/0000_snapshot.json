@@ -1,11 +1,11 @@
 {
-  "id": "32aabb9a-c767-44fa-983c-1f8846a9c40b",
+  "id": "30c8e62a-cf7c-4df3-9ed3-fb0de3ebe6ca",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.school_period": {
-      "name": "school_period",
+    "public.school_periods": {
+      "name": "school_periods",
       "schema": "",
       "columns": {
         "id": {
@@ -15,7 +15,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "school_period_id_seq",
+            "name": "school_periods_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -59,10 +59,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "school_period_school_id_institution_id_fk": {
-          "name": "school_period_school_id_institution_id_fk",
-          "tableFrom": "school_period",
-          "tableTo": "institution",
+        "school_periods_school_id_institutions_id_fk": {
+          "name": "school_periods_school_id_institutions_id_fk",
+          "tableFrom": "school_periods",
+          "tableTo": "institutions",
           "columnsFrom": [
             "school_id"
           ],
@@ -79,8 +79,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.base_class": {
-      "name": "base_class",
+    "public.base_classes": {
+      "name": "base_classes",
       "schema": "",
       "columns": {
         "id": {
@@ -90,7 +90,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "base_class_id_seq",
+            "name": "base_classes_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -128,10 +128,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "base_class_institution_unit_id_institution_id_fk": {
-          "name": "base_class_institution_unit_id_institution_id_fk",
-          "tableFrom": "base_class",
-          "tableTo": "institution",
+        "base_classes_institution_unit_id_institutions_id_fk": {
+          "name": "base_classes_institution_unit_id_institutions_id_fk",
+          "tableFrom": "base_classes",
+          "tableTo": "institutions",
           "columnsFrom": [
             "institution_unit_id"
           ],
@@ -148,8 +148,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.discipline": {
-      "name": "discipline",
+    "public.disciplines": {
+      "name": "disciplines",
       "schema": "",
       "columns": {
         "id": {
@@ -159,7 +159,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "discipline_id_seq",
+            "name": "disciplines_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -190,10 +190,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "discipline_base_id_base_class_id_fk": {
-          "name": "discipline_base_id_base_class_id_fk",
-          "tableFrom": "discipline",
-          "tableTo": "base_class",
+        "disciplines_base_id_base_classes_id_fk": {
+          "name": "disciplines_base_id_base_classes_id_fk",
+          "tableFrom": "disciplines",
+          "tableTo": "base_classes",
           "columnsFrom": [
             "base_id"
           ],
@@ -210,8 +210,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.institution": {
-      "name": "institution",
+    "public.institutions": {
+      "name": "institutions",
       "schema": "",
       "columns": {
         "id": {
@@ -221,7 +221,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "institution_id_seq",
+            "name": "institutions_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -259,8 +259,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.step": {
-      "name": "step",
+    "public.steps": {
+      "name": "steps",
       "schema": "",
       "columns": {
         "id": {
@@ -270,7 +270,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "step_id_seq",
+            "name": "steps_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -301,9 +301,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "step_modality_id_modalities_id_fk": {
-          "name": "step_modality_id_modalities_id_fk",
-          "tableFrom": "step",
+        "steps_modality_id_modalities_id_fk": {
+          "name": "steps_modality_id_modalities_id_fk",
+          "tableFrom": "steps",
           "tableTo": "modalities",
           "columnsFrom": [
             "modality_id"
@@ -457,10 +457,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "classes_step_id_step_id_fk": {
-          "name": "classes_step_id_step_id_fk",
+        "classes_step_id_steps_id_fk": {
+          "name": "classes_step_id_steps_id_fk",
           "tableFrom": "classes",
-          "tableTo": "step",
+          "tableTo": "steps",
           "columnsFrom": [
             "step_id"
           ],
@@ -470,10 +470,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "classes_school_period_id_school_period_id_fk": {
-          "name": "classes_school_period_id_school_period_id_fk",
+        "classes_school_period_id_school_periods_id_fk": {
+          "name": "classes_school_period_id_school_periods_id_fk",
           "tableFrom": "classes",
-          "tableTo": "school_period",
+          "tableTo": "school_periods",
           "columnsFrom": [
             "school_period_id"
           ],
@@ -483,10 +483,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "classes_base_class_id_base_class_id_fk": {
-          "name": "classes_base_class_id_base_class_id_fk",
+        "classes_base_class_id_base_classes_id_fk": {
+          "name": "classes_base_class_id_base_classes_id_fk",
           "tableFrom": "classes",
-          "tableTo": "base_class",
+          "tableTo": "base_classes",
           "columnsFrom": [
             "base_class_id"
           ],
@@ -601,10 +601,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "institution_unit_institution_id_institution_id_fk": {
-          "name": "institution_unit_institution_id_institution_id_fk",
+        "institution_unit_institution_id_institutions_id_fk": {
+          "name": "institution_unit_institution_id_institutions_id_fk",
           "tableFrom": "institution_unit",
-          "tableTo": "institution",
+          "tableTo": "institutions",
           "columnsFrom": [
             "institution_id"
           ],
@@ -697,10 +697,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "users_school_id_institution_id_fk": {
-          "name": "users_school_id_institution_id_fk",
+        "users_school_id_institutions_id_fk": {
+          "name": "users_school_id_institutions_id_fk",
           "tableFrom": "users",
-          "tableTo": "institution",
+          "tableTo": "institutions",
           "columnsFrom": [
             "school_id"
           ],

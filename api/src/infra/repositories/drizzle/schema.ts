@@ -6,7 +6,7 @@ export const modalidadeTable = pgTable("modalities", {
   name: varchar({ length: 20 }).notNull(),
 });
 
-export const etapaTable = pgTable("step", {
+export const etapaTable = pgTable("steps", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   sortOrder: integer().notNull(),
   name: varchar({ length: 50 }).notNull(),
@@ -27,7 +27,7 @@ export const etapaRelations = relations(etapaTable, ({ one, many }) => ({
   modalidades: many(baseCurricularTable),
 }));
 
-export const escolaTable = pgTable("institution", {
+export const escolaTable = pgTable("institutions", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
   email: varchar({ length: 100 }).notNull(),
@@ -56,7 +56,7 @@ export const escolaRelations = relations(escolaTable, ({ many }) => ({
   unidades: many(unidadeTable),
 }));
 
-export const baseCurricularTable = pgTable("base_class", {
+export const baseCurricularTable = pgTable("base_classes", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   code: varchar({ length: 12 }).notNull(),
   stepId: integer().notNull(),
@@ -77,7 +77,7 @@ export const baseRelations = relations(baseCurricularTable, ({ one }) => ({
   }),
 }));
 
-export const disciplinaTable = pgTable("discipline", {
+export const disciplinaTable = pgTable("disciplines", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 50 }).notNull(),
   annual_workload: integer().notNull(),
@@ -111,7 +111,7 @@ export const usuarioRelations = relations(usuarioTable, ({ one }) => ({
   }),
 }));
 
-export const anoLetivoTable = pgTable("school_period", {
+export const anoLetivoTable = pgTable("school_periods", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   year: integer().notNull(),
   startDate: timestamp("start_date").notNull(),
