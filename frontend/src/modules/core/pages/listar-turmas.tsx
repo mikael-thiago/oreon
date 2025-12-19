@@ -5,13 +5,17 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Users, ChevronRight, AlertCircle, Plus } from "lucide-react";
 import { listarTurmasQueryOptions } from "../queries/listar-turmas-query-options";
+import { ErroRequisicao } from "@/components/erro-requisicao";
 
 export function ListarTurmas() {
   const { unidadeId, anoLetivoId } = useSessionContext();
 
-  const { data: turmas = [], isPending } = useQuery(
-    listarTurmasQueryOptions(unidadeId, anoLetivoId)
-  );
+  const {
+    data: turmas = [],
+    isPending,
+    error,
+    refetch,
+  } = useQuery(listarTurmasQueryOptions(unidadeId, anoLetivoId));
 
   if (!unidadeId || !anoLetivoId) {
     return (
@@ -25,6 +29,10 @@ export function ListarTurmas() {
         </div>
       </div>
     );
+  }
+
+  if (error) {
+    return <ErroRequisicao onTentarNovamente={refetch} />;
   }
 
   if (isPending) {
@@ -47,7 +55,8 @@ export function ListarTurmas() {
         <div>
           <h1 className="text-2xl font-bold">Turmas</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {turmas.length} {turmas.length === 1 ? "turma" : "turmas"} encontrada
+            {turmas.length} {turmas.length === 1 ? "turma" : "turmas"}{" "}
+            encontrada
             {turmas.length === 1 ? "" : "s"}
           </p>
         </div>
@@ -59,7 +68,7 @@ export function ListarTurmas() {
         </Button>
       </div>
 
-      {turmas.length === 0 ? (
+      {turmas.length === 0 && (
         <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg">
           <Users className="size-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold mb-2">
@@ -69,7 +78,9 @@ export function ListarTurmas() {
             Não há turmas cadastradas para esta unidade e ano letivo.
           </p>
         </div>
-      ) : (
+      )}
+
+      {turmas.length > 0 && (
         <div className="grid gap-3">
           {turmas.map((turma) => (
             <Link

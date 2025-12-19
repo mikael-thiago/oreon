@@ -122,9 +122,21 @@ const matriculasRoute = createRoute({
   component: () => <div>Matrículas</div>,
 });
 
-const rhPessoasRoute = createRoute({
+const rhColaboradoresRoute = createRoute({
   getParentRoute: () => mainLayoutRoute,
   path: "/rh/colaboradores",
+  component: EmBreve,
+});
+
+const rhContratosRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/rh/contratos",
+  component: EmBreve,
+});
+
+const rhCargosRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/rh/cargos",
   component: EmBreve,
 });
 
@@ -141,7 +153,9 @@ const routeTree = rootRoute.addChildren([
     turmasRoute,
     cadastrarTurmaRoute,
     matriculasRoute,
-    rhPessoasRoute,
+    rhColaboradoresRoute,
+    rhContratosRoute,
+    rhCargosRoute,
   ]),
 ]);
 

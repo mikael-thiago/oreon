@@ -281,6 +281,8 @@ Inputs de data em formulários:
 
 5. **Config TypeScript**: Alias de caminho `@/*` mapeia para `./src/*` (configurado em `tsconfig.json` e `vite.config.ts`)
 
+6. **Tipagem Typescript**: Sempre usar `type` para tipos de dados e `interface` para representar um contrato que pode ser implementado por uma classe
+
 ## Padrões Comuns
 
 ### Adicionando uma Nova Funcionalidade CRUD

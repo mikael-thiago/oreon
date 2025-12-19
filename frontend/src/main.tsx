@@ -10,6 +10,7 @@ import {
 import { SessionContextProvider } from "./modules/shared/context/session-context.tsx";
 import { router } from "./routes.tsx";
 
+// TODO: Implementar exponential backoff
 export const queryClient = new QueryClient();
 
 function AppRouterProvider() {

@@ -30,7 +30,7 @@ async function parseSqlFile(filePath: string): Promise<{ up: string; down: strin
   const downMarkerIndex = content.indexOf("-- DOWN");
 
   if (downMarkerIndex === -1) {
-    throw new Error(`SQL file ${filePath} must contain a "-- DOWN" section`);
+    throw new Error(`Migration SQL ${filePath} deve conter a seção "-- DOWN"`);
   }
 
   // Extract UP section (everything before -- DOWN, excluding -- UP if present)
