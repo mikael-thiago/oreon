@@ -10,11 +10,14 @@ import { queryClient } from "./main";
 import type { AuthState } from "./modules/auth/context/auth-context";
 import { loggedGuard } from "./modules/auth/guards/logged-guard";
 import { unloggedGuard } from "./modules/auth/guards/unlogged-guard";
+import { EmBreve } from "./components/em-breve";
 import { Login } from "./modules/auth/pages/login";
+import { CadastrarAnoLetivo } from "./modules/core/pages/cadastrar-ano-letivo";
 import { CadastrarBaseCurricular } from "./modules/core/pages/cadastrar-base-curricular";
 import { CadastrarTurma } from "./modules/core/pages/cadastrar-turma";
 import { DetalhesBaseCurricular } from "./modules/core/pages/detalhes-base-curricular";
 import { ListaBasesCurriculares } from "./modules/core/pages/lista-bases-curriculares";
+import { ListarAnosLetivos } from "./modules/core/pages/listar-anos-letivos";
 import { ListarTurmas } from "./modules/core/pages/listar-turmas";
 import { unidadesEscolaresQueryOptions } from "./modules/core/queries/obter-unidades-escolares-query-options";
 
@@ -92,7 +95,13 @@ const cadastrarBaseCurricularRoute = createRoute({
 const anosLetivosRoute = createRoute({
   getParentRoute: () => mainLayoutRoute,
   path: "/anos-letivos",
-  component: () => <div>Anos Letivos</div>,
+  component: ListarAnosLetivos,
+});
+
+const cadastrarAnoLetivoRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/anos-letivos/cadastrar",
+  component: CadastrarAnoLetivo,
 });
 
 const turmasRoute = createRoute({
@@ -113,6 +122,12 @@ const matriculasRoute = createRoute({
   component: () => <div>Matrículas</div>,
 });
 
+const rhPessoasRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/rh/colaboradores",
+  component: EmBreve,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRootRoute,
   loginRoute,
@@ -122,9 +137,11 @@ const routeTree = rootRoute.addChildren([
     cadastrarBaseCurricularRoute,
     baseDetalhesRoute,
     anosLetivosRoute,
+    cadastrarAnoLetivoRoute,
     turmasRoute,
     cadastrarTurmaRoute,
     matriculasRoute,
+    rhPessoasRoute,
   ]),
 ]);
 

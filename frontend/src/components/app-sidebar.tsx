@@ -1,4 +1,4 @@
-import { Bot, SquareTerminal } from "lucide-react";
+import { Bot, SquareTerminal, Users } from "lucide-react";
 import * as React from "react";
 
 import { AnoLetivoSwitcher } from "@/components/ano-letivo-switcher";
@@ -53,6 +53,25 @@ const data = [
       //   title: "Matriculas",
       //   url: "/matriculas",
       // },
+    ],
+  },
+  {
+    title: "Recursos Humanos",
+    url: "#",
+    icon: Users,
+    items: [
+      {
+        title: "Colaboradores",
+        url: "/rh/colaboradores",
+      },
+      {
+        title: "Cargos",
+        url: "/rh/cargos",
+      },
+      {
+        title: "Contratos",
+        url: "/rh/contratos",
+      },
     ],
   },
 ];
