@@ -6,6 +6,7 @@ export type UsuarioArgs = {
   readonly telefone?: string | undefined;
   readonly escolaId: number;
   readonly admin: boolean;
+  readonly root: boolean;
 };
 
 export class Usuario {
@@ -16,6 +17,7 @@ export class Usuario {
   readonly telefone?: string | undefined;
   readonly escolaId: number;
   readonly admin: boolean;
+  readonly root: boolean;
 
   constructor(args: UsuarioArgs) {
     this.id = args.id;
@@ -25,5 +27,6 @@ export class Usuario {
     this.telefone = args.telefone;
     this.escolaId = args.escolaId;
     this.admin = args.admin;
+    this.root = args.root;
   }
 }

@@ -6,6 +6,7 @@ export type CriarUsuarioData = {
   readonly senha: string;
   readonly telefone?: string | undefined;
   readonly escolaId: number;
+  readonly root?: boolean;
 };
 
 export abstract class UsuarioRepository {

@@ -7,6 +7,8 @@ import { handleError } from "./handleError.js";
 import { anosLetivosRoutes } from "./routes/anos-letivos.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { basesRoutes } from "./routes/bases.routes.js";
+import { cargosRoutes } from "./routes/cargos.routes.js";
+import { colaboradoresRoutes } from "./routes/colaboradores.routes.js";
 import { escolasRoutes } from "./routes/escolas.routes.js";
 import { modalidadesRoutes } from "./routes/modalidades.routes.js";
 import { turmasRoutes } from "./routes/turmas.routes.js";
@@ -56,6 +58,8 @@ fastify.get("/", async function handle(_, reply) {
 // Registrar rotas
 fastify.register(authRoutes);
 fastify.register(basesRoutes);
+fastify.register(cargosRoutes);
+fastify.register(colaboradoresRoutes);
 fastify.register(escolasRoutes);
 fastify.register(modalidadesRoutes);
 fastify.register(anosLetivosRoutes);

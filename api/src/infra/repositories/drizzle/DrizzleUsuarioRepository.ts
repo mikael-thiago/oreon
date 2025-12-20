@@ -1,9 +1,8 @@
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
 import { Usuario } from "../../../domain/entities/Usuario.js";
 import type { CriarUsuarioData, UsuarioRepository } from "../../../domain/repositories/UsuarioRepository.js";
-import { usuarioTable } from "./schema.js";
 import type { DrizzleService } from "./DrizzleService.js";
+import { usuarioTable } from "./schema.js";
 
 export class DrizzleUsuarioRepository implements UsuarioRepository {
   constructor(private readonly drizzle: DrizzleService) {}
@@ -27,6 +26,7 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
+      root: usuarioModel.isRoot,
     });
   }
 
@@ -49,6 +49,7 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
+      root: usuarioModel.isRoot,
     });
   }
 
@@ -62,6 +63,7 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
         password: data.senha,
         phone: data.telefone,
         escolaId: data.escolaId,
+        isRoot: data.root,
       })
       .returning();
 
@@ -77,6 +79,7 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       telefone: usuarioModel.phone ?? undefined,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
+      root: usuarioModel.isRoot,
     });
   }
 }

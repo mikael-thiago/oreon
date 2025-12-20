@@ -1,12 +1,18 @@
-import { eq } from "drizzle-orm";
+import { and, eq, or } from "drizzle-orm";
 import type { ListarUnidadesResponse, UnidadeEscolarQueries } from "../../application/queries/UnidadeEscolarQueries.js";
 import type { DrizzleService } from "../repositories/drizzle/DrizzleService.js";
-import { escolaTable, unidadeTable } from "../repositories/drizzle/schema.js";
+import {
+  contratosTable,
+  employeesTable,
+  escolaTable,
+  unidadeTable,
+  usuarioTable,
+} from "../repositories/drizzle/schema.js";
 
 export class DrizzleUnidadeEscolarQueries implements UnidadeEscolarQueries {
   constructor(private readonly db: DrizzleService) {}
 
-  async listarUnidades(escolaId: number): Promise<ListarUnidadesResponse[]> {
+  async listarUnidades(usuarioId: number): Promise<ListarUnidadesResponse[]> {
     const unidades = await this.db
       .getTransaction()
       .select({
@@ -21,7 +27,21 @@ export class DrizzleUnidadeEscolarQueries implements UnidadeEscolarQueries {
       })
       .from(unidadeTable)
       .innerJoin(escolaTable, eq(unidadeTable.institutionId, escolaTable.id))
-      .where(eq(unidadeTable.institutionId, escolaId));
+      .innerJoin(usuarioTable, eq(usuarioTable.escolaId, escolaTable.id))
+      .leftJoin(employeesTable, eq(employeesTable.userId, usuarioTable.id))
+      .leftJoin(
+        contratosTable,
+        and(eq(contratosTable.employeeId, employeesTable.id), eq(contratosTable.status, "active"))
+      )
+      .where(
+        and(
+          eq(usuarioTable.id, usuarioId),
+          or(
+            and(eq(usuarioTable.isRoot, true), eq(unidadeTable.institutionId, usuarioTable.escolaId)),
+            and(eq(contratosTable.unitId, unidadeTable.id))
+          )
+        )
+      );
 
     return unidades;
   }

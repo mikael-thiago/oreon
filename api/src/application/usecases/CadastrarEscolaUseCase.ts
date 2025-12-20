@@ -96,6 +96,7 @@ export class CadastarEscolaUseCase {
         escolaId: escola.id,
         senha: await this.criptografiaService.hashear(senha),
         telefone: request.escola.telefone1,
+        root: true
       });
 
       return {

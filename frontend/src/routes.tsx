@@ -14,10 +14,12 @@ import { EmBreve } from "./components/em-breve";
 import { Login } from "./modules/auth/pages/login";
 import { CadastrarAnoLetivo } from "./modules/core/pages/cadastrar-ano-letivo";
 import { CadastrarBaseCurricular } from "./modules/core/pages/cadastrar-base-curricular";
+import { CadastrarColaborador } from "./modules/core/pages/cadastrar-colaborador";
 import { CadastrarTurma } from "./modules/core/pages/cadastrar-turma";
 import { DetalhesBaseCurricular } from "./modules/core/pages/detalhes-base-curricular";
 import { ListaBasesCurriculares } from "./modules/core/pages/lista-bases-curriculares";
 import { ListarAnosLetivos } from "./modules/core/pages/listar-anos-letivos";
+import { ListarColaboradores } from "./modules/core/pages/listar-colaboradores";
 import { ListarTurmas } from "./modules/core/pages/listar-turmas";
 import { unidadesEscolaresQueryOptions } from "./modules/core/queries/obter-unidades-escolares-query-options";
 
@@ -125,7 +127,13 @@ const matriculasRoute = createRoute({
 const rhColaboradoresRoute = createRoute({
   getParentRoute: () => mainLayoutRoute,
   path: "/rh/colaboradores",
-  component: EmBreve,
+  component: ListarColaboradores,
+});
+
+const cadastrarColaboradorRoute = createRoute({
+  getParentRoute: () => mainLayoutRoute,
+  path: "/rh/colaboradores/cadastrar",
+  component: CadastrarColaborador,
 });
 
 const rhContratosRoute = createRoute({
@@ -154,6 +162,7 @@ const routeTree = rootRoute.addChildren([
     cadastrarTurmaRoute,
     matriculasRoute,
     rhColaboradoresRoute,
+    cadastrarColaboradorRoute,
     rhContratosRoute,
     rhCargosRoute,
   ]),

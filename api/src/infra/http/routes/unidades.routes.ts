@@ -11,7 +11,7 @@ export async function unidadesRoutes(fastify: FastifyInstance) {
     },
     async function handle(request) {
       const query = container.get(UnidadeEscolarQueries);
-      return query.listarUnidades(request.user.escolaId);
+      return query.listarUnidades(request.user.id);
     }
   );
 }

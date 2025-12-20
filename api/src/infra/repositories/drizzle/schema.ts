@@ -102,6 +102,7 @@ export const usuarioTable = pgTable("users", {
   escolaId: integer("school_id").references(() => escolaTable.id),
   createdAt: timestamp().notNull().defaultNow(),
   isAdmin: boolean().notNull().default(false),
+  isRoot: boolean().notNull().default(false),
 });
 
 export const usuarioRelations = relations(usuarioTable, ({ one }) => ({
@@ -160,30 +161,44 @@ export const cargosTable = pgTable("occupations", {
   createdAt: timestamp().defaultNow(),
 });
 
+export const employeesTable = pgTable(
+  "employees",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    cpf: varchar({ length: 11 }).notNull().unique(),
+    email: varchar({ length: 100 }).notNull(),
+    userId: integer()
+      .notNull()
+      .references(() => usuarioTable.id),
+    createdAt: timestamp().notNull().defaultNow(),
+  },
+  (table) => [index("employees_user_id_idx").on(table.userId), index("employees_cpf_idx").on(table.cpf)]
+);
+
 export const statusContratoEnum = pgEnum("status_contract", ["active", "unactive"]);
 
 export const contratosTable = pgTable(
   "contracts",
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
-    userId: integer()
+    employeeId: integer()
       .notNull()
-      .references(() => usuarioTable.id),
+      .references(() => employeesTable.id),
     occupationId: integer()
       .notNull()
       .references(() => cargosTable.id),
     unitId: integer("institution_unit_id")
       .notNull()
       .references(() => unidadeTable.id),
-    registrationNumber: varchar({ length: 50 }),
-    startDate: date().notNull(),
-    endDate: date(),
+    registrationNumber: varchar("registration_number", { length: 50 }),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date"),
     status: statusContratoEnum().default("unactive"),
-    createdAt: timestamp().defaultNow(),
+    createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
-    index("institution_unit_id_user_id_idx").on(table.unitId, table.userId),
-    index("user_id_idx").on(table.userId),
+    index("contracts_employee_id_idx").on(table.employeeId),
+    index("institution_unit_id_employee_id_idx").on(table.unitId, table.employeeId),
     index("occupation_id_idx").on(table.occupationId),
   ]
 );

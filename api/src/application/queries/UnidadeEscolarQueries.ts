@@ -10,5 +10,5 @@ export type ListarUnidadesResponse = {
 };
 
 export abstract class UnidadeEscolarQueries {
-  abstract listarUnidades(escolaId: number): Promise<ListarUnidadesResponse[]>;
+  abstract listarUnidades(usuarioId: number): Promise<ListarUnidadesResponse[]>;
 }

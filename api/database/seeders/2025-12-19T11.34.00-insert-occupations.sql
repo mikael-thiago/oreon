@@ -7,4 +7,4 @@ INSERT INTO occupations (name, can_teach)
         ('Professor', true);
 
 -- DOWN
-TRUNCATE TABLE occupations;
+DELETE FROM occupations;
