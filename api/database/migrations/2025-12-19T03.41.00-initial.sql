@@ -81,6 +81,7 @@ CREATE TABLE "users" (
 	"school_id" integer,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"is_admin" boolean DEFAULT false NOT NULL,
+	"is_root" boolean DEFAULT false NOT NULL,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 
