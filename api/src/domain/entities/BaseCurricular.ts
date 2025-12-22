@@ -2,13 +2,22 @@ import { estaVazio } from "../../infra/utils/array.js";
 import { IllegalArgumentError } from "../errors/IllegalArgumentError.js";
 import { Disciplina } from "./Disciplina.js";
 
+export type DisciplinaDaBase = {
+  readonly id: number;
+  readonly nome: string;
+  readonly slug: string;
+  readonly codigo: string;
+  // Horas
+  readonly cargaHorariaAnual: number;
+}
+
 export type BaseCurricularArgs = {
   readonly id: number;
   readonly codigo: string;
   readonly dataCriacao: Date;
   readonly etapaId: number;
   readonly unidadeId: number;
-  readonly disciplinas: Disciplina[];
+  readonly disciplinas: DisciplinaDaBase[];
 };
 
 export class BaseCurricular {
@@ -17,7 +26,7 @@ export class BaseCurricular {
   readonly etapaId: number;
   readonly unidadeId: number;
   readonly dataCriacao: Date;
-  readonly disciplinas: Disciplina[];
+  readonly disciplinas: DisciplinaDaBase[];
 
   constructor(args: BaseCurricularArgs) {
     this.id = args.id;
@@ -38,7 +47,7 @@ export class BaseCurricular {
     }
   }
 
-  adicionarDisciplina(novaDisciplina: Disciplina) {
+  adicionarDisciplina(novaDisciplina: DisciplinaDaBase) {
     const disciplinaComMesmoExiste = this.disciplinas.some(
       (disciplina) => disciplina.nome === novaDisciplina.nome
     );

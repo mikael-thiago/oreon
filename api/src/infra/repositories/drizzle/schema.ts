@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, date, index, integer, pgEnum, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, pgEnum, pgTable, timestamp, unique, varchar } from "drizzle-orm/pg-core";
 
 export const modalidadeTable = pgTable("modalities", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -77,21 +77,32 @@ export const baseRelations = relations(baseCurricularTable, ({ one }) => ({
   }),
 }));
 
-export const disciplinaTable = pgTable("disciplines", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  name: varchar({ length: 50 }).notNull(),
-  annual_workload: integer().notNull(),
-  baseId: integer()
-    .notNull()
-    .references(() => baseCurricularTable.id),
-});
+export const disciplinasTable = pgTable(
+  "disciplines",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar({ length: 50 }).notNull(),
+    slug: varchar({ length: 50 }).notNull(),
+    unitId: integer().references(() => unidadeTable.id),
+  },
+  (table) => [unique("school_id_slug_unique_idx").on(table.unitId, table.slug)]
+);
 
-export const disciplinaRelations = relations(disciplinaTable, ({ one }) => ({
-  base: one(baseCurricularTable, {
-    fields: [disciplinaTable.baseId],
-    references: [baseCurricularTable.id],
-  }),
-}));
+export const baseDisciplinaTable = pgTable(
+  "base_class_discipline",
+  {
+    // id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    disciplineId: integer()
+      .notNull()
+      .references(() => disciplinasTable.id),
+    baseId: integer()
+      .notNull()
+      .references(() => baseCurricularTable.id),
+    code: varchar({ length: 10 }).notNull(),
+    annual_workload: integer().notNull(),
+  },
+  (table) => [unique("base_class_discipline_discipline_id_base_id_unique_idx").on(table.disciplineId, table.baseId)]
+);
 
 export const usuarioTable = pgTable("users", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -161,19 +172,13 @@ export const cargosTable = pgTable("occupations", {
   createdAt: timestamp().defaultNow(),
 });
 
-export const employeesTable = pgTable(
-  "employees",
-  {
-    id: integer().primaryKey().generatedByDefaultAsIdentity(),
-    cpf: varchar({ length: 11 }).notNull().unique(),
-    email: varchar({ length: 100 }).notNull(),
-    userId: integer()
-      .notNull()
-      .references(() => usuarioTable.id),
-    createdAt: timestamp().notNull().defaultNow(),
-  },
-  (table) => [index("employees_user_id_idx").on(table.userId), index("employees_cpf_idx").on(table.cpf)]
-);
+export const colaboradoresTable = pgTable("employees", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer()
+    .notNull()
+    .references(() => usuarioTable.id),
+  createdAt: timestamp().notNull().defaultNow(),
+});
 
 export const statusContratoEnum = pgEnum("status_contract", ["active", "unactive"]);
 
@@ -183,7 +188,7 @@ export const contratosTable = pgTable(
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
     employeeId: integer()
       .notNull()
-      .references(() => employeesTable.id),
+      .references(() => colaboradoresTable.id),
     occupationId: integer()
       .notNull()
       .references(() => cargosTable.id),
@@ -200,5 +205,24 @@ export const contratosTable = pgTable(
     index("contracts_employee_id_idx").on(table.employeeId),
     index("institution_unit_id_employee_id_idx").on(table.unitId, table.employeeId),
     index("occupation_id_idx").on(table.occupationId),
+  ]
+);
+
+export const contratoProfessorDisciplinaTable = pgTable(
+  "contract_professor_discipline",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    contractId: integer()
+      .notNull()
+      .references(() => contratosTable.id),
+    disciplineId: integer()
+      .notNull()
+      .references(() => disciplinasTable.id),
+    etapaId: integer()
+      .notNull()
+      .references(() => etapaTable.id),
+  },
+  (table) => [
+    unique("contract_professor_discipline_unique_idx").on(table.contractId, table.disciplineId, table.disciplineId),
   ]
 );

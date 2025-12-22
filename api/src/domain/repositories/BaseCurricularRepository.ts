@@ -1,4 +1,4 @@
-import { BaseCurricular } from "../entities/BaseCurricular.js";
+import { BaseCurricular, type DisciplinaDaBase } from "../entities/BaseCurricular.js";
 import { Disciplina } from "../entities/Disciplina.js";
 
 export abstract class BaseCurricularRepository {
@@ -8,7 +8,11 @@ export abstract class BaseCurricularRepository {
     readonly unidadeId: number;
     readonly etapaId: number;
     readonly codigo: string;
-    readonly disciplinas: Pick<Disciplina, "nome" | "codigo" | "cargaHorariaAnual">[];
+    readonly disciplinas: DisciplinaDaBase[];
   }): Promise<BaseCurricular>;
   abstract salvarBaseCurricular(base: BaseCurricular): Promise<void>;
+  abstract obterSequencialPorEtapaEUnidade(request: {
+    readonly etapaId: number;
+    readonly unidadeId: number;
+  }): Promise<number>;
 }

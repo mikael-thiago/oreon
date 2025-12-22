@@ -2,6 +2,7 @@ import { IllegalArgumentError } from "../../domain/errors/IllegalArgumentError.j
 import { UnauthorizedError } from "../../domain/errors/UnauthorizedError.js";
 import type { ColaboradorRepository } from "../../domain/repositories/ColaboradorRepository.js";
 import type { UsuarioRepository } from "../../domain/repositories/UsuarioRepository.js";
+import { cpfEhValido } from "../../infra/utils/cpf.js";
 import { gerarStringAleatoria } from "../../infra/utils/string.js";
 import type { CriptografiaService } from "../interfaces/CriptografiaService.js";
 import type { UnitOfWork } from "../interfaces/UnitOfWork.js";
@@ -21,6 +22,13 @@ export type CadastrarColaboradorRequest = {
   };
 };
 
+type CadastrarProfessorRequest = CadastrarColaboradorRequest & {
+  readonly restricoes: {
+    readonly disciplinaId: number;
+    readonly etapasIds: number[];
+  }[];
+};
+
 export type CadastrarColaboradorResponse = {};
 
 export class CadastrarColaboradorUseCase {
@@ -35,7 +43,11 @@ export class CadastrarColaboradorUseCase {
     if (request.contrato.dataFim && request.contrato.dataInicio > request.contrato.dataFim) {
       throw new IllegalArgumentError("A data de início não pode ser maior que a data de fim");
     }
-    
+
+    if (!cpfEhValido(request.cpf)) {
+      throw new IllegalArgumentError(`O CPF ${request.cpf} é invalido!`);
+    }
+
     const usuarioQueEstaCriando = await this.usuarioRepository.obterUsuarioPorId(usuarioAutenticado.id);
 
     if (!usuarioQueEstaCriando)
@@ -73,5 +85,9 @@ export class CadastrarColaboradorUseCase {
         contrato: colaborador.ultimoContrato,
       };
     });
+  }
+
+  private async cadastrarProfessor({}: CadastrarProfessorRequest) {
+    
   }
 }

@@ -12,4 +12,6 @@ export type EtapaResponse = {
 export abstract class ModalidadesQueries {
   abstract listarModalidades(): Promise<ModalidadeResponse[]>;
   abstract listarEtapas(modalidadeId: number): Promise<EtapaResponse[]>;
+  abstract obterModalidadePorId(id: number): Promise<ModalidadeResponse | null>;
+  abstract obterEtapaPorId(id: number): Promise<(EtapaResponse & { readonly modalidadeId: number }) | null>;
 }

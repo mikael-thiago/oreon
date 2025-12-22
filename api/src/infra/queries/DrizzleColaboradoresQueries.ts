@@ -4,7 +4,7 @@ import type { DrizzleService } from "../repositories/drizzle/DrizzleService.js";
 import {
   cargosTable,
   contratosTable,
-  employeesTable,
+  colaboradoresTable,
   escolaTable,
   unidadeTable,
   usuarioTable,
@@ -37,10 +37,10 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
     const queryBuilder = this.drizzle
       .getTransaction()
       .select({
-        id: employeesTable.id,
+        id: colaboradoresTable.id,
         nome: usuarioTable.name,
-        email: employeesTable.email,
-        cpf: employeesTable.cpf,
+        email: colaboradoresTable.email,
+        cpf: colaboradoresTable.cpf,
         telefone: usuarioTable.phone,
         unidadeId: unidadeTable.id,
         unidadeCnpj: unidadeTable.cnpj,
@@ -51,11 +51,11 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
         dataFim: contratosTable.endDate,
         status: contratosTable.status,
       })
-      .from(employeesTable)
-      .innerJoin(usuarioTable, eq(employeesTable.userId, usuarioTable.id))
+      .from(colaboradoresTable)
+      .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         latestContracts,
-        eq(employeesTable.id, latestContracts.employeeId)
+        eq(colaboradoresTable.id, latestContracts.employeeId)
       )
       .innerJoin(
         contratosTable,

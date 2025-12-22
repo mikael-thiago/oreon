@@ -3,7 +3,7 @@ import type { ListarUnidadesResponse, UnidadeEscolarQueries } from "../../applic
 import type { DrizzleService } from "../repositories/drizzle/DrizzleService.js";
 import {
   contratosTable,
-  employeesTable,
+  colaboradoresTable,
   escolaTable,
   unidadeTable,
   usuarioTable,
@@ -28,10 +28,10 @@ export class DrizzleUnidadeEscolarQueries implements UnidadeEscolarQueries {
       .from(unidadeTable)
       .innerJoin(escolaTable, eq(unidadeTable.institutionId, escolaTable.id))
       .innerJoin(usuarioTable, eq(usuarioTable.escolaId, escolaTable.id))
-      .leftJoin(employeesTable, eq(employeesTable.userId, usuarioTable.id))
+      .leftJoin(colaboradoresTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .leftJoin(
         contratosTable,
-        and(eq(contratosTable.employeeId, employeesTable.id), eq(contratosTable.status, "active"))
+        and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
       .where(
         and(

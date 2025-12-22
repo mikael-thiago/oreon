@@ -5,7 +5,7 @@ import type {
   CriarColaboradorData,
 } from "../../../domain/repositories/ColaboradorRepository.js";
 import type { DrizzleService } from "./DrizzleService.js";
-import { employeesTable, usuarioTable, contratosTable } from "./schema.js";
+import { colaboradoresTable, usuarioTable, contratosTable } from "./schema.js";
 import { DateFormatter } from "../../utils/date-formatter.js";
 import { StatusContratoEnum } from "../../../domain/enums/StatusContratoEnum.js";
 
@@ -17,9 +17,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .getTransaction()
       .select({
         // Employee fields
-        id: employeesTable.id,
-        cpf: employeesTable.cpf,
-        email: employeesTable.email,
+        id: colaboradoresTable.id,
+        cpf: colaboradoresTable.cpf,
+        email: colaboradoresTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -33,10 +33,10 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         usuarioEmail: usuarioTable.email,
         usuarioSenha: usuarioTable.password,
       })
-      .from(employeesTable)
-      .innerJoin(usuarioTable, eq(employeesTable.userId, usuarioTable.id))
-      .innerJoin(contratosTable, and(eq(contratosTable.employeeId, employeesTable.id)))
-      .where(eq(employeesTable.id, id));
+      .from(colaboradoresTable)
+      .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
+      .innerJoin(contratosTable, and(eq(contratosTable.employeeId, colaboradoresTable.id)))
+      .where(eq(colaboradoresTable.id, id));
 
     if (!result) {
       return null;
@@ -68,9 +68,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .getTransaction()
       .select({
         // Employee fields
-        id: employeesTable.id,
-        cpf: employeesTable.cpf,
-        email: employeesTable.email,
+        id: colaboradoresTable.id,
+        cpf: colaboradoresTable.cpf,
+        email: colaboradoresTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -84,13 +84,13 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         usuarioEmail: usuarioTable.email,
         usuarioSenha: usuarioTable.password,
       })
-      .from(employeesTable)
-      .innerJoin(usuarioTable, eq(employeesTable.userId, usuarioTable.id))
+      .from(colaboradoresTable)
+      .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
-        and(eq(contratosTable.employeeId, employeesTable.id), eq(contratosTable.status, "active"))
+        and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
-      .where(eq(employeesTable.cpf, cpf));
+      .where(eq(colaboradoresTable.cpf, cpf));
 
     if (!result) {
       return null;
@@ -122,9 +122,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .getTransaction()
       .select({
         // Employee fields
-        id: employeesTable.id,
-        cpf: employeesTable.cpf,
-        email: employeesTable.email,
+        id: colaboradoresTable.id,
+        cpf: colaboradoresTable.cpf,
+        email: colaboradoresTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -138,13 +138,13 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         usuarioEmail: usuarioTable.email,
         usuarioSenha: usuarioTable.password,
       })
-      .from(employeesTable)
-      .innerJoin(usuarioTable, eq(employeesTable.userId, usuarioTable.id))
+      .from(colaboradoresTable)
+      .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
-        and(eq(contratosTable.employeeId, employeesTable.id), eq(contratosTable.status, "active"))
+        and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
-      .where(eq(employeesTable.email, email));
+      .where(eq(colaboradoresTable.email, email));
 
     if (!result) {
       return null;
@@ -176,9 +176,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .getTransaction()
       .select({
         // Employee fields
-        id: employeesTable.id,
-        cpf: employeesTable.cpf,
-        email: employeesTable.email,
+        id: colaboradoresTable.id,
+        cpf: colaboradoresTable.cpf,
+        email: colaboradoresTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -192,13 +192,13 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         usuarioEmail: usuarioTable.email,
         usuarioSenha: usuarioTable.password,
       })
-      .from(employeesTable)
-      .innerJoin(usuarioTable, eq(employeesTable.userId, usuarioTable.id))
+      .from(colaboradoresTable)
+      .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
-        and(eq(contratosTable.employeeId, employeesTable.id), eq(contratosTable.status, "active"))
+        and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
-      .where(eq(employeesTable.userId, usuarioId));
+      .where(eq(colaboradoresTable.userId, usuarioId));
 
     if (!result) {
       return null;
@@ -229,7 +229,7 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
     // Step 1: Create employee record
     const [employeeModel] = await this.drizzle
       .getTransaction()
-      .insert(employeesTable)
+      .insert(colaboradoresTable)
       .values({
         cpf: data.cpf,
         email: data.email,

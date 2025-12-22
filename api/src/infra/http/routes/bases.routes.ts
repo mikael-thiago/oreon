@@ -3,7 +3,6 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { BaseCurricularQueries } from "../../../application/queries/BaseQueries.js";
 import { CadastrarBaseUseCase } from "../../../application/usecases/CadastrarBaseCurricularUseCase.js";
-import { CadastrarDisciplinaUseCase } from "../../../application/usecases/CadastrarDisciplinaUseCase.js";
 import { container } from "../../di/di.js";
 
 const criarBaseSchema = z.object({
@@ -72,27 +71,27 @@ export async function basesRoutes(fastify: FastifyInstance) {
       }
     );
 
-  fastify.withTypeProvider<ZodTypeProvider>().post(
-    "/bases/:id/disciplinas",
-    {
-      schema: {
-        params: z.object({
-          id: z.coerce.number().nonoptional("O ID da base é obrigatório"),
-        }),
-        body: criarDisciplinaSchema,
-      },
-      onRequest: [fastify.authenticate],
-    },
-    async function handle(request) {
-      const usecase = container.get(CadastrarDisciplinaUseCase);
+  // fastify.withTypeProvider<ZodTypeProvider>().post(
+  //   "/bases/:id/disciplinas",
+  //   {
+  //     schema: {
+  //       params: z.object({
+  //         id: z.coerce.number().nonoptional("O ID da base é obrigatório"),
+  //       }),
+  //       body: criarDisciplinaSchema,
+  //     },
+  //     onRequest: [fastify.authenticate],
+  //   },
+  //   async function handle(request) {
+  //     const usecase = container.get(CadastrarDisciplinaUseCase);
 
-      return usecase.executar({
-        ...request.body,
-        baseId: request.params.id,
-        usuario: request.user,
-      });
-    }
-  );
+  //     return usecase.executar({
+  //       ...request.body,
+  //       baseId: request.params.id,
+  //       usuario: request.user,
+  //     });
+  //   }
+  // );
 
   fastify.withTypeProvider<ZodTypeProvider>().get(
     "/unidade/:unidadeId/bases",

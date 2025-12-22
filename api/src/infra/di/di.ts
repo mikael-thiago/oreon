@@ -14,7 +14,6 @@ import { UnidadeEscolarQueries } from "../../application/queries/UnidadeEscolarQ
 import { CadastrarAnoLetivoUseCase } from "../../application/usecases/CadastrarAnoLetivoUseCase.js";
 import { CadastrarBaseUseCase } from "../../application/usecases/CadastrarBaseCurricularUseCase.js";
 import { CadastrarColaboradorUseCase } from "../../application/usecases/CadastrarColaboradorUseCase.js";
-import { CadastrarDisciplinaUseCase } from "../../application/usecases/CadastrarDisciplinaUseCase.js";
 import { CadastarEscolaUseCase } from "../../application/usecases/CadastrarEscolaUseCase.js";
 import { CadastrarTurmaUseCase } from "../../application/usecases/CadastrarTurmaUseCase.js";
 import { CadastrarUsuarioUseCase } from "../../application/usecases/CadastrarUsuarioUseCase.js";
@@ -44,6 +43,8 @@ import { DrizzleUnidadeEscolaRepository } from "../repositories/drizzle/DrizzleU
 import { DrizzleUsuarioRepository } from "../repositories/drizzle/DrizzleUsuarioRepository.js";
 import { Argon2CriptografiaService } from "../services/Argon2CriptografiaService.js";
 import { FastJwtService } from "../services/FastJwtService.js";
+import { DisciplinaRepository } from "../../domain/repositories/DisciplinaRepository.js";
+import { DrizzleDisciplinaRepository } from "../repositories/drizzle/DrizzleDisciplinaRepository.js";
 
 const container = new Container({ defaultScope: bindingScopeValues.Singleton });
 
@@ -94,17 +95,18 @@ container
   .toResolvedValue((db: DrizzleService) => new DrizzleTurmaRepository(db), [DrizzleService]);
 
 container
+  .bind(DisciplinaRepository)
+  .toResolvedValue((db: DrizzleService) => new DrizzleDisciplinaRepository(db), [DrizzleService]);
+
+container
   .bind(CadastrarBaseUseCase)
   .toResolvedValue(
-    (repo, escolaRepo, unidadeRepo) => new CadastrarBaseUseCase(escolaRepo, repo, unidadeRepo),
-    [BaseCurricularRepository, EscolaRepository, UnidadeEscolarRepository]
+    (repo, escolaRepo, unidadeRepo, disciplinaRepository, unitOfWork, modalidadesQueries) =>
+      new CadastrarBaseUseCase(escolaRepo, repo, unidadeRepo, disciplinaRepository, modalidadesQueries, unitOfWork),
+    [BaseCurricularRepository, EscolaRepository, UnidadeEscolarRepository, DisciplinaRepository, UnitOfWork, ModalidadesQueries]
   );
 
 container.bind(ObterMeusDadosUseCase).toResolvedValue((repo) => new ObterMeusDadosUseCase(repo), [UsuarioRepository]);
-
-container
-  .bind(CadastrarDisciplinaUseCase)
-  .toResolvedValue((repo) => new CadastrarDisciplinaUseCase(repo), [BaseCurricularRepository]);
 
 container
   .bind(CadastarEscolaUseCase)
@@ -116,9 +118,7 @@ container
 
 container.bind(UsuarioRepository).toResolvedValue((db) => new DrizzleUsuarioRepository(db), [DrizzleService]);
 
-container
-  .bind(ColaboradorRepository)
-  .toResolvedValue((db) => new DrizzleColaboradorRepository(db), [DrizzleService]);
+container.bind(ColaboradorRepository).toResolvedValue((db) => new DrizzleColaboradorRepository(db), [DrizzleService]);
 
 container.bind(CriptografiaService).toConstantValue(new Argon2CriptografiaService());
 

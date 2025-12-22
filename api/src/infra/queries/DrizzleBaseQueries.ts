@@ -5,7 +5,7 @@ import type {
   ObterBaseResponse,
 } from "../../application/queries/BaseQueries.js";
 import type { DrizzleService } from "../repositories/drizzle/DrizzleService.js";
-import { baseCurricularTable, disciplinaTable, etapaTable, modalidadeTable } from "../repositories/drizzle/schema.js";
+import { baseCurricularTable, baseDisciplinaTable, disciplinasTable, etapaTable, modalidadeTable } from "../repositories/drizzle/schema.js";
 
 export class DrizzleBaseQueries implements BaseCurricularQueries {
   constructor(private readonly db: DrizzleService) {}
@@ -40,13 +40,14 @@ export class DrizzleBaseQueries implements BaseCurricularQueries {
         etapa: etapaTable.name,
         dataCriacao: baseCurricularTable.creationDate,
         unidadeId: baseCurricularTable.unitId,
-        disciplinaId: disciplinaTable.id,
-        disciplinaNome: disciplinaTable.name,
-        disciplinaCargaHorariaAnual: disciplinaTable.annual_workload,
+        disciplinaId: disciplinasTable.id,
+        disciplinaNome: disciplinasTable.name,
+        disciplinaCargaHorariaAnual: baseDisciplinaTable.annual_workload,
       })
       .from(baseCurricularTable)
       .innerJoin(etapaTable, eq(baseCurricularTable.stepId, etapaTable.id))
-      .leftJoin(disciplinaTable, eq(disciplinaTable.baseId, baseCurricularTable.id))
+      .leftJoin(baseDisciplinaTable, eq(baseDisciplinaTable.baseId, baseCurricularTable.id))
+      .leftJoin(disciplinasTable, eq(disciplinasTable.id, baseDisciplinaTable.disciplineId))
       .where(eq(baseCurricularTable.id, id));
 
     if (rows.length === 0) {

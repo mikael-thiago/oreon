@@ -1,23 +1,33 @@
-import { count, eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import type { PgInsertValue } from "drizzle-orm/pg-core";
-import { BaseCurricular } from "../../../domain/entities/BaseCurricular.js";
-import { Disciplina } from "../../../domain/entities/Disciplina.js";
+import { BaseCurricular, type DisciplinaDaBase } from "../../../domain/entities/BaseCurricular.js";
 import type { BaseCurricularRepository } from "../../../domain/repositories/BaseCurricularRepository.js";
 import type { DrizzleService } from "./DrizzleService.js";
-import { baseCurricularTable, disciplinaTable } from "./schema.js";
+import { baseCurricularTable, baseDisciplinaTable, disciplinasTable } from "./schema.js";
 
 export class DrizzleBaseRepository implements BaseCurricularRepository {
   constructor(private readonly drizzleUow: DrizzleService) {}
+
+  async obterSequencialPorEtapaEUnidade(request: {
+    readonly etapaId: number;
+    readonly unidadeId: number;
+  }): Promise<number> {
+    const [result_1] = await this.drizzleUow
+      .getTransaction()
+      .select({ count: count() })
+      .from(baseCurricularTable)
+      .where(and(eq(baseCurricularTable.stepId, request.etapaId), eq(baseCurricularTable.unitId, request.unidadeId)));
+
+    return (result_1?.count ?? 0) + 1;
+  }
 
   async obterPorId(id: number): Promise<BaseCurricular | null> {
     const model = await this.drizzleUow
       .getTransaction()
       .select()
       .from(baseCurricularTable)
-      .innerJoin(
-        disciplinaTable,
-        eq(baseCurricularTable.id, disciplinaTable.baseId)
-      )
+      .innerJoin(baseDisciplinaTable, eq(baseCurricularTable.id, baseDisciplinaTable.baseId))
+      .innerJoin(disciplinasTable, eq(baseDisciplinaTable.disciplineId, disciplinasTable.id))
       .where(eq(baseCurricularTable.id, id));
 
     if (model.length === 0) return null;
@@ -28,15 +38,13 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
       dataCriacao: model[0]!.base_classes.creationDate,
       etapaId: model[0]!.base_classes.stepId,
       unidadeId: model[0]!.base_classes.unitId,
-      disciplinas: model.map(
-        (m) =>
-          new Disciplina({
-            id: m.disciplines.id,
-            nome: m.disciplines.name,
-            codigo: "",
-            cargaHorariaAnual: m.disciplines.annual_workload,
-          })
-      ),
+      disciplinas: model.map((m) => ({
+        id: m.disciplines.id,
+        nome: m.disciplines.name,
+        slug: m.disciplines.slug,
+        codigo: m.base_class_discipline.code,
+        cargaHorariaAnual: m.base_class_discipline.annual_workload,
+      })),
     });
   }
 
@@ -54,7 +62,7 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
     readonly unidadeId: number;
     readonly etapaId: number;
     readonly codigo: string;
-    readonly disciplinas: Omit<Disciplina, "id" | "baseId">[];
+    readonly disciplinas: DisciplinaDaBase[];
   }): Promise<BaseCurricular> {
     const [baseModel] = await this.drizzleUow
       .getTransaction()
@@ -66,17 +74,17 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
       })
       .returning();
 
-    const disciplinas = await this.drizzleUow
+    await this.drizzleUow
       .getTransaction()
-      .insert(disciplinaTable)
+      .insert(baseDisciplinaTable)
       .values(
-        request.disciplinas.map<PgInsertValue<typeof disciplinaTable>>((d) => ({
+        request.disciplinas.map<PgInsertValue<typeof baseDisciplinaTable>>((d) => ({
           baseId: baseModel!.id,
-          name: d.nome,
+          disciplineId: d.id,
+          code: d.codigo,
           annual_workload: d.cargaHorariaAnual,
         }))
-      )
-      .returning();
+      );
 
     return new BaseCurricular({
       id: baseModel!.id,
@@ -84,43 +92,20 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
       dataCriacao: baseModel!.creationDate,
       etapaId: baseModel!.stepId,
       unidadeId: baseModel!.unitId,
-      disciplinas: disciplinas.map(
-        (d) =>
-          new Disciplina({
-            id: d.id,
-            nome: d.name,
-            codigo: "",
-            cargaHorariaAnual: d.annual_workload,
-          })
-      ),
+      disciplinas: request.disciplinas,
     });
   }
 
   async salvarBaseCurricular(base: BaseCurricular): Promise<void> {
     await this.drizzleUow.getTransaction().transaction(async (tx) => {
       for (const disciplina of base.disciplinas) {
-        if (!disciplina.getId()) {
-          const [id] = await tx
-            .insert(disciplinaTable)
-            .values({
-              name: disciplina.nome,
-              annual_workload: disciplina.cargaHorariaAnual,
-              baseId: base.id,
-            })
-            .returning({
-              id: disciplinaTable.id,
-            });
-
-          disciplina.setId(id!.id);
-        } else {
-          await tx
-            .update(disciplinaTable)
-            .set({
-              name: disciplinaTable.name,
-              annual_workload: disciplina.cargaHorariaAnual,
-            })
-            .where(eq(disciplinaTable.id, disciplina.getId()!));
-        }
+        await tx
+          .update(baseDisciplinaTable)
+          .set({
+            code: disciplina.codigo,
+            annual_workload: disciplina.cargaHorariaAnual,
+          })
+          .where(eq(baseDisciplinaTable.baseId, base.id));
       }
     });
   }
