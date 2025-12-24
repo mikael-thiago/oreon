@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { CadastrarColaboradorUseCase } from "../../../application/usecases/CadastrarColaboradorUseCase.js";
-import { ListarColaboradoresUseCase } from "../../../application/usecases/ListarColaboradoresUseCase.js";
+import { CadastrarColaboradorUseCase } from "../../../application/usecases/cadastrar-colaborador.usecase.js";
+import { ListarColaboradoresUseCase } from "../../../application/usecases/listar-colaboradores.usecase.js";
 import { container } from "../../di/di.js";
 
 const listarColaboradoresQuerySchema = z.object({
@@ -65,6 +65,37 @@ const cadastrarColaboradorSchema = z.object({
     dataFim: z.iso
       .date("A data de fim deve estar no formato ISO 8601")
       .transform((val) => new Date(val))
+      .optional(),
+    salario: z
+      .number({
+        error: (issue) => (issue.input === undefined ? "O salário é obrigatório" : "O salário deve ser um número"),
+      })
+      .positive("O salário deve ser um número positivo"),
+    disciplinasPermitidas: z
+      .array(
+        z.object({
+          disciplinaId: z
+            .number({
+              error: (issue) =>
+                issue.input === undefined
+                  ? "O ID da disciplina é obrigatório"
+                  : "O ID da disciplina deve ser um número",
+            })
+            .int("O ID da disciplina deve ser um número inteiro")
+            .positive("O ID da disciplina deve ser um número positivo"),
+          etapasIds: z
+            .array(
+              z
+                .number({
+                  error: (issue) =>
+                    issue.input === undefined ? "O ID da etapa é obrigatório" : "O ID da etapa deve ser um número",
+                })
+                .int("O ID da etapa deve ser um número inteiro")
+                .positive("O ID da etapa deve ser um número positivo")
+            )
+            .min(1, "Ao menos uma etapa deve ser informada"),
+        })
+      )
       .optional(),
   }),
 });

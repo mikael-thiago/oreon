@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { AnoLetivoQueries } from "../../../application/queries/AnoLetivoQueries.js";
-import { CadastrarAnoLetivoUseCase } from "../../../application/usecases/CadastrarAnoLetivoUseCase.js";
+import { AnoLetivoQueries } from "../../../application/queries/ano-letivo.queries.js";
+import { CadastrarAnoLetivoUseCase } from "../../../application/usecases/cadastrar-ano-letivo.usecase.js";
 import { container } from "../../di/di.js";
 
 const cadastrarAnoLetivoSchema = z.object({

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
-import { CargoQueries } from "../../../application/queries/CargoQueries.js";
+import { CargoQueries } from "../../../application/queries/cargo.queries.js";
 import { container } from "../../di/di.js";
 
 export async function cargosRoutes(fastify: FastifyInstance) {

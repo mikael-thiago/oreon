@@ -24,7 +24,7 @@ export type ConflictError = {
 
 export type ValidationError = {
   readonly type: "validation-error";
-  readonly status: 400;
+  readonly status: 400 | 422;
   readonly erros: Array<{
     readonly propriedade: string;
     readonly mensagem?: string;

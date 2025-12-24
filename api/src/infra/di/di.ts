@@ -1,50 +1,54 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { bindingScopeValues, Container, type ServiceIdentifier } from "inversify";
-import { CriptografiaService } from "../../application/interfaces/CriptografiaService.js";
-import { JwtService } from "../../application/interfaces/JwtService.js";
-import { UnitOfWork } from "../../application/interfaces/UnitOfWork.js";
-import { AnoLetivoQueries } from "../../application/queries/AnoLetivoQueries.js";
-import { BaseCurricularQueries } from "../../application/queries/BaseQueries.js";
-import { CargoQueries } from "../../application/queries/CargoQueries.js";
-import { ColaboradoresQueries } from "../../application/queries/ColaboradoresQueries.js";
-import { DrizzleCargoQueries } from "../queries/DrizzleCargoQueries.js";
-import { ModalidadesQueries } from "../../application/queries/ModalidadesQueries.js";
-import { TurmaQueries } from "../../application/queries/TurmaQueries.js";
-import { UnidadeEscolarQueries } from "../../application/queries/UnidadeEscolarQueries.js";
-import { CadastrarAnoLetivoUseCase } from "../../application/usecases/CadastrarAnoLetivoUseCase.js";
-import { CadastrarBaseUseCase } from "../../application/usecases/CadastrarBaseCurricularUseCase.js";
-import { CadastrarColaboradorUseCase } from "../../application/usecases/CadastrarColaboradorUseCase.js";
-import { CadastarEscolaUseCase } from "../../application/usecases/CadastrarEscolaUseCase.js";
-import { CadastrarTurmaUseCase } from "../../application/usecases/CadastrarTurmaUseCase.js";
-import { CadastrarUsuarioUseCase } from "../../application/usecases/CadastrarUsuarioUseCase.js";
-import { ListarColaboradoresUseCase } from "../../application/usecases/ListarColaboradoresUseCase.js";
-import { LoginUseCase } from "../../application/usecases/LoginUseCase.js";
-import { ObterMeusDadosUseCase } from "../../application/usecases/ObterMeusDadosUseCase.js";
-import { AnoLetivoRepository } from "../../domain/repositories/AnoLetivoRepository.js";
-import { BaseCurricularRepository } from "../../domain/repositories/BaseCurricularRepository.js";
-import { ColaboradorRepository } from "../../domain/repositories/ColaboradorRepository.js";
-import { EscolaRepository } from "../../domain/repositories/EscolaRepository.js";
-import { TurmaRepository } from "../../domain/repositories/TurmaRepository.js";
-import { UnidadeEscolarRepository } from "../../domain/repositories/UnidadeEscolaRepository.js";
-import { UsuarioRepository } from "../../domain/repositories/UsuarioRepository.js";
-import { DrizzleAnoLetivoQueries } from "../queries/DrizzleAnoLetivoQueries.js";
-import { DrizzleBaseQueries } from "../queries/DrizzleBaseQueries.js";
-import { DrizzleColaboradoresQueries } from "../queries/DrizzleColaboradoresQueries.js";
-import { DrizzleModalidadesQueries } from "../queries/DrizzleEtapasQueries.js";
-import { DrizzleTurmaQueries } from "../queries/DrizzleTurmaQueries.js";
-import { DrizzleUnidadeEscolarQueries } from "../queries/DrizzleUnidadeEscolarQueries.js";
-import { DrizzleAnoLetivoRepository } from "../repositories/drizzle/DrizzleAnoLetivoRepository.js";
-import { DrizzleBaseRepository } from "../repositories/drizzle/DrizzleBaseRepository.js";
-import { DrizzleColaboradorRepository } from "../repositories/drizzle/DrizzleColaboradorRepository.js";
-import { DrizzleEscolaRepository } from "../repositories/drizzle/DrizzleEscolaRepository.js";
-import { DrizzleService } from "../repositories/drizzle/DrizzleService.js";
-import { DrizzleTurmaRepository } from "../repositories/drizzle/DrizzleTurmaRepository.js";
-import { DrizzleUnidadeEscolaRepository } from "../repositories/drizzle/DrizzleUnidadeEscolaRepository.js";
-import { DrizzleUsuarioRepository } from "../repositories/drizzle/DrizzleUsuarioRepository.js";
-import { Argon2CriptografiaService } from "../services/Argon2CriptografiaService.js";
-import { FastJwtService } from "../services/FastJwtService.js";
-import { DisciplinaRepository } from "../../domain/repositories/DisciplinaRepository.js";
-import { DrizzleDisciplinaRepository } from "../repositories/drizzle/DrizzleDisciplinaRepository.js";
+import { CriptografiaService } from "../../application/interfaces/criptografia.service.js";
+import { JwtService } from "../../application/interfaces/jwt.service.js";
+import { UnitOfWork } from "../../application/interfaces/unit-of-work.interface.js";
+import { AnoLetivoQueries } from "../../application/queries/ano-letivo.queries.js";
+import { BaseCurricularQueries } from "../../application/queries/base.queries.js";
+import { CargoQueries } from "../../application/queries/cargo.queries.js";
+import { ColaboradoresQueries } from "../../application/queries/colaboradores.queries.js";
+import { DisciplinaQueries } from "../../application/queries/disciplina.queries.js";
+import { DrizzleCargoQueries } from "../queries/drizzle-cargo.queries.js";
+import { ModalidadesQueries } from "../../application/queries/modalidades.queries.js";
+import { TurmaQueries } from "../../application/queries/turma.queries.js";
+import { UnidadeEscolarQueries } from "../../application/queries/unidade-escolar.queries.js";
+import { CadastrarAnoLetivoUseCase } from "../../application/usecases/cadastrar-ano-letivo.usecase.js";
+import { CadastrarBaseUseCase } from "../../application/usecases/cadastrar-base-curricular.usecase.js";
+import { CadastrarColaboradorUseCase } from "../../application/usecases/cadastrar-colaborador.usecase.js";
+import { CadastarEscolaUseCase } from "../../application/usecases/cadastrar-escola.usecase.js";
+import { CadastrarTurmaUseCase } from "../../application/usecases/cadastrar-turma.usecase.js";
+import { CadastrarUsuarioUseCase } from "../../application/usecases/cadastrar-usuario.usecase.js";
+import { ListarColaboradoresUseCase } from "../../application/usecases/listar-colaboradores.usecase.js";
+import { LoginUseCase } from "../../application/usecases/login.usecase.js";
+import { ObterMeusDadosUseCase } from "../../application/usecases/obter-meus-dados.usecase.js";
+import { AnoLetivoRepository } from "../../domain/repositories/ano-letivo.repository.js";
+import { BaseCurricularRepository } from "../../domain/repositories/base-curricular.repository.js";
+import { CargoRepository } from "../../domain/repositories/cargo.repository.js";
+import { ColaboradorRepository } from "../../domain/repositories/colaborador.repository.js";
+import { EscolaRepository } from "../../domain/repositories/escola.repository.js";
+import { TurmaRepository } from "../../domain/repositories/turma.repository.js";
+import { UnidadeEscolarRepository } from "../../domain/repositories/unidade-escola.repository.js";
+import { UsuarioRepository } from "../../domain/repositories/usuario.repository.js";
+import { DrizzleAnoLetivoQueries } from "../queries/drizzle-ano-letivo.queries.js";
+import { DrizzleBaseQueries } from "../queries/drizzle-base.queries.js";
+import { DrizzleColaboradoresQueries } from "../queries/drizzle-colaboradores.queries.js";
+import { DrizzleDisciplinaQueries } from "../queries/drizzle-disciplina.queries.js";
+import { DrizzleModalidadesQueries } from "../queries/drizzle-etapas.queries.js";
+import { DrizzleTurmaQueries } from "../queries/drizzle-turma.queries.js";
+import { DrizzleUnidadeEscolarQueries } from "../queries/drizzle-unidade-escolar.queries.js";
+import { DrizzleAnoLetivoRepository } from "../repositories/drizzle/drizzle-ano-letivo.repository.js";
+import { DrizzleBaseRepository } from "../repositories/drizzle/drizzle-base.repository.js";
+import { DrizzleCargoRepository } from "../repositories/drizzle/drizzle-cargo.repository.js";
+import { DrizzleColaboradorRepository } from "../repositories/drizzle/drizzle-colaborador.repository.js";
+import { DrizzleEscolaRepository } from "../repositories/drizzle/drizzle-escola.repository.js";
+import { DrizzleService } from "../repositories/drizzle/drizzle.service.js";
+import { DrizzleTurmaRepository } from "../repositories/drizzle/drizzle-turma.repository.js";
+import { DrizzleUnidadeEscolaRepository } from "../repositories/drizzle/drizzle-unidade-escola.repository.js";
+import { DrizzleUsuarioRepository } from "../repositories/drizzle/drizzle-usuario.repository.js";
+import { Argon2CriptografiaService } from "../services/argon2-criptografia.service.js";
+import { FastJwtService } from "../services/fast-jwt.service.js";
+import { DisciplinaRepository } from "../../domain/repositories/disciplina.repository.js";
+import { DrizzleDisciplinaRepository } from "../repositories/drizzle/drizzle-disciplina.repository.js";
 
 const container = new Container({ defaultScope: bindingScopeValues.Singleton });
 
@@ -63,6 +67,8 @@ container.bind(UnitOfWork).toService(DrizzleService);
 container.bind(ModalidadesQueries).toResolvedValue((db) => new DrizzleModalidadesQueries(db), [DrizzleService]);
 
 container.bind(CargoQueries).toResolvedValue((db) => new DrizzleCargoQueries(db), [DrizzleService]);
+
+container.bind(DisciplinaQueries).toResolvedValue((db) => new DrizzleDisciplinaQueries(db), [DrizzleService]);
 
 container.bind(BaseCurricularQueries).toResolvedValue((db) => new DrizzleBaseQueries(db), [DrizzleService]);
 
@@ -99,11 +105,22 @@ container
   .toResolvedValue((db: DrizzleService) => new DrizzleDisciplinaRepository(db), [DrizzleService]);
 
 container
+  .bind(CargoRepository)
+  .toResolvedValue((db: DrizzleService) => new DrizzleCargoRepository(db), [DrizzleService]);
+
+container
   .bind(CadastrarBaseUseCase)
   .toResolvedValue(
     (repo, escolaRepo, unidadeRepo, disciplinaRepository, unitOfWork, modalidadesQueries) =>
       new CadastrarBaseUseCase(escolaRepo, repo, unidadeRepo, disciplinaRepository, modalidadesQueries, unitOfWork),
-    [BaseCurricularRepository, EscolaRepository, UnidadeEscolarRepository, DisciplinaRepository, UnitOfWork, ModalidadesQueries]
+    [
+      BaseCurricularRepository,
+      EscolaRepository,
+      UnidadeEscolarRepository,
+      DisciplinaRepository,
+      UnitOfWork,
+      ModalidadesQueries,
+    ]
   );
 
 container.bind(ObterMeusDadosUseCase).toResolvedValue((repo) => new ObterMeusDadosUseCase(repo), [UsuarioRepository]);
@@ -155,9 +172,9 @@ container
 container
   .bind(CadastrarColaboradorUseCase)
   .toResolvedValue(
-    (uow, usuarioRepo, colaboradorRepo, criptoService) =>
-      new CadastrarColaboradorUseCase(uow, usuarioRepo, colaboradorRepo, criptoService),
-    [UnitOfWork, UsuarioRepository, ColaboradorRepository, CriptografiaService]
+    (uow, usuarioRepo, colaboradorRepo, criptoService, cargoRepository) =>
+      new CadastrarColaboradorUseCase(uow, usuarioRepo, colaboradorRepo, cargoRepository, criptoService),
+    [UnitOfWork, UsuarioRepository, ColaboradorRepository, CriptografiaService, CargoRepository]
   );
 
 container

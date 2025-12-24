@@ -1,3 +1,5 @@
+import type { StatusContrato } from "../types/status-contrato.enum";
+
 export type ListarColaboradoresResponse = {
   readonly id: number;
   readonly nome: string;
@@ -18,6 +20,24 @@ export type ListarColaboradoresResponse = {
   };
 }
 
+export type DetalhesColaboradorResponse = {
+  readonly id: number;
+  readonly nome: string;
+  readonly email: string;
+  readonly cpf: string;
+  readonly telefone: string;
+  readonly contratos: {
+    readonly id: number;
+    readonly dataInicio: string;
+    readonly dataFim?: string | null;
+    readonly cargoId: number;
+    readonly cargoNome: string;
+    readonly matricula: string;
+    readonly status: StatusContrato;
+    readonly salario: number;
+  }[];
+}
+
 export type CadastrarColaboradorRequest = {
   readonly nome: string;
   readonly cpf: string;
@@ -26,13 +46,19 @@ export type CadastrarColaboradorRequest = {
   readonly unidadeId: number;
   readonly contrato: {
     readonly cargoId: number;
+    readonly salario: number;
     readonly dataInicio: Date;
     readonly dataFim?: Date;
+    readonly disciplinasPermitidas?: {
+      readonly disciplinaId: number;
+      readonly etapasIds: number[];
+    }[];
   };
 }
 
 export interface IColaboradorService {
   listarColaboradores(unidadeId?: number | null): Promise<ListarColaboradoresResponse[]>;
+  obterDetalhes(unidadeId: number, colaboradorId: number): Promise<DetalhesColaboradorResponse>;
   cadastrar(data: CadastrarColaboradorRequest): Promise<void>;
 }
 
@@ -45,6 +71,19 @@ export class ColaboradorService implements IColaboradorService {
     }
 
     const response = await fetch(`http://localhost:4000/colaboradores?${searchParams.toString()}`, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+
+    return response.json();
+  }
+
+  async obterDetalhes(unidadeId: number, colaboradorId: number): Promise<DetalhesColaboradorResponse> {
+    const response = await fetch(`http://localhost:4000/unidades/${unidadeId}/colaboradores/${colaboradorId}`, {
       credentials: "include",
     });
 
@@ -71,10 +110,12 @@ export class ColaboradorService implements IColaboradorService {
         unidadeId: data.unidadeId,
         contrato: {
           cargoId: data.contrato.cargoId,
+          salario: data.contrato.salario,
           dataInicio: data.contrato.dataInicio.toISOString().split("T")[0],
           dataFim: data.contrato.dataFim
             ? data.contrato.dataFim.toISOString().split("T")[0]
             : undefined,
+          disciplinasPermitidas: data.contrato.disciplinasPermitidas,
         },
       }),
     });

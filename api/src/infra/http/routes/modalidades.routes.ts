@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { ModalidadesQueries } from "../../../application/queries/ModalidadesQueries.js";
+import { ModalidadesQueries } from "../../../application/queries/modalidades.queries.js";
 import { container } from "../../di/di.js";
 
 export async function modalidadesRoutes(fastify: FastifyInstance) {
@@ -27,4 +27,9 @@ export async function modalidadesRoutes(fastify: FastifyInstance) {
         return query.listarEtapas(request.params.id);
       }
     );
+
+  fastify.get("/etapas", { onRequest: [fastify.authenticate] }, async function handle() {
+    const query = container.get(ModalidadesQueries);
+    return query.listarTodasEtapas();
+  });
 }

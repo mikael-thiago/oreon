@@ -35,6 +35,11 @@ export const cadastrarColaboradorSchema = z
         })
         .int("O ID do cargo deve ser um número inteiro")
         .positive("O ID do cargo deve ser um número positivo"),
+      salario: z
+        .number({
+          message: "O salário é obrigatório",
+        })
+        .positive("O salário deve ser um número positivo"),
       dataInicio: z.iso.date({
         error: (issue) =>
           issue.input
@@ -45,6 +50,19 @@ export const cadastrarColaboradorSchema = z
         .date("A data de fim deve estar no formato yyyy-MM-dd")
         .optional()
         .or(z.literal("")),
+      disciplinasPermitidas: z.array(
+        z.object({
+          disciplinaId: z
+            .number({
+              message: "O ID da disciplina é obrigatório",
+            })
+            .int("O ID da disciplina deve ser um número inteiro")
+            .positive("Selecione uma disciplina"),
+          etapasIds: z.array(
+            z.number().int().positive()
+          ).min(1, "Selecione pelo menos uma etapa para esta disciplina"),
+        })
+      ).optional(),
     }),
   })
   .refine(

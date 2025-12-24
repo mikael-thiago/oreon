@@ -1,6 +1,7 @@
 export interface CargoResponse {
   readonly id: number;
   readonly nome: string;
+  readonly podeEnsinar: boolean;
 }
 
 export interface ICargoService {

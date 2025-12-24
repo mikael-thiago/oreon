@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { TurmaQueries } from "../../../application/queries/TurmaQueries.js";
-import { CadastrarTurmaUseCase } from "../../../application/usecases/CadastrarTurmaUseCase.js";
+import { TurmaQueries } from "../../../application/queries/turma.queries.js";
+import { CadastrarTurmaUseCase } from "../../../application/usecases/cadastrar-turma.usecase.js";
 import { container } from "../../di/di.js";
 
 const listarTurmasParamsSchema = z.object({

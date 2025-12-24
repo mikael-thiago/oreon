@@ -18,3 +18,7 @@ export function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+export function padStart(value: string | number, maxLength: number, fill: string) {
+  return String(value).padStart(maxLength, fill);
+}

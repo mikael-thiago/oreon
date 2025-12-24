@@ -1,8 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { BaseCurricularQueries } from "../../../application/queries/BaseQueries.js";
-import { CadastrarBaseUseCase } from "../../../application/usecases/CadastrarBaseCurricularUseCase.js";
+import { BaseCurricularQueries } from "../../../application/queries/base.queries.js";
+import { CadastrarBaseUseCase } from "../../../application/usecases/cadastrar-base-curricular.usecase.js";
 import { container } from "../../di/di.js";
 
 const criarBaseSchema = z.object({

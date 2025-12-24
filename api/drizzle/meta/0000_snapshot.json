@@ -1,5 +1,5 @@
 {
-  "id": "6bc7621e-f390-4048-9c49-9575cbdf648e",
+  "id": "83845189-c2f1-4398-9b16-685ed18022bc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -152,6 +152,23 @@
       "name": "base_class_discipline",
       "schema": "",
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "base_class_discipline_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
         "discipline_id": {
           "name": "discipline_id",
           "type": "integer",
@@ -207,7 +224,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "base_class_discipline_discipline_id_base_id_unique_idx": {
+          "name": "base_class_discipline_discipline_id_base_id_unique_idx",
+          "nullsNotDistinct": false,
+          "columns": [
+            "discipline_id",
+            "base_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -258,6 +284,161 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.employees": {
+      "name": "employees",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "employees_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "employees_user_id_users_id_fk": {
+          "name": "employees_user_id_users_id_fk",
+          "tableFrom": "employees",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.contract_professor_discipline": {
+      "name": "contract_professor_discipline",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "contract_professor_discipline_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "contract_id": {
+          "name": "contract_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discipline_id": {
+          "name": "discipline_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "etapa_id": {
+          "name": "etapa_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "contract_professor_discipline_contract_id_contracts_id_fk": {
+          "name": "contract_professor_discipline_contract_id_contracts_id_fk",
+          "tableFrom": "contract_professor_discipline",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contract_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contract_professor_discipline_discipline_id_disciplines_id_fk": {
+          "name": "contract_professor_discipline_discipline_id_disciplines_id_fk",
+          "tableFrom": "contract_professor_discipline",
+          "tableTo": "disciplines",
+          "columnsFrom": [
+            "discipline_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contract_professor_discipline_etapa_id_steps_id_fk": {
+          "name": "contract_professor_discipline_etapa_id_steps_id_fk",
+          "tableFrom": "contract_professor_discipline",
+          "tableTo": "steps",
+          "columnsFrom": [
+            "etapa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "contract_professor_discipline_unique_idx": {
+          "name": "contract_professor_discipline_unique_idx",
+          "nullsNotDistinct": false,
+          "columns": [
+            "contract_id",
+            "discipline_id",
+            "discipline_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -499,114 +680,6 @@
           "columns": [
             "unit_id",
             "slug"
-          ]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.employees": {
-      "name": "employees",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "identity": {
-            "type": "byDefault",
-            "name": "employees_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
-        },
-        "cpf": {
-          "name": "cpf",
-          "type": "varchar(11)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "email": {
-          "name": "email",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "employees_user_id_idx": {
-          "name": "employees_user_id_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "employees_cpf_idx": {
-          "name": "employees_cpf_idx",
-          "columns": [
-            {
-              "expression": "cpf",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "employees_user_id_users_id_fk": {
-          "name": "employees_user_id_users_id_fk",
-          "tableFrom": "employees",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "employees_cpf_unique": {
-          "name": "employees_cpf_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "cpf"
           ]
         }
       },
@@ -1060,8 +1133,20 @@
           "primaryKey": false,
           "notNull": true
         },
+        "cpf": {
+          "name": "cpf",
+          "type": "varchar(11)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "email": {
           "name": "email",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "login": {
+          "name": "login",
           "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
@@ -1124,11 +1209,25 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_cpf_unique": {
+          "name": "users_cpf_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cpf"
+          ]
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
+          ]
+        },
+        "users_login_unique": {
+          "name": "users_login_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "login"
           ]
         }
       },

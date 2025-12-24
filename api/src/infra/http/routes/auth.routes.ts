@@ -1,12 +1,12 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { CriptografiaService } from "../../../application/interfaces/CriptografiaService.js";
-import { type UsuarioAutenticado } from "../../../application/types/AuthenticatedUser.js";
-import { _CadastrarAdminUseCase } from "../../../application/usecases/_CadastrarAdminUseCase.js";
-import { CadastrarUsuarioUseCase } from "../../../application/usecases/CadastrarUsuarioUseCase.js";
-import { LoginUseCase } from "../../../application/usecases/LoginUseCase.js";
-import { ObterMeusDadosUseCase } from "../../../application/usecases/ObterMeusDadosUseCase.js";
+import { CriptografiaService } from "../../../application/interfaces/criptografia.service.js";
+import { type UsuarioAutenticado } from "../../../application/types/authenticated-user.type.js";
+import { _CadastrarAdminUseCase } from "../../../application/usecases/_cadastrar-admin.usecase.js";
+import { CadastrarUsuarioUseCase } from "../../../application/usecases/cadastrar-usuario.usecase.js";
+import { LoginUseCase } from "../../../application/usecases/login.usecase.js";
+import { ObterMeusDadosUseCase } from "../../../application/usecases/obter-meus-dados.usecase.js";
 import { container } from "../../di/di.js";
 
 const loginSchema = z.object({
@@ -26,12 +26,12 @@ const cadastrarUsuarioSchema = z.object({
       error: (issue) => (issue.input === undefined ? "O nome é obrigatório" : "O nome deve ser um texto"),
     })
     .min(1, "O nome é obrigatório"),
-  email: z
+  login: z
     .string({
-      error: (issue) => (issue.input === undefined ? "O email é obrigatório" : "O email deve ser um texto"),
+      error: (issue) => (issue.input === undefined ? "O login é obrigatório" : "O login deve ser um texto"),
     })
-    .email("O email deve ser válido")
-    .min(1, "O email é obrigatório"),
+    .email("O login deve ser email válido")
+    .min(1, "O login é obrigatório"),
   senha: z
     .string({
       error: (issue) => (issue.input === undefined ? "A senha é obrigatória" : "A senha deve ser um texto"),

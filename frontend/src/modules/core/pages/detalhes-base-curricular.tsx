@@ -4,7 +4,7 @@ import { useParams } from "@tanstack/react-router";
 import { obterBasePorIdQueryOptions } from "../queries/obter-base-por-id-query-options";
 
 export function DetalhesBaseCurricular() {
-  const { id } = useParams({ strict: false });
+  const { id } = useParams({ from: "/main/bases/$id"});
   const baseId = Number(id);
 
   const { data: base, isPending } = useQuery(

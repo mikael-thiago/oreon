@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
-import { CadastarEscolaUseCase } from "../../../application/usecases/CadastrarEscolaUseCase.js";
+import { CadastarEscolaUseCase } from "../../../application/usecases/cadastrar-escola.usecase.js";
 import { container } from "../../di/di.js";
 
 const cadastrarEscolaSchema = z.object({

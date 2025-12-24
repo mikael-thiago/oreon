@@ -3,7 +3,7 @@ import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
-import { handleError } from "./handleError.js";
+import { handleError } from "./handle-error.js";
 import { anosLetivosRoutes } from "./routes/anos-letivos.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { basesRoutes } from "./routes/bases.routes.js";
@@ -14,9 +14,11 @@ import { modalidadesRoutes } from "./routes/modalidades.routes.js";
 import { turmasRoutes } from "./routes/turmas.routes.js";
 import { unidadesRoutes } from "./routes/unidades.routes.js";
 import "./types.js";
+import { randomUUID } from "node:crypto";
 
 const fastify = Fastify({
   logger: true,
+  genReqId: () => randomUUID()
 });
 
 fastify.register(fastifyCookie, {

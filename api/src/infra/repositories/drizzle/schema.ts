@@ -1,5 +1,16 @@
 import { relations } from "drizzle-orm";
-import { boolean, date, index, integer, pgEnum, pgTable, timestamp, unique, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  date,
+  decimal,
+  index,
+  integer,
+  pgEnum,
+  pgTable,
+  timestamp,
+  unique,
+  varchar,
+} from "drizzle-orm/pg-core";
 
 export const modalidadeTable = pgTable("modalities", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
@@ -91,7 +102,7 @@ export const disciplinasTable = pgTable(
 export const baseDisciplinaTable = pgTable(
   "base_class_discipline",
   {
-    // id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
     disciplineId: integer()
       .notNull()
       .references(() => disciplinasTable.id),
@@ -107,7 +118,9 @@ export const baseDisciplinaTable = pgTable(
 export const usuarioTable = pgTable("users", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
+  cpf: varchar({ length: 11 }).unique(),
   email: varchar({ length: 100 }).notNull().unique(),
+  login: varchar({ length: 100 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
   phone: varchar({ length: 20 }),
   escolaId: integer("school_id").references(() => escolaTable.id),
@@ -199,6 +212,7 @@ export const contratosTable = pgTable(
     startDate: date("start_date").notNull(),
     endDate: date("end_date"),
     status: statusContratoEnum().default("unactive"),
+    salary: decimal({ precision: 8, scale: 2 }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -223,6 +237,6 @@ export const contratoProfessorDisciplinaTable = pgTable(
       .references(() => etapaTable.id),
   },
   (table) => [
-    unique("contract_professor_discipline_unique_idx").on(table.contractId, table.disciplineId, table.disciplineId),
+    unique("contract_professor_discipline_unique_idx").on(table.contractId, table.disciplineId, table.etapaId),
   ]
 );
