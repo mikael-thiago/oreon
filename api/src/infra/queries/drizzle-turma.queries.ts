@@ -11,8 +11,6 @@ export class DrizzleTurmaQueries implements TurmaQueries {
   constructor(private readonly db: DrizzleService) {}
 
   async listarTurmas(request: ListarTurmasRequest): Promise<ListarTurmasResponse[]> {
-    console.log(request);
-
     const turmas = await this.db
       .getTransaction()
       .select({
@@ -29,7 +27,11 @@ export class DrizzleTurmaQueries implements TurmaQueries {
       .innerJoin(unidadeTable, eq(turmaTable.unitId, unidadeTable.id))
       .innerJoin(
         baseCurricularTable,
-        and(eq(baseCurricularTable.stepId, etapaTable.id), eq(baseCurricularTable.unitId, unidadeTable.id))
+        and(
+          eq(turmaTable.baseClassId, baseCurricularTable.id),
+          eq(baseCurricularTable.stepId, etapaTable.id),
+          eq(baseCurricularTable.unitId, unidadeTable.id)
+        )
       )
       .where(and(eq(turmaTable.unitId, request.unidadeId), eq(turmaTable.schoolPeriodId, request.anoLetivoId)))
       .orderBy(etapaTable.name, turmaTable.letter);

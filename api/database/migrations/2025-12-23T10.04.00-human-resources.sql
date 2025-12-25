@@ -26,7 +26,7 @@ CREATE TABLE "contracts" (
 	"registration_number" varchar(50),
 	"start_date" date NOT NULL,
 	"end_date" date,
-	"salary" DECIMAL (10, 2)
+	"salary" DECIMAL (10, 2) NOT NULL,
 	"status" "status_contract" DEFAULT 'unactive',
 	"created_at" timestamp DEFAULT now()
 );

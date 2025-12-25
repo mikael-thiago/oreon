@@ -3,6 +3,7 @@ import { Aluno } from "../entities/aluno.entity.js";
 export type CriarAlunoRequest = {
   readonly nome: string;
   readonly cpf: string;
+  readonly dataDeNascimento: Date;
 };
 
 export abstract class AlunoRepository {

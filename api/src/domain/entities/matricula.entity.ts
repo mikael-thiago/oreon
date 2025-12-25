@@ -1,61 +1,34 @@
-import {
-  type StatusMatricula,
-  StatusMatriculaEnum,
-} from "../enums/status-matricula.enum.js";
-
-export type ResultadoMatriculaArgs = {
-  readonly matriculaId: number;
-  readonly status: "Aprovacao" | "Reprovacao";
-};
-
-export class ResultadoMatricula {
-  readonly matriculaId: number;
-  readonly status: "Aprovacao" | "Reprovacao";
-
-  constructor(args: ResultadoMatriculaArgs) {
-    this.matriculaId = args.matriculaId;
-    this.status = args.status;
-  }
-}
+import type { StatusMatricula } from "../enums/status-matricula.enum.js";
 
 export type MatriculaArgs = {
   readonly id: number;
-  readonly alunoId: number;
-  readonly dataInicio: Date;
-  readonly dataFim?: Date | null;
-  readonly anoLetivoId: number;
-  readonly turmaId: number;
+  readonly unidadeId: number;
+  readonly estudanteId: number;
+  readonly periodoLetivoId: number;
   readonly status: StatusMatricula;
-  readonly resultado?: ResultadoMatricula;
+  readonly dataCriacao: Date;
+  readonly comprovanteResidenciaId: number;
+  readonly historicoEscolarId: number;
 };
 
 export class Matricula {
   readonly id: number;
-  readonly alunoId: number;
-  readonly anoLetivoId: number;
-  readonly turmaId: number;
-  readonly dataInicio: Date;
-  readonly dataFim: Date | null;
+  readonly unidadeId: number;
+  readonly estudanteId: number;
+  readonly periodoLetivoId: number;
   readonly status: StatusMatricula;
-  readonly resultado: ResultadoMatricula | null;
+  readonly dataCriacao: Date;
+  readonly comprovanteResidenciaId: number;
+  readonly historicoEscolarId: number;
 
   constructor(args: MatriculaArgs) {
     this.id = args.id;
-    this.alunoId = args.alunoId;
-    this.anoLetivoId = args.anoLetivoId;
-    this.turmaId = args.turmaId;
-    this.dataInicio = args.dataInicio;
-    this.dataFim = args.dataFim ?? null;
+    this.unidadeId = args.unidadeId;
+    this.estudanteId = args.estudanteId;
+    this.periodoLetivoId = args.periodoLetivoId;
     this.status = args.status;
-    this.resultado = args.resultado ?? null;
+    this.dataCriacao = args.dataCriacao;
+    this.comprovanteResidenciaId = args.comprovanteResidenciaId;
+    this.historicoEscolarId = args.historicoEscolarId;
   }
-
-  estaAtiva() {
-    return (
-      this.status === StatusMatriculaEnum.Ativa ||
-      this.status === StatusMatriculaEnum.Aprovada
-    );
-  }
-
-  cancelarMatricula() {}
 }

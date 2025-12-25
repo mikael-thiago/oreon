@@ -212,7 +212,7 @@ export const contratosTable = pgTable(
     startDate: date("start_date").notNull(),
     endDate: date("end_date"),
     status: statusContratoEnum().default("unactive"),
-    salary: decimal({ precision: 8, scale: 2 }).notNull(),
+    salary: decimal({ precision: 10, scale: 2 }).notNull(),
     createdAt: timestamp("created_at").defaultNow(),
   },
   (table) => [
@@ -240,3 +240,35 @@ export const contratoProfessorDisciplinaTable = pgTable(
     unique("contract_professor_discipline_unique_idx").on(table.contractId, table.disciplineId, table.etapaId),
   ]
 );
+
+export const estudantesTable = pgTable("students", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer().references(() => usuarioTable.id),
+  cpf: varchar({ length: 11 }).notNull(),
+  name: varchar({ length: 100 }).notNull(),
+  birthDate: date().notNull(),
+});
+
+export const documentsTable = pgTable("documents", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  url: varchar({ length: 255 }),
+  content: varchar(),
+  status: varchar(),
+});
+
+export const matriculasTable = pgTable("matriculations", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  unitId: integer()
+    .notNull()
+    .references(() => unidadeTable.id),
+  studentId: integer()
+    .notNull()
+    .references(() => estudantesTable.id),
+  schoolPeriodId: integer()
+    .notNull()
+    .references(() => anoLetivoTable.id),
+  status: varchar().notNull(),
+  createdDate: date().notNull(),
+  proofOfResidenceId: integer().notNull().references(() => documentsTable.id),
+  scholarHistoryId: integer().notNull().references(() => documentsTable.id),
+});
