@@ -29,12 +29,12 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
     });
   }
 
-  async obterUsuarioPorEmail(email: string): Promise<Usuario | null> {
+  async obterUsuarioPorEmail(login: string): Promise<Usuario | null> {
     const [usuarioModel] = await this.drizzle
       .getTransaction()
       .select()
       .from(usuarioTable)
-      .where(eq(usuarioTable.email, email));
+      .where(eq(usuarioTable.login, login));
 
     if (!usuarioModel) {
       return null;
@@ -43,7 +43,7 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
     return new Usuario({
       id: usuarioModel.id,
       nome: usuarioModel.name,
-      login: usuarioModel.email,
+      login: usuarioModel.login,
       senha: usuarioModel.password,
       escolaId: usuarioModel.escolaId!,
       admin: usuarioModel.isAdmin,
@@ -57,7 +57,6 @@ export class DrizzleUsuarioRepository implements UsuarioRepository {
       .insert(usuarioTable)
       .values({
         name: data.nome,
-        email: data.login,
         login: data.login,
         password: data.senha,
         escolaId: data.escolaId,

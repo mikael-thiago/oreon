@@ -49,6 +49,26 @@ import { Argon2CriptografiaService } from "../services/argon2-criptografia.servi
 import { FastJwtService } from "../services/fast-jwt.service.js";
 import { DisciplinaRepository } from "../../domain/repositories/disciplina.repository.js";
 import { DrizzleDisciplinaRepository } from "../repositories/drizzle/drizzle-disciplina.repository.js";
+import { AlunoRepository } from "../../domain/repositories/aluno.repository.js";
+import { MatriculaRepository } from "../../domain/repositories/matricula.repository.js";
+import { DocumentoRepository } from "../../domain/repositories/documento.repository.js";
+import { DrizzleAlunoRepository } from "../repositories/drizzle/drizzle-aluno.repository.js";
+import { DrizzleMatriculaRepository } from "../repositories/drizzle/drizzle-matricula.repository.js";
+import { DrizzleDocumentoRepository } from "../repositories/drizzle/drizzle-documento.repository.js";
+import { FileStorageService } from "../../application/interfaces/file-storage.interface.js";
+import { LocalFileStorageService } from "../services/local-file-storage.service.js";
+import { MatriculasQueries } from "../../application/queries/matriculas.queries.js";
+import { DrizzleMatriculasQueries } from "../queries/drizzle-matriculas.queries.js";
+import { CriarMatriculaUseCase } from "../../application/usecases/criar-matricula.usecase.js";
+import { SolicitarMatriculaUseCase } from "../../application/usecases/solicitar-matricula.usecase.js";
+import { ResponsavelRepository } from "../../domain/repositories/responsavel.repository.js";
+import { SolicitacaoMatriculaRepository } from "../../domain/repositories/solicitacao-matricula.repository.js";
+import { DrizzleResponsavelRepository } from "../repositories/drizzle/drizzle-responsavel.repository.js";
+import { DrizzleSolicitacaoMatriculaRepository } from "../repositories/drizzle/drizzle-solicitacao-matricula.repository.js";
+import { DocumentoQueries } from "../../application/queries/documento.queries.js";
+import { DrizzleDocumentoQueries } from "../queries/drizzle-documento.queries.js";
+import { ListarSolicitacoesUseCase } from "../../application/usecases/listar-solicitacoes.usecase.js";
+import { ObterDetalhesSolicitacaoUseCase } from "../../application/usecases/obter-detalhes-solicitacao.usecase.js";
 
 const container = new Container({ defaultScope: bindingScopeValues.Singleton });
 
@@ -182,6 +202,94 @@ container
   .toResolvedValue(
     (usuarioRepo, colaboradoresQueries) => new ListarColaboradoresUseCase(usuarioRepo, colaboradoresQueries),
     [UsuarioRepository, ColaboradoresQueries]
+  );
+
+container.bind(AlunoRepository).toResolvedValue((db) => new DrizzleAlunoRepository(db), [DrizzleService]);
+
+container.bind(MatriculaRepository).toResolvedValue((db) => new DrizzleMatriculaRepository(db), [DrizzleService]);
+
+container.bind(DocumentoRepository).toResolvedValue((db) => new DrizzleDocumentoRepository(db), [DrizzleService]);
+
+container.bind(FileStorageService).toConstantValue(new LocalFileStorageService("./uploads", process.env.DOWNLOAD_TOKEN_SECRET!, process.env.BASE_URL!));
+
+container
+  .bind(MatriculasQueries)
+  .toResolvedValue(
+    (db, fileStorageService) => new DrizzleMatriculasQueries(db, fileStorageService),
+    [DrizzleService, FileStorageService]
+  );
+
+container.bind(DocumentoQueries).toResolvedValue((db) => new DrizzleDocumentoQueries(db), [DrizzleService]);
+
+container
+  .bind(CriarMatriculaUseCase)
+  .toResolvedValue(
+    (alunoRepo, unidadeRepo, anoLetivoRepo, matriculaRepo, documentoRepo, fileStorage, uow) =>
+      new CriarMatriculaUseCase(
+        alunoRepo,
+        unidadeRepo,
+        anoLetivoRepo,
+        matriculaRepo,
+        documentoRepo,
+        fileStorage,
+        uow
+      ),
+    [
+      AlunoRepository,
+      UnidadeEscolarRepository,
+      AnoLetivoRepository,
+      MatriculaRepository,
+      DocumentoRepository,
+      FileStorageService,
+      UnitOfWork,
+    ]
+  );
+
+container.bind(ResponsavelRepository).toResolvedValue((db) => new DrizzleResponsavelRepository(db), [DrizzleService]);
+
+container
+  .bind(SolicitacaoMatriculaRepository)
+  .toResolvedValue((db) => new DrizzleSolicitacaoMatriculaRepository(db), [DrizzleService]);
+
+container
+  .bind(SolicitarMatriculaUseCase)
+  .toResolvedValue(
+    (alunoRepo, responsavelRepo, unidadeRepo, anoLetivoRepo, solicitacaoRepo, documentoRepo, fileStorage, uow) =>
+      new SolicitarMatriculaUseCase(
+        alunoRepo,
+        responsavelRepo,
+        unidadeRepo,
+        anoLetivoRepo,
+        solicitacaoRepo,
+        documentoRepo,
+        fileStorage,
+        uow
+      ),
+    [
+      AlunoRepository,
+      ResponsavelRepository,
+      UnidadeEscolarRepository,
+      AnoLetivoRepository,
+      SolicitacaoMatriculaRepository,
+      DocumentoRepository,
+      FileStorageService,
+      UnitOfWork,
+    ]
+  );
+
+container
+  .bind(ListarSolicitacoesUseCase)
+  .toResolvedValue(
+    (unidadeRepo, matriculasQueries) => new ListarSolicitacoesUseCase(unidadeRepo, matriculasQueries),
+    [UnidadeEscolarRepository, MatriculasQueries]
+  );
+
+container
+  .bind(ObterDetalhesSolicitacaoUseCase)
+  .toResolvedValue(
+    (solicitacaoRepo, unidadeRepo, matriculasQueries) =>
+      new ObterDetalhesSolicitacaoUseCase(solicitacaoRepo, unidadeRepo, matriculasQueries),
+    [SolicitacaoMatriculaRepository, UnidadeEscolarRepository, MatriculasQueries]
   );
 
 export { container };

@@ -1,17 +1,34 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
+import { createSigner, createVerifier } from "fast-jwt";
 import type {
   FileStorageService,
+  SignUrlRequest,
   UploadFileRequest,
   UploadFileResponse,
+  VerifyTokenResponse,
 } from "../../application/interfaces/file-storage.interface.js";
 
 export class LocalFileStorageService implements FileStorageService {
   private readonly uploadDir: string;
+  private readonly signer: ReturnType<typeof createSigner>;
+  private readonly verifier: ReturnType<typeof createVerifier>;
+  private readonly baseUrl: string;
 
-  constructor(uploadDir: string = "./uploads") {
+  constructor(uploadDir: string, downloadTokenSecret: string, baseUrl: string) {
     this.uploadDir = uploadDir;
+    this.baseUrl = baseUrl;
+    const secret = downloadTokenSecret;
+
+    this.signer = createSigner({
+      key: async () => secret,
+      expiresIn: 1000 * 60 * 5, // 5 minutes
+    });
+
+    this.verifier = createVerifier({
+      key: async () => secret,
+    });
   }
 
   async uploadFile(request: UploadFileRequest): Promise<UploadFileResponse> {
@@ -36,6 +53,32 @@ export class LocalFileStorageService implements FileStorageService {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
         throw error;
       }
+    }
+  }
+
+  async signUrl(request: SignUrlRequest): Promise<string> {
+    const token = await this.signer({
+      documentId: request.documentId,
+      type: "download",
+    });
+    return `${this.baseUrl}/documents/${request.documentId}/download?token=${token}`;
+  }
+
+  async verifyToken(token: string): Promise<VerifyTokenResponse | null> {
+    try {
+      const payload = await this.verifier(token);
+
+      if (payload.type !== "download" || !payload.documentId) {
+        return null;
+      }
+
+      return {
+        documentId: payload.documentId,
+        expiresAt: payload.exp,
+      };
+    } catch (error) {
+      // Token expired, invalid signature, or malformed
+      return null;
     }
   }
 }

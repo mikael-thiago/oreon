@@ -22,3 +22,7 @@ export function slugify(text: string): string {
 export function padStart(value: string | number, maxLength: number, fill: string) {
   return String(value).padStart(maxLength, fill);
 }
+
+export function removerCaracteresEspeciais(value: string) {
+  return value.replace(/[^a-zA-Z0-9]/g, "");
+}

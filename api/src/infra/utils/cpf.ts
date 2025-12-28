@@ -69,3 +69,5 @@ export function formatarCPF(cpf: string): string {
 export function limparCPF(cpf: string): string {
   return cpf.replace(/\D/g, "");
 }
+
+export const CPF_REGEX = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;

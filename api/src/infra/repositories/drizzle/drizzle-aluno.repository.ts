@@ -1,12 +1,21 @@
 import { eq } from "drizzle-orm";
 import { Aluno } from "../../../domain/entities/aluno.entity.js";
 import type { AlunoRepository, CriarAlunoRequest } from "../../../domain/repositories/aluno.repository.js";
+import type { Sexo } from "../../../domain/enums/sexo.enum.js";
 import { DateFormatter } from "../../utils/date-formatter.js";
 import type { DrizzleService } from "./drizzle.service.js";
 import { estudantesTable } from "./schema.js";
 
 export class DrizzleAlunoRepository implements AlunoRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
+
+  private mapSexoToDb(sexo: Sexo): "male" | "female" {
+    return sexo === "masculino" ? "male" : "female";
+  }
+
+  private mapSexoFromDb(sex: "male" | "female"): Sexo {
+    return sex === "male" ? "masculino" : "feminino";
+  }
 
   async obterAlunoPorCpf(cpf: string): Promise<Aluno | null> {
     const [alunoModel] = await this.drizzleDb
@@ -24,6 +33,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
       nome: alunoModel.name,
       cpf: alunoModel.cpf,
       dataDeNascimento: new Date(alunoModel.birthDate),
+      sexo: this.mapSexoFromDb(alunoModel.sex),
     });
   }
 
@@ -43,6 +53,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
       nome: alunoModel.name,
       cpf: alunoModel.cpf,
       dataDeNascimento: new Date(alunoModel.birthDate),
+      sexo: this.mapSexoFromDb(alunoModel.sex),
     });
   }
 
@@ -54,6 +65,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
         name: request.nome,
         cpf: request.cpf,
         birthDate: DateFormatter.format(request.dataDeNascimento, "YYYY-MM-DD"),
+        sex: this.mapSexoToDb(request.sexo),
         userId: null,
       })
       .returning();
@@ -67,6 +79,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
       nome: alunoModel.name,
       cpf: alunoModel.cpf,
       dataDeNascimento: new Date(alunoModel.birthDate),
+      sexo: this.mapSexoFromDb(alunoModel.sex),
     });
   }
 }

@@ -1,6 +1,7 @@
 import fastifyCookie from "@fastify/cookie";
 import fastifyCors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 import Fastify, { type FastifyReply, type FastifyRequest } from "fastify";
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import { handleError } from "./handle-error.js";
@@ -15,15 +16,19 @@ import { turmasRoutes } from "./routes/turmas.routes.js";
 import { unidadesRoutes } from "./routes/unidades.routes.js";
 import "./types.js";
 import { randomUUID } from "node:crypto";
+import { matriculasRoutes } from "./routes/matriculas.routes.js";
+import { documentosRoutes } from "./routes/documentos.routes.js";
 
 const fastify = Fastify({
   logger: true,
-  genReqId: () => randomUUID()
+  genReqId: () => randomUUID(),
 });
 
 fastify.register(fastifyCookie, {
   secret: process.env.COOKIEs_SECRET!,
 });
+
+fastify.register(fastifyMultipart);
 
 fastify.register(fastifyJwt, {
   secret: process.env.JWT_SECRET!,
@@ -67,6 +72,8 @@ fastify.register(modalidadesRoutes);
 fastify.register(anosLetivosRoutes);
 fastify.register(turmasRoutes);
 fastify.register(unidadesRoutes);
+fastify.register(matriculasRoutes);
+fastify.register(documentosRoutes);
 
 await fastify.listen({ port: Number(process.env.PORT) });
 

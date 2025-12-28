@@ -1,0 +1,157 @@
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useSessionContext } from "@/modules/shared/context/session-context";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { FileText, ChevronRight, AlertCircle, Plus } from "lucide-react";
+import { listarSolicitacoesQueryOptions } from "../queries/listar-solicitacoes-query-options";
+import { ErroRequisicao } from "@/components/erro-requisicao";
+import { formatCpf } from "@/modules/shared/utils/cpf";
+import { formatTelefone } from "@/modules/shared/utils/telefone";
+
+const getStatusConfig = (status: string) => {
+  switch (status) {
+    case "aprovada":
+      return {
+        label: "Aprovada",
+        className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      };
+    case "rejeitada":
+      return {
+        label: "Rejeitada",
+        className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+      };
+    default:
+      return {
+        label: "Em Andamento",
+        className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      };
+  }
+};
+
+export function ListarSolicitacoes() {
+  const { unidadeId, anoLetivoId } = useSessionContext();
+
+  const {
+    data: solicitacoes = [],
+    isPending,
+    error,
+    refetch,
+  } = useQuery(listarSolicitacoesQueryOptions(unidadeId, anoLetivoId));
+
+  if (!unidadeId || !anoLetivoId) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Solicitações de Matrícula</h1>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <AlertCircle className="size-12 text-muted-foreground mb-4" />
+          <p className="text-muted-foreground text-lg">
+            Selecione uma unidade e um ano letivo para visualizar as solicitações de matrícula
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return <ErroRequisicao onTentarNovamente={refetch} />;
+  }
+
+  if (isPending) {
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-6">Solicitações de Matrícula</h1>
+        <div className="space-y-3">
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Solicitações de Matrícula</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {solicitacoes.length} {solicitacoes.length === 1 ? "solicitação" : "solicitações"} encontrada
+            {solicitacoes.length === 1 ? "" : "s"}
+          </p>
+        </div>
+        <Button asChild className="cursor-pointer">
+          <Link to="/matriculas/solicitar">
+            <Plus className="size-4 mr-2" />
+            Nova Solicitação
+          </Link>
+        </Button>
+      </div>
+
+      {solicitacoes.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed rounded-lg">
+          <FileText className="size-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Nenhuma solicitação encontrada</h3>
+          <p className="text-muted-foreground max-w-md">
+            Não há solicitações de matrícula para esta unidade e ano letivo.
+          </p>
+        </div>
+      )}
+
+      {solicitacoes.length > 0 && (
+        <div className="grid gap-3">
+          {solicitacoes.map((solicitacao) => {
+            const statusConfig = getStatusConfig(solicitacao.status);
+
+            return (
+              <Link
+                key={solicitacao.id}
+                to={`/solicitacoes/$id`}
+                params={{ id: String(solicitacao.id) }}
+                className="group relative p-5 border rounded-lg hover:border-primary hover:shadow-md transition-all duration-200 bg-card"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="p-2.5 rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                      <FileText className="size-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                          {solicitacao.estudante.nome}
+                        </h3>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusConfig.className}`}>
+                          {statusConfig.label}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium">Aluno:</span> CPF {formatCpf(solicitacao.estudante.cpf)} •
+                          Nascimento: {new Date(solicitacao.estudante.dataDeNascimento).toLocaleDateString("pt-BR")}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium">Modalidade/Etapa:</span> {solicitacao.modalidade} -{" "}
+                          {solicitacao.etapa}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium">Responsável:</span> {solicitacao.responsavel.nome} •{" "}
+                          {formatTelefone(solicitacao.responsavel.telefone)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium">Solicitado em:</span>{" "}
+                          {new Date(solicitacao.dataSolicitacao).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}

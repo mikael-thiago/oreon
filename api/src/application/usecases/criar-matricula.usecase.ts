@@ -6,6 +6,7 @@ import type { MatriculaRepository } from "../../domain/repositories/matricula.re
 import type { DocumentoRepository } from "../../domain/repositories/documento.repository.js";
 import type { UnidadeEscolarRepository } from "../../domain/repositories/unidade-escola.repository.js";
 import { StatusMatriculaEnum } from "../../domain/enums/status-matricula.enum.js";
+import type { Sexo } from "../../domain/enums/sexo.enum.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { FileStorageService } from "../interfaces/file-storage.interface.js";
 import { cpfEhValido } from "../../infra/utils/cpf.js";
@@ -13,6 +14,7 @@ import { cpfEhValido } from "../../infra/utils/cpf.js";
 export type CriarMatriculaRequest = {
   readonly cpf: string;
   readonly nome: string;
+  readonly sexo: Sexo;
   readonly dataDeNascimento: Date;
   readonly unidadeId: number;
   readonly periodoLetivoId: number;
@@ -92,6 +94,7 @@ export class CriarMatriculaUseCase {
           nome: request.nome,
           cpf: request.cpf,
           dataDeNascimento: request.dataDeNascimento,
+          sexo: request.sexo,
         });
       }
 

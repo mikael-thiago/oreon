@@ -46,6 +46,10 @@ const data = [
     icon: Bot,
     items: [
       {
+        title: "Solicitações",
+        url: "/solicitacoes",
+      },
+      {
         title: "Turmas",
         url: "/turmas",
       },

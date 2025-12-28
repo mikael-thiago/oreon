@@ -14,7 +14,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 export function NavMain({
   items,
@@ -30,6 +30,10 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const location = useLocation();
+
+  console.log(location.pathname);
+
   return (
     <SidebarGroup>
       {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
@@ -38,7 +42,10 @@ export function NavMain({
           <Collapsible
             key={item.title}
             asChild
-            defaultOpen={item.isActive}
+            defaultOpen={
+              item.url === location.pathname ||
+              item.items?.some((item) => item.url === location.pathname)
+            }
             className="group/collapsible"
           >
             <SidebarMenuItem>
@@ -56,7 +63,11 @@ export function NavMain({
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild className="cursor-pointer">
+                      <SidebarMenuSubButton
+                        asChild
+                        className="cursor-pointer"
+                        isActive={location.pathname === subItem.url}
+                      >
                         <Link to={subItem.url}>
                           <span>{subItem.title}</span>
                         </Link>

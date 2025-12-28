@@ -118,11 +118,8 @@ export const baseDisciplinaTable = pgTable(
 export const usuarioTable = pgTable("users", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
-  cpf: varchar({ length: 11 }).unique(),
-  email: varchar({ length: 100 }).notNull().unique(),
   login: varchar({ length: 100 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
-  phone: varchar({ length: 20 }),
   escolaId: integer("school_id").references(() => escolaTable.id),
   createdAt: timestamp().notNull().defaultNow(),
   isAdmin: boolean().notNull().default(false),
@@ -241,11 +238,14 @@ export const contratoProfessorDisciplinaTable = pgTable(
   ]
 );
 
+export const sexEnum = pgEnum("sex_enum", ["male", "female"]);
+
 export const estudantesTable = pgTable("students", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   userId: integer().references(() => usuarioTable.id),
   cpf: varchar({ length: 11 }).notNull(),
   name: varchar({ length: 100 }).notNull(),
+  sex: sexEnum().notNull(),
   birthDate: date().notNull(),
 });
 
@@ -269,6 +269,66 @@ export const matriculasTable = pgTable("matriculations", {
     .references(() => anoLetivoTable.id),
   status: varchar().notNull(),
   createdDate: date().notNull(),
-  proofOfResidenceId: integer().notNull().references(() => documentsTable.id),
-  scholarHistoryId: integer().notNull().references(() => documentsTable.id),
+  proofOfResidenceId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
+  scholarHistoryId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
+});
+
+export const responsaveisTable = pgTable("responsibles", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  // TODO: Verificar possibilidade de extrair informações para tabela "personal_infos"
+  name: varchar({ length: 100 }).notNull(),
+  cpf: varchar({ length: 11 }).notNull().unique(),
+  email: varchar({ length: 100 }).unique().notNull(),
+  birthDate: date().notNull(),
+  phone: varchar({ length: 11 }).notNull(),
+  userId: integer()
+    .unique()
+    .references(() => usuarioTable.id),
+});
+
+export const responsabilityRelationsTable = pgTable("responsibility_relations", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar({ length: 20 }).notNull(),
+  slug: varchar({ length: 20 }).notNull(),
+});
+
+export const solicitacoesMatriculaTable = pgTable("matriculation_requests", {
+  id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  unitId: integer()
+    .notNull()
+    .references(() => unidadeTable.id),
+  studentId: integer()
+    .notNull()
+    .references(() => estudantesTable.id),
+  responsibleId: integer()
+    .notNull()
+    .references(() => responsaveisTable.id),
+  schoolPeriodId: integer()
+    .notNull()
+    .references(() => anoLetivoTable.id),
+  stepId: integer()
+    .notNull()
+    .references(() => etapaTable.id),
+  responsibilityRelationId: integer()
+    .notNull()
+    .references(() => responsabilityRelationsTable.id),
+  status: varchar().notNull(),
+  createdDate: date().notNull(),
+  observations: varchar({ length: 255 }),
+  proofOfResidenceId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
+  scholarHistoryId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
+  studentDocumentId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
+  responsibleDocumentId: integer()
+    .notNull()
+    .references(() => documentsTable.id),
 });
