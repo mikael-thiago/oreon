@@ -1,0 +1,44 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "migrate": {
+      "cache": false
+    },
+    "migrate:down": {
+      "cache": false
+    },
+    "migrate:pending": {
+      "cache": false
+    },
+    "migrate:executed": {
+      "cache": false
+    },
+    "seed": {
+      "cache": false
+    },
+    "seed:down": {
+      "cache": false
+    },
+    "seed:pending": {
+      "cache": false
+    },
+    "seed:executed": {
+      "cache": false
+    }
+  }
+}

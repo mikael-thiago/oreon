@@ -1,0 +1,25 @@
+{
+  "name": "oreon-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "packageManager": "npm@10.8.2",
+  "scripts": {
+    "dev": "turbo run dev",
+    "start": "turbo run start",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "migrate": "turbo run migrate",
+    "migrate:down": "turbo run migrate:down",
+    "migrate:pending": "turbo run migrate:pending",
+    "migrate:executed": "turbo run migrate:executed",
+    "seed": "turbo run seed",
+    "seed:down": "turbo run seed:down",
+    "seed:pending": "turbo run seed:pending",
+    "seed:executed": "turbo run seed:executed"
+  },
+  "devDependencies": {
+    "turbo": "^2.7.2"
+  }
+}
