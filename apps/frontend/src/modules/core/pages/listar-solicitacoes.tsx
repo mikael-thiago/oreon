@@ -1,15 +1,18 @@
+import { ErroRequisicao } from "@/components/erro-requisicao";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSessionContext } from "@/modules/shared/context/session-context";
+import { formatarTelefone } from "@/modules/shared/utils/telefone";
+import { parseDateIgnoringTimezone } from "@oreon/utils/date";
+import { DateFormatEnum } from "@oreon/utils/date-format";
+import { DateFormatter } from "@oreon/utils/date-formatter";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { FileText, ChevronRight, AlertCircle, Plus } from "lucide-react";
+import { AlertCircle, ChevronRight, FileText, Plus } from "lucide-react";
 import { listarSolicitacoesQueryOptions } from "../queries/listar-solicitacoes-query-options";
-import { ErroRequisicao } from "@/components/erro-requisicao";
-import { formatCpf } from "@/modules/shared/utils/cpf";
-import { formatTelefone } from "@/modules/shared/utils/telefone";
+import { formatarCPF } from "@oreon/utils/cpf";
 
-const getStatusConfig = (status: string) => {
+function getStatusConfig(status: string) {
   switch (status) {
     case "aprovada":
       return {
@@ -27,7 +30,14 @@ const getStatusConfig = (status: string) => {
         className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
       };
   }
-};
+}
+
+function formatSolicitacaoDate(value: string) {
+  return DateFormatter.format(
+    parseDateIgnoringTimezone(value, DateFormatEnum.ISO_DATE),
+    DateFormatEnum.BRAZIL_DATE_ONLY
+  );
+}
 
 export function ListarSolicitacoes() {
   const { unidadeId, anoLetivoId } = useSessionContext();
@@ -127,8 +137,8 @@ export function ListarSolicitacoes() {
                       </div>
                       <div className="flex flex-col gap-1">
                         <p className="text-sm text-muted-foreground">
-                          <span className="font-medium">Aluno:</span> CPF {formatCpf(solicitacao.estudante.cpf)} •
-                          Nascimento: {new Date(solicitacao.estudante.dataDeNascimento).toLocaleDateString("pt-BR")}
+                          <span className="font-medium">Aluno:</span> CPF {formatarCPF(solicitacao.estudante.cpf)} •
+                          Nascimento: {formatSolicitacaoDate(solicitacao.estudante.dataDeNascimento)}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <span className="font-medium">Modalidade/Etapa:</span> {solicitacao.modalidade} -{" "}
@@ -136,11 +146,11 @@ export function ListarSolicitacoes() {
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <span className="font-medium">Responsável:</span> {solicitacao.responsavel.nome} •{" "}
-                          {formatTelefone(solicitacao.responsavel.telefone)}
+                          {formatarTelefone(solicitacao.responsavel.telefone)}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           <span className="font-medium">Solicitado em:</span>{" "}
-                          {new Date(solicitacao.dataSolicitacao).toLocaleDateString("pt-BR")}
+                          {formatSolicitacaoDate(solicitacao.dataSolicitacao)}
                         </p>
                       </div>
                     </div>

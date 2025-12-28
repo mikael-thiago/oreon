@@ -1,4 +1,4 @@
-import { estaVazio } from "../../infra/utils/array.js";
+import { estaVazio } from "@oreon/utils/array";
 import { IllegalArgumentError } from "../errors/illegal-argument.error.js";
 import { Disciplina } from "./disciplina.entity.js";
 

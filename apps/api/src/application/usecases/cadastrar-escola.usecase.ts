@@ -3,7 +3,7 @@ import { ForbiddenError } from "../../domain/errors/forbidden.error.js";
 import { IllegalArgumentError } from "../../domain/errors/illegal-argument.error.js";
 import { EscolaRepository } from "../../domain/repositories/escola.repository.js";
 import type { UsuarioRepository } from "../../domain/repositories/usuario.repository.js";
-import { gerarStringAleatoria } from "../../infra/utils/string.js";
+import { gerarStringAleatoria } from "@oreon/utils/string";
 import type { CriptografiaService } from "../interfaces/criptografia.service.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";

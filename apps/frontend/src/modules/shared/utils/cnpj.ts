@@ -1,4 +1,4 @@
-export function formatCnpj(cnpj: string): string {
+export function formatarCnpj(cnpj: string): string {
   const apenasDigitos = cnpj.replace(/\D/g, "");
 
   if (!apenasDigitos || apenasDigitos.length !== 14) {

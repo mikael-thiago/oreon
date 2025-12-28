@@ -1,0 +1,42 @@
+{
+  "name": "@oreon/utils",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "tsc --watch"
+  },
+  "exports": {
+    "./array": {
+      "types": "./dist/array.d.ts",
+      "default": "./dist/array.js"
+    },
+    "./cpf": {
+      "types": "./dist/cpf.d.ts",
+      "default": "./dist/cpf.js"
+    },
+    "./string": {
+      "types": "./dist/string.d.ts",
+      "default": "./dist/string.js"
+    },
+    "./date-formatter": {
+      "types": "./dist/date/date-formatter.d.ts",
+      "default": "./dist/date/date-formatter.js"
+    },
+    "./date": {
+      "types": "./dist/date/date.d.ts",
+      "default": "./dist/date/date.js"
+    },
+    "./date-format": {
+      "types": "./dist/date/date-format.enum.d.ts",
+      "default": "./dist/date/date-format.enum.js"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

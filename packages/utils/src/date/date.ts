@@ -1,8 +1,4 @@
-export const DateFormatEnum = {
-  ISO_DATE: "yyyy-MM-dd",
-} as const;
-
-export type DateFormat = (typeof DateFormatEnum)[keyof typeof DateFormatEnum];
+import { DateFormatEnum, type DateFormat } from "./date-format.enum.js";
 
 /**
  * Converte uma string de data no formato especificado em um objeto Date
@@ -20,21 +16,24 @@ export type DateFormat = (typeof DateFormatEnum)[keyof typeof DateFormatEnum];
  * const date = parseDate("2024-12-27", "YYYY-MM-DD");
  */
 export function parseDateIgnoringTimezone(value: string, format: DateFormat): Date {
-  if (format !== DateFormatEnum.ISO_DATE) {
-    throw new Error(`Unsupported date format: ${format}. Currently only "YYYY-MM-DD" is supported.`);
+  switch (format) {
+    case DateFormatEnum.ISO_DATE: {
+      const [year, month, day] = value.split("-").map(Number);
+
+      if (!year || !month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
+        throw new Error(`[parseDateIgnoringTimezone] Invalid date string: ${value}. Expected format: ${format}`);
+      }
+
+      const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+      if (isNaN(date.getTime())) {
+        throw new Error(`[parseDateIgnoringTimezone] Data inválida: ${value}`);
+      }
+
+      return date;
+    }
+    default: {
+      throw new Error(`[parseDateIgnoringTimezone] Formato inválido: ${format}`);
+    }
   }
-
-  const [year, month, day] = value.split("-").map(Number);
-
-  if (!year || !month || !day || month < 1 || month > 12 || day < 1 || day > 31) {
-    throw new Error(`Invalid date string: ${value}. Expected format: ${format}`);
-  }
-
-  const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-
-  if (isNaN(date.getTime())) {
-    throw new Error(`Invalid date: ${value}`);
-  }
-
-  return date;
 }

@@ -1,3 +1,4 @@
+import { cpfEhValido } from "@oreon/utils/cpf";
 import type { Cargo } from "../../domain/entities/cargo.entity.js";
 import type { Colaborador, ContratoAtivoColaborador } from "../../domain/entities/colaborador.entity.js";
 import { IllegalArgumentError } from "../../domain/errors/illegal-argument.error.js";
@@ -6,12 +7,11 @@ import { ValidationError } from "../../domain/errors/validation.error.js";
 import type { CargoRepository } from "../../domain/repositories/cargo.repository.js";
 import type { ColaboradorRepository } from "../../domain/repositories/colaborador.repository.js";
 import type { UsuarioRepository } from "../../domain/repositories/usuario.repository.js";
-import { groupBy } from "../../infra/utils/array.js";
-import { cpfEhValido } from "../../infra/utils/cpf.js";
-import { gerarStringAleatoria } from "../../infra/utils/string.js";
 import type { CriptografiaService } from "../interfaces/criptografia.service.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";
+import { gerarStringAleatoria } from "@oreon/utils/string";
+import { groupBy } from "@oreon/utils/array";
 
 export type CadastrarColaboradorRequest = {
   readonly usuarioAutenticado: UsuarioAutenticado;

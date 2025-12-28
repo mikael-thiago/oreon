@@ -4,8 +4,8 @@ import type { BaseCurricularRepository } from "../../domain/repositories/base-cu
 import type { DisciplinaRepository } from "../../domain/repositories/disciplina.repository.js";
 import type { EscolaRepository } from "../../domain/repositories/escola.repository.js";
 import type { UnidadeEscolarRepository } from "../../domain/repositories/unidade-escola.repository.js";
-import { groupBy } from "../../infra/utils/array.js";
-import { padStart } from "../../infra/utils/string.js";
+import { groupBy } from "@oreon/utils/array";
+import { padStart } from "@oreon/utils/string";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { ModalidadesQueries } from "../queries/modalidades.queries.js";
 import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";

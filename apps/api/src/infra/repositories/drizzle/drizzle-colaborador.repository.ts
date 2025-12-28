@@ -6,7 +6,7 @@ import type {
   CriarColaboradorData,
   CriarProfessorRequest,
 } from "../../../domain/repositories/colaborador.repository.js";
-import { DateFormatter } from "../../utils/date-formatter.js";
+import { DateFormatter } from "@oreon/utils/date-formatter";
 import type { DrizzleService } from "./drizzle.service.js";
 import { colaboradoresTable, contratoProfessorDisciplinaTable, contratosTable, usuarioTable } from "./schema.js";
 

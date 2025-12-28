@@ -9,7 +9,7 @@ import { StatusMatriculaEnum } from "../../domain/enums/status-matricula.enum.js
 import type { Sexo } from "../../domain/enums/sexo.enum.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { FileStorageService } from "../interfaces/file-storage.interface.js";
-import { cpfEhValido } from "../../infra/utils/cpf.js";
+import { cpfEhValido } from "@oreon/utils/cpf";
 
 export type CriarMatriculaRequest = {
   readonly cpf: string;

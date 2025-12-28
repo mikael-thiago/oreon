@@ -1,19 +1,4 @@
-export type DateFormat =
-  | "DD/MM/YYYY"
-  | "DD/MM/YYYY HH:mm:ss"
-  | "DD/MM/YY"
-  | "YYYY-MM-DD"
-  | "YYYY-MM-DD HH:mm:ss"
-  | "MM/DD/YYYY"
-  | "HH:mm:ss"
-  | "HH:mm"
-  | "DD de MMMM de YYYY"
-  | "MMMM de YYYY"
-  | "weekday"
-  | "short-weekday"
-  | "relative"
-  | "iso"
-  | "database";
+import { DateFormatEnum, type DateFormat } from "./date-format.enum.js";
 
 export class DateFormatter {
   private static readonly MONTHS_PT = [
@@ -50,49 +35,52 @@ export class DateFormatter {
    * @returns Formatted date string
    */
   static format(date: Date, format: DateFormat): string {
+    console.log('formatando data', date, format);
+    
     switch (format) {
-      case "DD/MM/YYYY":
+      case DateFormatEnum.BRAZIL_DATE_ONLY:
         return this.formatBrazilianDate(date);
-
-      case "DD/MM/YYYY HH:mm:ss":
-        return this.formatBrazilianDateTime(date);
-
-      case "DD/MM/YY":
-        return this.formatShortBrazilianDate(date);
-
-      case "YYYY-MM-DD":
+        
+      case DateFormatEnum.ISO_DATE:
         return this.formatISODate(date);
 
-      case "YYYY-MM-DD HH:mm:ss":
-      case "database":
-        return this.formatISODateTime(date);
+      // case "DD/MM/YYYY HH:mm:ss":
+      //   return this.formatBrazilianDateTime(date);
 
-      case "MM/DD/YYYY":
-        return this.formatAmericanDate(date);
+      // case "DD/MM/YY":
+      //   return this.formatShortBrazilianDate(date);
 
-      case "HH:mm:ss":
-        return this.formatTime(date);
 
-      case "HH:mm":
-        return this.formatShortTime(date);
+      // case "YYYY-MM-DD HH:mm:ss":
+      // case "database":
+      //   return this.formatISODateTime(date);
 
-      case "DD de MMMM de YYYY":
-        return this.formatLongBrazilianDate(date);
+      // case "MM/DD/YYYY":
+      //   return this.formatAmericanDate(date);
 
-      case "MMMM de YYYY":
-        return this.formatBrazilianMonthYear(date);
+      // case "HH:mm:ss":
+      //   return this.formatTime(date);
 
-      case "weekday":
-        return this.formatWeekday(date);
+      // case "HH:mm":
+      //   return this.formatShortTime(date);
 
-      case "short-weekday":
-        return this.formatShortWeekday(date);
+      // case "DD de MMMM de YYYY":
+      //   return this.formatLongBrazilianDate(date);
 
-      case "relative":
-        return this.formatRelativeTime(date);
+      // case "MMMM de YYYY":
+      //   return this.formatBrazilianMonthYear(date);
 
-      case "iso":
-        return date.toISOString();
+      // case "weekday":
+      //   return this.formatWeekday(date);
+
+      // case "short-weekday":
+      //   return this.formatShortWeekday(date);
+
+      // case "relative":
+      //   return this.formatRelativeTime(date);
+
+      // case "iso":
+      //   return date.toISOString();
 
       default:
         const _exhaustiveCheck: never = format;

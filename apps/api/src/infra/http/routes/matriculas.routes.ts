@@ -8,9 +8,10 @@ import { ListarSolicitacoesUseCase } from "../../../application/usecases/listar-
 import { ObterDetalhesSolicitacaoUseCase } from "../../../application/usecases/obter-detalhes-solicitacao.usecase.js";
 import { container } from "../../di/di.js";
 import { ValidationError } from "../../../domain/errors/validation.error.js";
-import { removerCaracteresEspeciais } from "../../utils/string.js";
-import { CPF_REGEX } from "../../utils/cpf.js";
-import { DateFormatEnum, parseDateIgnoringTimezone } from "../../utils/date.js";
+import { removerCaracteresEspeciais } from "@oreon/utils/string";
+import { CPF_REGEX } from "@oreon/utils/cpf";
+import { parseDateIgnoringTimezone } from "@oreon/utils/date";
+import { DateFormatEnum } from "@oreon/utils/date-format";
 
 const listarMatriculasParamsSchema = z.object({
   unidadeId: z.coerce

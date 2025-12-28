@@ -2,9 +2,10 @@ import { and, eq } from "drizzle-orm";
 import { SolicitacaoMatricula } from "../../../domain/entities/solicitacao-matricula.entity.js";
 import type { SolicitacaoMatriculaRepository, CriarSolicitacaoMatriculaRequest } from "../../../domain/repositories/solicitacao-matricula.repository.js";
 import type { RelacaoResponsabilidade } from "../../../domain/enums/relacao-responsabilidade.enum.js";
-import { DateFormatter } from "../../utils/date-formatter.js";
+import { DateFormatter } from "@oreon/utils/date-formatter";
 import type { DrizzleService } from "./drizzle.service.js";
 import { responsabilityRelationsTable, solicitacoesMatriculaTable } from "./schema.js";
+import { DateFormatEnum } from "@oreon/utils/date-format";
 
 export class DrizzleSolicitacaoMatriculaRepository implements SolicitacaoMatriculaRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
@@ -32,7 +33,7 @@ export class DrizzleSolicitacaoMatriculaRepository implements SolicitacaoMatricu
         schoolPeriodId: request.periodoEscolarId,
         stepId: request.etapaId,
         status: request.status,
-        createdDate: DateFormatter.format(request.dataSolicitacao, "YYYY-MM-DD"),
+        createdDate: DateFormatter.format(request.dataSolicitacao, DateFormatEnum.ISO_DATE),
         proofOfResidenceId: request.comprovanteDeResidenciaId,
         scholarHistoryId: request.historicoEscolarId,
         studentDocumentId: request.documentoAlunoId,

@@ -1,10 +1,11 @@
 import { eq } from "drizzle-orm";
 import { Aluno } from "../../../domain/entities/aluno.entity.js";
-import type { AlunoRepository, CriarAlunoRequest } from "../../../domain/repositories/aluno.repository.js";
 import type { Sexo } from "../../../domain/enums/sexo.enum.js";
-import { DateFormatter } from "../../utils/date-formatter.js";
+import type { AlunoRepository, CriarAlunoRequest } from "../../../domain/repositories/aluno.repository.js";
 import type { DrizzleService } from "./drizzle.service.js";
 import { estudantesTable } from "./schema.js";
+import { DateFormatter } from "@oreon/utils/date-formatter";
+import { DateFormatEnum } from "@oreon/utils/date-format";
 
 export class DrizzleAlunoRepository implements AlunoRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
@@ -64,7 +65,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
       .values({
         name: request.nome,
         cpf: request.cpf,
-        birthDate: DateFormatter.format(request.dataDeNascimento, "YYYY-MM-DD"),
+        birthDate: DateFormatter.format(request.dataDeNascimento, DateFormatEnum.ISO_DATE),
         sex: this.mapSexoToDb(request.sexo),
         userId: null,
       })

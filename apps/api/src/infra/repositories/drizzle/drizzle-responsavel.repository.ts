@@ -1,9 +1,10 @@
 import { eq } from "drizzle-orm";
 import { Responsavel } from "../../../domain/entities/responsavel.entity.js";
 import type { ResponsavelRepository, CriarResponsavelRequest } from "../../../domain/repositories/responsavel.repository.js";
-import { DateFormatter } from "../../utils/date-formatter.js";
+import { DateFormatter } from "@oreon/utils/date-formatter";
 import type { DrizzleService } from "./drizzle.service.js";
 import { responsaveisTable } from "./schema.js";
+import { DateFormatEnum } from "@oreon/utils/date-format";
 
 export class DrizzleResponsavelRepository implements ResponsavelRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
@@ -59,7 +60,7 @@ export class DrizzleResponsavelRepository implements ResponsavelRepository {
         cpf: request.cpf,
         phone: request.telefone,
         email: request.email,
-        birthDate: DateFormatter.format(request.dataDeNascimento, "YYYY-MM-DD"),
+        birthDate: DateFormatter.format(request.dataDeNascimento, DateFormatEnum.ISO_DATE),
         userId: null,
       })
       .returning();

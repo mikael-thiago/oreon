@@ -62,6 +62,26 @@ export function formatarCPF(cpf: string): string {
 }
 
 /**
+ * Formata um CPF no padrão XXX.XXX.XXX-XX
+ * @param cpf - CPF (apenas números)
+ * @returns CPF formatado
+ */
+export function mascararCpf(cpf: string): string {
+  const numbers = cpf.replace(/\D/g, "");
+  const limited = numbers.slice(0, 11);
+
+  if (limited.length <= 3) return limited;
+  if (limited.length <= 6) return `${limited.slice(0, 3)}.${limited.slice(3)}`;
+  if (limited.length <= 9)
+    return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(6)}`;
+
+  return `${limited.slice(0, 3)}.${limited.slice(3, 6)}.${limited.slice(
+    6,
+    9
+  )}-${limited.slice(9)}`;
+}
+
+/**
  * Remove a formatação de um CPF, mantendo apenas os números
  * @param cpf - O CPF formatado
  * @returns O CPF sem formatação (apenas números)

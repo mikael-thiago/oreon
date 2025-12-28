@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import type { UnidadeEscolarResponse } from "@/modules/core/services/escola-service";
 import { Skeleton } from "./ui/skeleton";
-import { formatCnpj } from "@/modules/shared/utils/cnpj";
+import { formatarCnpj } from "@/modules/shared/utils/cnpj";
 import { useSessionContext } from "@/modules/shared/context/session-context";
 
 export function TeamSwitcher({
@@ -80,7 +80,7 @@ export function TeamSwitcher({
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{activeTeam.nome}</span>
                 <span className="truncate text-xs">
-                  {formatCnpj(activeTeam.cnpj)}
+                  {formatarCnpj(activeTeam.cnpj)}
                 </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -108,7 +108,7 @@ export function TeamSwitcher({
                 {/* <div className="flex size-6 items-center justify-center rounded-md border">
                   <team.logo className="size-3.5 shrink-0" />
                 </div> */}
-                {unidade.nome} - {formatCnpj(unidade.cnpj)}
+                {unidade.nome} - {formatarCnpj(unidade.cnpj)}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}

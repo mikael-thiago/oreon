@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSessionContext } from "@/modules/shared/context/session-context";
-import { formatCnpj } from "@/modules/shared/utils/cnpj";
-import { formatCpf } from "@/modules/shared/utils/cpf";
+import { formatarCnpj } from "@/modules/shared/utils/cnpj";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Plus, Users } from "lucide-react";
 import { listarColaboradoresQueryOptions } from "../queries/listar-colaboradores-query-options";
+import { formatarCPF } from "@oreon/utils/cpf";
 
 export function ListarColaboradores() {
   const { unidadeId } = useSessionContext();
@@ -74,7 +74,7 @@ export function ListarColaboradores() {
                     <div className="flex flex-col gap-1">
                       <p>
                         <span className="font-medium">CPF:</span>{" "}
-                        {formatCpf(colaborador.cpf)}
+                        {formatarCPF(colaborador.cpf)}
                       </p>
                       <p>
                         <span className="font-medium">Email:</span>{" "}
@@ -94,7 +94,7 @@ export function ListarColaboradores() {
                       </p>
                       <p>
                         <span className="font-medium">Unidade:</span>{" "}
-                        {formatCnpj(colaborador.unidade.cnpj)}
+                        {formatarCnpj(colaborador.unidade.cnpj)}
                       </p>
                       <p>
                         <span className="font-medium">Cargo:</span>{" "}

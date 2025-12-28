@@ -11,7 +11,7 @@ import type { Sexo } from "../../domain/enums/sexo.enum.js";
 import type { RelacaoResponsabilidade } from "../../domain/enums/relacao-responsabilidade.enum.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { FileStorageService } from "../interfaces/file-storage.interface.js";
-import { cpfEhValido } from "../../infra/utils/cpf.js";
+import { cpfEhValido } from "@oreon/utils/cpf";
 
 export type SolicitarMatriculaRequest = {
   readonly cpf: string;

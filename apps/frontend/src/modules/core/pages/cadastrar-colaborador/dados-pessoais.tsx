@@ -5,9 +5,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { formatCpf, unformatCPF } from "@/modules/shared/utils/cpf";
 import { Controller, type useForm } from "react-hook-form";
 import type { CadastrarColaboradorFormData } from "../../schemas/cadastrar-colaborador-schema";
+import { limparCPF, mascararCpf } from '@oreon/utils/cpf';
 
 export type DadosPessoaisProps = Pick<
   ReturnType<typeof useForm<CadastrarColaboradorFormData>>,
@@ -45,9 +45,9 @@ export function DadosPessoais({
                 id="cpf"
                 type="text"
                 placeholder="000.000.000-00"
-                value={formatCpf(field.value ?? "")}
+                value={mascararCpf(field.value ?? "")}
                 onChange={(e) => {
-                  const unformatted = unformatCPF(e.target.value);
+                  const unformatted = limparCPF(e.target.value);
                   field.onChange(unformatted);
                 }}
                 onBlur={field.onBlur}

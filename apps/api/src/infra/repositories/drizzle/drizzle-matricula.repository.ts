@@ -5,7 +5,7 @@ import type {
   MatriculaRepository,
 } from "../../../domain/repositories/matricula.repository.js";
 import type { StatusMatricula } from "../../../domain/enums/status-matricula.enum.js";
-import { DateFormatter } from "../../utils/date-formatter.js";
+import { DateFormatter } from "@oreon/utils/date-formatter";
 import type { DrizzleService } from "./drizzle.service.js";
 import { matriculasTable } from "./schema.js";
 

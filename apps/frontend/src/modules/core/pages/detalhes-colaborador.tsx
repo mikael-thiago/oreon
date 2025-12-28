@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSessionContext } from "@/modules/shared/context/session-context";
-import { formatCpf } from "@/modules/shared/utils/cpf";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "@tanstack/react-router";
 import { AlertCircle, ArrowLeft } from "lucide-react";
@@ -19,6 +18,7 @@ import {
   type StatusContrato,
 } from "../types/status-contrato.enum";
 import { titleCase } from "@/modules/shared/utils/string";
+import { formatarCPF } from "@oreon/utils/cpf";
 
 export function DetalhesColaborador() {
   const { unidadeId } = useSessionContext();
@@ -150,7 +150,7 @@ export function DetalhesColaborador() {
                 <dt className="text-sm font-medium text-muted-foreground">
                   CPF
                 </dt>
-                <dd className="text-sm mt-1">{formatCpf(colaborador.cpf)}</dd>
+                <dd className="text-sm mt-1">{formatarCPF(colaborador.cpf)}</dd>
               </div>
               <div>
                 <dt className="text-sm font-medium text-muted-foreground">

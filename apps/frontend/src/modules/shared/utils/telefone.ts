@@ -3,7 +3,7 @@
  * @param telefone - Telefone (apenas números)
  * @returns Telefone formatado
  */
-export function formatTelefone(telefone: string): string {
+export function formatarTelefone(telefone: string): string {
   const numbers = telefone.replace(/\D/g, "");
   const limited = numbers.slice(0, 11);
 
@@ -24,6 +24,6 @@ export function formatTelefone(telefone: string): string {
  * @param telefone - Telefone formatado
  * @returns Telefone sem formatação (apenas números)
  */
-export function unformatTelefone(telefone: string): string {
+export function limparTelefone(telefone: string): string {
   return telefone.replace(/\D/g, "");
 }

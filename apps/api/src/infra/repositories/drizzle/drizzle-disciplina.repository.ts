@@ -4,7 +4,7 @@ import type {
   DisciplinaRepository,
   ObterOuCriarDisciplinaRequest,
 } from "../../../domain/repositories/disciplina.repository.js";
-import { slugify } from "../../utils/string.js";
+import { slugify } from "@oreon/utils/string";
 import type { DrizzleService } from "./drizzle.service.js";
 import { disciplinasTable } from "./schema.js";
 

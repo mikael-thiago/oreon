@@ -184,6 +184,9 @@ export const cargosTable = pgTable("occupations", {
 
 export const colaboradoresTable = pgTable("employees", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
+  cpf: varchar({ length: 11 }).notNull(),
+  email: varchar({ length: 100 }).notNull(),
+  phone: varchar({ length: 11 }).notNull(),
   userId: integer()
     .notNull()
     .references(() => usuarioTable.id),
