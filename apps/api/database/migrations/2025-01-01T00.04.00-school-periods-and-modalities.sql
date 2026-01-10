@@ -5,7 +5,8 @@ CREATE TABLE "school_periods" (
 	"start_date" timestamp NOT NULL,
 	"end_date" timestamp NOT NULL,
 	"school_id" integer NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "school_periods_unique_idx" UNIQUE("year","school_id")
 );
 
 CREATE TABLE "modalities" (

@@ -21,7 +21,7 @@ import { Skeleton } from "./ui/skeleton";
 import { formatarCnpj } from "@/modules/shared/utils/cnpj";
 import { useSessionContext } from "@/modules/shared/context/session-context";
 
-export function TeamSwitcher({
+export function SeletorUnidade({
   unidades,
   isLoading,
 }: {

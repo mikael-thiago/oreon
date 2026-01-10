@@ -9,10 +9,17 @@ export type EtapaResponse = {
   readonly nome: string;
 };
 
+export type ModalidadeComMatriculaResponse = {
+  readonly id: number;
+  readonly nome: string;
+  readonly quantidadeSolicitacoes: number;
+}
+
 export abstract class ModalidadesQueries {
   abstract listarModalidades(): Promise<ModalidadeResponse[]>;
   abstract listarEtapas(modalidadeId: number): Promise<EtapaResponse[]>;
   abstract listarTodasEtapas(): Promise<(EtapaResponse & { readonly modalidadeId: number })[]>;
   abstract obterModalidadePorId(id: number): Promise<ModalidadeResponse | null>;
   abstract obterEtapaPorId(id: number): Promise<(EtapaResponse & { readonly modalidadeId: number }) | null>;
+  abstract obterModalidadesComMatriculas(unidadeId: number, anoLetivoId: number): Promise<ModalidadeComMatriculaResponse[]>;
 }

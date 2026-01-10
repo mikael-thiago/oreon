@@ -9,6 +9,8 @@ import { padStart } from "@oreon/utils/string";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { ModalidadesQueries } from "../queries/modalidades.queries.js";
 import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";
+import { BaseCurricular } from "../../domain/entities/base-curricular.entity.js";
+import { Result } from "../../domain/shared/result.js";
 
 export type CadastrarBaseCurricularRequest = {
   readonly usuario: UsuarioAutenticado;
@@ -31,14 +33,18 @@ export class CadastrarBaseUseCase {
     private readonly uow: UnitOfWork
   ) {}
 
-  async executar(request: CadastrarBaseCurricularRequest) {
+  async executar(
+    request: CadastrarBaseCurricularRequest
+  ): Promise<Result<BaseCurricular, IllegalArgumentError | ValidationError>> {
     const [escolaExiste, unidadeExiste] = await Promise.all([
       this.escolaRepository.existe(request.usuario.escolaId),
       this.unidadeEscolarRepository.existeComId(request.unidadeId),
     ]);
 
-    if (!escolaExiste) throw new IllegalArgumentError(`Escola com ID ${request.usuario.escolaId} não existe!`);
-    if (!unidadeExiste) throw new IllegalArgumentError(`Unidade com ID ${request.unidadeId} não existe!`);
+    if (!escolaExiste)
+      return Result.fail(new IllegalArgumentError(`Escola com ID ${request.usuario.escolaId} não existe!`));
+    if (!unidadeExiste)
+      return Result.fail(new IllegalArgumentError(`Unidade com ID ${request.unidadeId} não existe!`));
 
     const disciplinasAgrupadasPorNome = groupBy(request.disciplinas, (d) => d.nome);
 
@@ -47,15 +53,17 @@ export class CadastrarBaseUseCase {
       .filter((group) => group.length > 1);
 
     if (disciplinasDuplicadas.length > 0) {
-      throw new IllegalArgumentError(
-        `Disciplinas duplicadas informadas: ${JSON.stringify(disciplinasDuplicadas, null, 2)}`
+      return Result.fail(
+        new IllegalArgumentError(
+          `Disciplinas duplicadas informadas: ${JSON.stringify(disciplinasDuplicadas, null, 2)}`
+        )
       );
     }
 
     const etapa = await this.modalidadesQueries.obterEtapaPorId(request.etapaId);
 
     if (!etapa) {
-      throw new IllegalArgumentError(`Etapa com ID ${request.etapaId} não existe!`);
+      return Result.fail(new IllegalArgumentError(`Etapa com ID ${request.etapaId} não existe!`));
     }
 
     const modalidade = (await this.modalidadesQueries.obterModalidadePorId(etapa.modalidadeId))!;
@@ -81,14 +89,16 @@ export class CadastrarBaseUseCase {
       const disciplinasComCodigoExistente = verificacaoExistencia.filter((verificacao) => verificacao.existe);
 
       if (disciplinasComCodigoExistente.length > 0) {
-        throw ValidationError.semantico([
-          {
-            propriedade: "request.disciplinas",
-            mensagem:
-              `Os seguintes códigos já existem na unidade ${request.unidadeId}: ` +
-              disciplinasComCodigoExistente.map((disciplina) => disciplina.codigo).join(", "),
-          },
-        ]);
+        return Result.fail(
+          ValidationError.semantico([
+            {
+              propriedade: "request.disciplinas",
+              mensagem:
+                `Os seguintes códigos já existem na unidade ${request.unidadeId}: ` +
+                disciplinasComCodigoExistente.map((disciplina) => disciplina.codigo).join(", "),
+            },
+          ])
+        );
       }
 
       const disciplinasDaBase = await Promise.all(
@@ -108,16 +118,22 @@ export class CadastrarBaseUseCase {
         })
       );
 
-      return this.baseRepository.criarBaseCurricular({
-        codigo: `BASEM${padStart(modalidade.id, 2, "0")}E${padStart(etapa.numero, 2, "0")}${padStart(
-          sequencial,
-          2,
-          "0"
-        )}`,
-        etapaId: request.etapaId,
-        disciplinas: disciplinasDaBase,
-        unidadeId: request.unidadeId,
-      });
+      const baseCurricular = await this.baseRepository.salvar(
+        new BaseCurricular({
+          id: await this.baseRepository.obterProximoId(),
+          codigo: `BASEM${padStart(modalidade.id, 2, "0")}E${padStart(etapa.numero, 2, "0")}${padStart(
+            sequencial,
+            2,
+            "0"
+          )}`,
+          etapaId: request.etapaId,
+          disciplinas: disciplinasDaBase,
+          unidadeId: request.unidadeId,
+          dataCriacao: new Date(),
+        })
+      );
+
+      return Result.ok(baseCurricular);
     });
   }
 }

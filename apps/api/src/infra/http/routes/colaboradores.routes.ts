@@ -4,6 +4,9 @@ import z from "zod";
 import { CadastrarColaboradorUseCase } from "../../../application/usecases/cadastrar-colaborador.usecase.js";
 import { ListarColaboradoresUseCase } from "../../../application/usecases/listar-colaboradores.usecase.js";
 import { container } from "../../di/di.js";
+import { parseDateIgnoringTimezone } from "@oreon/utils/date";
+import { DateFormatEnum } from "@oreon/utils/date-format";
+import { Result } from "../../../domain/shared/result.js";
 
 const listarColaboradoresQuerySchema = z.object({
   unidadeId: z.coerce
@@ -46,6 +49,12 @@ const cadastrarColaboradorSchema = z.object({
     })
     .int("O ID da unidade deve ser um número inteiro")
     .positive("O ID da unidade deve ser um número positivo"),
+  dataDeNascimento: z.iso.date({
+    error: (issue) =>
+      issue.input === undefined
+        ? "A data de nascimento do colaborador é obrigatória"
+        : "A data informada deve estar no formato yyyy-MM-dd",
+  }),
   contrato: z.object({
     cargoId: z
       .number({
@@ -107,13 +116,15 @@ export async function colaboradoresRoutes(fastify: FastifyInstance) {
       schema: { querystring: listarColaboradoresQuerySchema },
       onRequest: [fastify.authenticate],
     },
-    async function handle(request) {
+    async function handle(request, reply) {
       const usecase = container.get(ListarColaboradoresUseCase);
 
-      return usecase.executar({
+      const result = await usecase.executar({
         usuarioAutenticado: request.user,
         unidadeId: request.query.unidadeId,
       });
+
+      reply.replyResult(result);
     }
   );
 
@@ -123,10 +134,10 @@ export async function colaboradoresRoutes(fastify: FastifyInstance) {
       schema: { body: cadastrarColaboradorSchema },
       onRequest: [fastify.authenticate],
     },
-    async function handle(request) {
+    async function handle(request, reply) {
       const usecase = container.get(CadastrarColaboradorUseCase);
 
-      return usecase.executar({
+      const result = await usecase.executar({
         usuarioAutenticado: request.user,
         nome: request.body.nome,
         cpf: request.body.cpf,
@@ -134,7 +145,10 @@ export async function colaboradoresRoutes(fastify: FastifyInstance) {
         email: request.body.email,
         unidadeId: request.body.unidadeId,
         contrato: request.body.contrato,
+        dataDeNascimento: parseDateIgnoringTimezone(request.body.dataDeNascimento, DateFormatEnum.ISO_DATE),
       });
+
+      reply.replyResult(result, 201);
     }
   );
 }

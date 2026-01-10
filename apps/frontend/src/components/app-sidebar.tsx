@@ -4,7 +4,7 @@ import * as React from "react";
 import { AnoLetivoSwitcher } from "@/components/ano-letivo-switcher";
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { SeletorUnidade } from "@/components/seletor-unidade";
 import {
   Sidebar,
   SidebarContent,
@@ -96,7 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" variant="sidebar" {...props}>
       <SidebarHeader>
-        <TeamSwitcher unidades={unidades} isLoading={isPending} />
+        <SeletorUnidade unidades={unidades} isLoading={isPending} />
         <AnoLetivoSwitcher
           anosLetivos={anosLetivos}
           isLoading={isPendingAnosLetivos}

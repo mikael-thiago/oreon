@@ -4,6 +4,7 @@ import z from "zod";
 import { BaseCurricularQueries } from "../../../application/queries/base.queries.js";
 import { CadastrarBaseUseCase } from "../../../application/usecases/cadastrar-base-curricular.usecase.js";
 import { container } from "../../di/di.js";
+import { Result } from "../../../domain/shared/result.js";
 
 const criarBaseSchema = z.object({
   etapaId: z
@@ -64,10 +65,12 @@ export async function basesRoutes(fastify: FastifyInstance) {
       async function handle(request, reply) {
         const usecase = container.get(CadastrarBaseUseCase);
 
-        return usecase.executar({
+        const result = await usecase.executar({
           ...request.body,
           usuario: request.user,
         });
+
+        reply.replyResult(result, 201);
       }
     );
 

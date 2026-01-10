@@ -7,6 +7,7 @@ import {
   colaboradoresTable,
   contratosTable,
   escolaTable,
+  pessoasTable,
   unidadeTable,
   usuarioTable,
 } from "../repositories/drizzle/schema.js";
@@ -37,9 +38,9 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
       .select({
         id: colaboradoresTable.id,
         nome: usuarioTable.name,
-        email: colaboradoresTable.email,
-        cpf: colaboradoresTable.cpf,
-        telefone: colaboradoresTable.phone,
+        email: pessoasTable.email,
+        cpf: pessoasTable.cpf,
+        telefone: pessoasTable.phone,
         unidadeId: unidadeTable.id,
         unidadeCnpj: unidadeTable.cnpj,
         escolaNome: escolaTable.name,
@@ -50,13 +51,14 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
         status: contratosTable.status,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(latestContracts, eq(colaboradoresTable.id, latestContracts.employeeId))
       .innerJoin(contratosTable, eq(contratosTable.id, latestContracts.maxId))
       .innerJoin(unidadeTable, eq(contratosTable.unitId, unidadeTable.id))
       .innerJoin(escolaTable, eq(unidadeTable.institutionId, escolaTable.id))
       .innerJoin(cargosTable, eq(contratosTable.occupationId, cargosTable.id))
-      .where(eq(usuarioTable.escolaId, escolaId))
+      .where(eq(usuarioTable.schoolId, escolaId))
       .orderBy(desc(contratosTable.id));
 
     const results = await queryBuilder;
@@ -64,7 +66,7 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
     return results.map((result) => ({
       id: result.id,
       nome: result.nome,
-      email: result.email,
+      email: result.email!,
       cpf: result.cpf!,
       telefone: result.telefone || "",
       unidade: {
@@ -88,9 +90,9 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
       .select({
         id: colaboradoresTable.id,
         nome: usuarioTable.name,
-        email: colaboradoresTable.email,
-        cpf: colaboradoresTable.cpf,
-        telefone: colaboradoresTable.phone,
+        email: pessoasTable.email,
+        cpf: pessoasTable.cpf,
+        telefone: pessoasTable.phone,
         contratoId: contratosTable.id,
         contratoDataInicio: contratosTable.startDate,
         contratoDataFim: contratosTable.endDate,
@@ -101,6 +103,7 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
         contratoSalario: contratosTable.salary,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(contratosTable, eq(contratosTable.employeeId, colaboradoresTable.id))
       .innerJoin(cargosTable, eq(contratosTable.occupationId, cargosTable.id))
@@ -127,7 +130,7 @@ export class DrizzleColaboradoresQueries implements ColaboradoresQueries {
         cargoNome: result.contratoCargoNome,
         matricula: result.contratoMatricula || "",
         status: result.contratoStatus === "active" ? StatusContratoEnum.Ativo : StatusContratoEnum.Inativo,
-        salario: result.contratoSalario, // TODO: Add salary field to schema
+        salario: result.contratoSalario,
       })),
     };
   }

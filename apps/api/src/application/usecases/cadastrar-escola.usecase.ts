@@ -7,6 +7,9 @@ import { gerarStringAleatoria } from "@oreon/utils/string";
 import type { CriptografiaService } from "../interfaces/criptografia.service.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";
+import { Escola } from "../../domain/entities/escola.entity.js";
+import { Usuario } from "../../domain/entities/usuario.entity.js";
+import { Result } from "../../domain/shared/result.js";
 
 type CadastrarEscolaRequest = {
   readonly escola: {
@@ -65,40 +68,69 @@ export class CadastarEscolaUseCase {
     private readonly uow: UnitOfWork
   ) {}
 
-  async executar(request: CadastrarEscolaRequest): Promise<CadastrarEscolaResponse> {
+  async executar(
+    request: CadastrarEscolaRequest
+  ): Promise<Result<CadastrarEscolaResponse, IllegalArgumentError | ForbiddenError | ConflictError>> {
     const usuario = await this.usuarioRepository.obterUsuarioPorId(request.usuarioAutenticado.id);
 
     if (usuario === null)
-      throw new IllegalArgumentError(`Usuário autenticado com ID ${request.usuarioAutenticado.id} não encontrado!`);
-    if (!usuario.admin) throw new ForbiddenError("Operação permitida apenas para usuários admin");
+      return Result.fail(
+        new IllegalArgumentError(`Usuário autenticado com ID ${request.usuarioAutenticado.id} não encontrado!`)
+      );
+    if (!usuario.admin) return Result.fail(new ForbiddenError("Operação permitida apenas para usuários admin"));
 
     const existeComMesmoEmail = await this.escolaRepository.existeComEmail(request.escola.email);
 
     if (existeComMesmoEmail) {
-      throw new ConflictError(`Já existe uma escola cadastrada com o email '${request.escola.email}'`);
+      return Result.fail(new ConflictError(`Já existe uma escola cadastrada com o email '${request.escola.email}'`));
     }
 
     return this.uow.transact(async () => {
-      const escola = await this.escolaRepository.criarEscola({
+      const escolaId = await this.escolaRepository.obterProximoId();
+      const dataCriacao = new Date();
+
+      const escola = new Escola({
+        id: escolaId,
         nome: request.escola.nome,
         email: request.escola.email,
-        cnpjMatriz: request.escola.cnpjMatriz,
-        telefone1: request.escola.telefone1,
-        telefone2: request.escola.telefone2,
-        endereco: request.escola.endereco,
+        dataDeCriacao: dataCriacao,
+        matriz: {
+          id: escolaId, // Matriz uses same ID as escola
+          nome: request.escola.nome,
+          email: request.escola.email,
+          cnpj: request.escola.cnpjMatriz,
+          telefone1: request.escola.telefone1,
+          telefone2: request.escola.telefone2 ?? null,
+          escolaId: escolaId,
+          endereco: {
+            rua: request.escola.endereco?.rua ?? null,
+            numero: request.escola.endereco?.number ?? null,
+            cidade: request.escola.endereco?.city ?? null,
+            estado: request.escola.endereco?.state ?? null,
+            cep: request.escola.endereco?.zipCode ?? null,
+            pais: request.escola.endereco?.country ?? null,
+          },
+          dataDeCriacao: dataCriacao,
+        },
       });
+
+      await this.escolaRepository.salvar(escola);
 
       const senha = gerarStringAleatoria(12);
 
-      const usuarioEscola = await this.usuarioRepository.criarUsuario({
+      const usuarioEscola = new Usuario({
+        id: await this.usuarioRepository.obterProximoId(),
         login: request.escola.email,
         nome: request.escola.nome,
         escolaId: escola.id,
         senha: await this.criptografiaService.hashear(senha),
-        root: true
+        admin: false,
+        root: true,
       });
 
-      return {
+      await this.usuarioRepository.salvar(usuarioEscola);
+
+      return Result.ok({
         escola: {
           id: escola.id,
           nome: escola.nome,
@@ -116,7 +148,7 @@ export class CadastarEscolaUseCase {
           email: usuarioEscola.login,
           senha,
         },
-      };
+      });
     });
   }
 }

@@ -10,6 +10,7 @@ export type AtualizarDocumentoRequest = {
 };
 
 export abstract class DocumentoRepository {
+  abstract obterProximoId(): Promise<number>;
   abstract criarDocumento(request: CriarDocumentoRequest): Promise<Documento>;
   abstract atualizarDocumento(request: AtualizarDocumentoRequest): Promise<Documento>;
 }

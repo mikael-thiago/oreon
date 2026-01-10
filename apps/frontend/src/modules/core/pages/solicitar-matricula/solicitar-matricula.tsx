@@ -17,6 +17,7 @@ import { Documentos } from "./documentos";
 import { InformacoesAluno } from "./informacoes-aluno";
 import { InformacoesResponsavel } from "./informacoes-responsavel";
 import { WizardSteps } from "./wizard-steps";
+import { listarSolicitacoesQueryOptions } from "../../queries/listar-solicitacoes-query-options";
 
 const WIZARD_STEPS = [
   { id: 1, title: "Aluno", description: "Dados do estudante" },
@@ -114,8 +115,8 @@ export function SolicitarMatricula() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["matriculas"] });
-      navigate({ to: "/matriculas" });
+      queryClient.invalidateQueries(listarSolicitacoesQueryOptions(unidadeId, anoLetivoId));
+      navigate({ to: "/solicitacoes" });
     },
     onError: (error) => {
       setFormValidationErrors(error, setError);
@@ -199,7 +200,7 @@ export function SolicitarMatricula() {
       </div>
 
       <div className="max-w-4xl">
-        <WizardSteps steps={WIZARD_STEPS} currentStep={currentStep} />
+        <WizardSteps steps={WIZARD_STEPS} currentStep={currentStep} onStepChange={setCurrentStep} />
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>

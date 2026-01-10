@@ -15,3 +15,25 @@ export function groupBy<Item = unknown, Key extends string | number = string>(ar
 
   return result;
 }
+
+/**
+ * Remove itens duplicados de um array, mantendo apenas o primeiro item de cada chave
+ * @param arr Array de itens
+ * @param getKey Chave de unicidade
+ * @returns Array deduplicado
+ */
+export function deduplicate<Item = unknown, Key extends string | number = string>(arr: Item[], getKey: (item: Item) => Key): Item[] {
+  const existence: Record<Key, boolean> = {} as Record<Key, boolean>;
+
+  const result: Item[] = [];
+
+  for (const item of arr) {
+    if (existence[getKey(item)]) continue;
+
+    result.push(item);
+
+    existence[getKey(item)] = true;
+  }
+
+  return result;
+}

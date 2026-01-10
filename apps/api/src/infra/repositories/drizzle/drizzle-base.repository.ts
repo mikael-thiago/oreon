@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import type { PgInsertValue } from "drizzle-orm/pg-core";
 import { BaseCurricular, type DisciplinaDaBase } from "../../../domain/entities/base-curricular.entity.js";
 import type { BaseCurricularRepository } from "../../../domain/repositories/base-curricular.repository.js";
@@ -7,6 +7,14 @@ import { baseCurricularTable, baseDisciplinaTable, disciplinasTable } from "./sc
 
 export class DrizzleBaseRepository implements BaseCurricularRepository {
   constructor(private readonly drizzleUow: DrizzleService) {}
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzleUow
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('base_classes_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async verificarExistenciaDeCodigoDeDisciplinaNaUnidade(codigo: string, unidadeId: number): Promise<boolean> {
     const [result] = await this.drizzleUow
@@ -74,55 +82,63 @@ export class DrizzleBaseRepository implements BaseCurricularRepository {
     return !res || res.count > 0;
   }
 
-  async criarBaseCurricular(request: {
-    readonly unidadeId: number;
-    readonly etapaId: number;
-    readonly codigo: string;
-    readonly disciplinas: DisciplinaDaBase[];
-  }): Promise<BaseCurricular> {
+  async salvar(base: BaseCurricular): Promise<BaseCurricular> {
     const [baseModel] = await this.drizzleUow
       .getTransaction()
       .insert(baseCurricularTable)
       .values({
-        code: request.codigo,
-        stepId: request.etapaId,
-        unitId: request.unidadeId,
+        id: base.id,
+        code: base.codigo,
+        stepId: base.etapaId,
+        unitId: base.unidadeId,
+        creationDate: base.dataCriacao,
       })
-      .returning();
+      .returning({ id: baseCurricularTable.id });
+
+    if (!baseModel) {
+      throw new Error("Falha ao criar base curricular");
+    }
 
     await this.drizzleUow
       .getTransaction()
       .insert(baseDisciplinaTable)
       .values(
-        request.disciplinas.map<PgInsertValue<typeof baseDisciplinaTable>>((d) => ({
-          baseId: baseModel!.id,
+        base.disciplinas.map<PgInsertValue<typeof baseDisciplinaTable>>((d) => ({
+          baseId: baseModel.id,
           disciplineId: d.id,
           code: d.codigo,
           annual_workload: d.cargaHorariaAnual,
         }))
       );
 
-    return new BaseCurricular({
-      id: baseModel!.id,
-      codigo: baseModel!.code,
-      dataCriacao: baseModel!.creationDate,
-      etapaId: baseModel!.stepId,
-      unidadeId: baseModel!.unitId,
-      disciplinas: request.disciplinas,
-    });
+    return base;
   }
 
-  async salvarBaseCurricular(base: BaseCurricular): Promise<void> {
-    await this.drizzleUow.getTransaction().transaction(async (tx) => {
-      for (const disciplina of base.disciplinas) {
-        await tx
-          .update(baseDisciplinaTable)
-          .set({
-            code: disciplina.codigo,
-            annual_workload: disciplina.cargaHorariaAnual,
-          })
-          .where(eq(baseDisciplinaTable.baseId, base.id));
-      }
-    });
+  async atualizar(base: BaseCurricular): Promise<BaseCurricular> {
+    await this.drizzleUow
+      .getTransaction()
+      .update(baseCurricularTable)
+      .set({
+        code: base.codigo,
+        stepId: base.etapaId,
+        unitId: base.unidadeId,
+      })
+      .where(eq(baseCurricularTable.id, base.id));
+
+    await this.drizzleUow.getTransaction().delete(baseDisciplinaTable).where(eq(baseDisciplinaTable.baseId, base.id));
+
+    await this.drizzleUow
+      .getTransaction()
+      .insert(baseDisciplinaTable)
+      .values(
+        base.disciplinas.map<PgInsertValue<typeof baseDisciplinaTable>>((d) => ({
+          baseId: base.id,
+          disciplineId: d.id,
+          code: d.codigo,
+          annual_workload: d.cargaHorariaAnual,
+        }))
+      );
+
+    return base;
   }
 }

@@ -2,7 +2,9 @@ export type ValidationErrorItem = { readonly propriedade: string; readonly mensa
 export type ValidationErrorStatuses = 400 | 422;
 
 export class ValidationError extends Error {
-  readonly type = "validation-error" as const;
+  static readonly TYPE = "validation-error" as const; 
+  
+  readonly type = ValidationError.TYPE;
   readonly status: ValidationErrorStatuses;
   readonly erros: ValidationErrorItem[];
 

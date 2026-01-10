@@ -4,6 +4,7 @@ import z from "zod";
 import { TurmaQueries } from "../../../application/queries/turma.queries.js";
 import { CadastrarTurmaUseCase } from "../../../application/usecases/cadastrar-turma.usecase.js";
 import { container } from "../../di/di.js";
+import { Result } from "../../../domain/shared/result.js";
 
 const listarTurmasParamsSchema = z.object({
   unidadeId: z.coerce
@@ -87,8 +88,8 @@ export async function turmasRoutes(fastify: FastifyInstance) {
     },
     async function handle(request, reply) {
       const usecase = container.get(CadastrarTurmaUseCase);
-      const turma = await usecase.executar(request.body);
-      return reply.status(201).send(turma);
+      const result = await usecase.executar(request.body);
+      reply.replyResult(result, 201);
     }
   );
 }

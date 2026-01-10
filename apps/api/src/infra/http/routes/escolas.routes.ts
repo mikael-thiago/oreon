@@ -3,6 +3,7 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import z from "zod";
 import { CadastarEscolaUseCase } from "../../../application/usecases/cadastrar-escola.usecase.js";
 import { container } from "../../di/di.js";
+import { Result } from "../../../domain/shared/result.js";
 
 const cadastrarEscolaSchema = z.object({
   nome: z
@@ -45,10 +46,11 @@ export async function escolasRoutes(fastify: FastifyInstance) {
     .post(
       "/escolas",
       { schema: { body: cadastrarEscolaSchema }, onRequest: [fastify.authenticate] },
-      async function handle(request) {
+      async function handle(request, reply) {
         const usecase = container.get(CadastarEscolaUseCase);
 
-        return usecase.executar({ escola: request.body, usuarioAutenticado: request.user });
+        const result = await usecase.executar({ escola: request.body, usuarioAutenticado: request.user });
+        reply.replyResult(result, 201);
       }
     );
 }

@@ -17,7 +17,7 @@ export const cadastrarMatriculaSchema = z.object({
     .string({ message: "A data de nascimento é obrigatória" })
     .regex(
       /^\d{4}-\d{2}-\d{2}$/,
-      "A data de nascimento deve estar no formato YYYY-MM-DD"
+      "A data de nascimento deve estar no formato yyyy-MM-dd"
     ),
   unidadeId: z
     .number({ message: "O ID da unidade é obrigatório" })

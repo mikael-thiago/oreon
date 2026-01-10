@@ -1,73 +1,116 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { Aluno } from "../../../domain/entities/aluno.entity.js";
-import type { Sexo } from "../../../domain/enums/sexo.enum.js";
-import type { AlunoRepository, CriarAlunoRequest } from "../../../domain/repositories/aluno.repository.js";
+import { SexoEnum, type Sexo } from "../../../domain/enums/sexo.enum.js";
+import type { AlunoRepository } from "../../../domain/repositories/aluno.repository.js";
 import type { DrizzleService } from "./drizzle.service.js";
-import { estudantesTable } from "./schema.js";
+import { estudantesTable, pessoasTable } from "./schema.js";
 import { DateFormatter } from "@oreon/utils/date-formatter";
 import { DateFormatEnum } from "@oreon/utils/date-format";
 
 export class DrizzleAlunoRepository implements AlunoRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
 
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzleDb
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('students_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
+
   private mapSexoToDb(sexo: Sexo): "male" | "female" {
     return sexo === "masculino" ? "male" : "female";
   }
 
-  private mapSexoFromDb(sex: "male" | "female"): Sexo {
-    return sex === "male" ? "masculino" : "feminino";
+  private mapGeneroFromDb(gender: "male" | "female" | null): Sexo | null {
+    if (!gender) return null;
+    if (gender === "male") return SexoEnum.Masculino;
+    return SexoEnum.Feminino;
   }
 
   async obterAlunoPorCpf(cpf: string): Promise<Aluno | null> {
     const [alunoModel] = await this.drizzleDb
       .getTransaction()
-      .select()
+      .select({
+        id: estudantesTable.id,
+        personId: estudantesTable.personId,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        dataDeNascimento: pessoasTable.birthDate,
+        sexo: pessoasTable.gender,
+        escolaId: pessoasTable.schoolId,
+      })
       .from(estudantesTable)
-      .where(eq(estudantesTable.cpf, cpf));
+      .innerJoin(pessoasTable, eq(estudantesTable.personId, pessoasTable.id))
+      .where(eq(pessoasTable.cpf, cpf));
 
     if (!alunoModel) {
       return null;
     }
 
-    return new Aluno({
+    return Aluno.reconstituir({
       id: alunoModel.id,
-      nome: alunoModel.name,
+      nome: alunoModel.nome,
       cpf: alunoModel.cpf,
-      dataDeNascimento: new Date(alunoModel.birthDate),
-      sexo: this.mapSexoFromDb(alunoModel.sex),
+      dataDeNascimento: new Date(alunoModel.dataDeNascimento),
+      sexo: this.mapGeneroFromDb(alunoModel.sexo),
+      escolaId: alunoModel.escolaId,
     });
   }
 
   async obterAlunoPorId(id: number): Promise<Aluno | null> {
     const [alunoModel] = await this.drizzleDb
       .getTransaction()
-      .select()
+      .select({
+        id: estudantesTable.id,
+        personId: estudantesTable.personId,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        dataDeNascimento: pessoasTable.birthDate,
+        sexo: pessoasTable.gender,
+        escolaId: pessoasTable.schoolId,
+      })
       .from(estudantesTable)
+      .innerJoin(pessoasTable, eq(estudantesTable.personId, pessoasTable.id))
       .where(eq(estudantesTable.id, id));
 
     if (!alunoModel) {
       return null;
     }
 
-    return new Aluno({
+    return Aluno.reconstituir({
       id: alunoModel.id,
-      nome: alunoModel.name,
+      nome: alunoModel.nome,
       cpf: alunoModel.cpf,
-      dataDeNascimento: new Date(alunoModel.birthDate),
-      sexo: this.mapSexoFromDb(alunoModel.sex),
+      dataDeNascimento: new Date(alunoModel.dataDeNascimento),
+      sexo: this.mapGeneroFromDb(alunoModel.sexo),
+      escolaId: alunoModel.escolaId,
     });
   }
 
-  async criarAluno(request: CriarAlunoRequest): Promise<Aluno> {
+  async salvar(aluno: Aluno): Promise<Aluno> {
+    const [pessoa] = await this.drizzleDb
+      .getTransaction()
+      .insert(pessoasTable)
+      .values({
+        id: aluno.id,
+        name: aluno.nomeCompleto,
+        cpf: aluno.cpfValor,
+        birthDate: DateFormatter.format(aluno.dataDeNascimento, DateFormatEnum.ISO_DATE),
+        gender: aluno.sexo ? this.mapSexoToDb(aluno.sexo) : "male",
+        schoolId: aluno.escolaId,
+      })
+      .returning();
+
+    if (!pessoa) {
+      throw new Error("Falha ao criar registro de pessoa");
+    }
+
     const [alunoModel] = await this.drizzleDb
       .getTransaction()
       .insert(estudantesTable)
       .values({
-        name: request.nome,
-        cpf: request.cpf,
-        birthDate: DateFormatter.format(request.dataDeNascimento, DateFormatEnum.ISO_DATE),
-        sex: this.mapSexoToDb(request.sexo),
-        userId: null,
+        personId: pessoa.id,
       })
       .returning();
 
@@ -75,12 +118,13 @@ export class DrizzleAlunoRepository implements AlunoRepository {
       throw new Error("Falha ao criar aluno");
     }
 
-    return new Aluno({
+    return Aluno.reconstituir({
       id: alunoModel.id,
-      nome: alunoModel.name,
-      cpf: alunoModel.cpf,
-      dataDeNascimento: new Date(alunoModel.birthDate),
-      sexo: this.mapSexoFromDb(alunoModel.sex),
+      nome: aluno.nomeCompleto,
+      cpf: aluno.cpfValor,
+      dataDeNascimento: aluno.dataDeNascimento,
+      sexo: aluno.sexo,
+      escolaId: aluno.escolaId,
     });
   }
 }

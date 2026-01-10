@@ -1,4 +1,6 @@
 import { ConflictError } from "../../domain/errors/conflict.error.js";
+import { ForbiddenError } from "../../domain/errors/forbidden.error.js";
+import { NotFoundError } from "../../domain/errors/not-found.error.js";
 import { ValidationError } from "../../domain/errors/validation.error.js";
 import type { AlunoRepository } from "../../domain/repositories/aluno.repository.js";
 import type { AnoLetivoRepository } from "../../domain/repositories/ano-letivo.repository.js";
@@ -9,9 +11,14 @@ import { StatusMatriculaEnum } from "../../domain/enums/status-matricula.enum.js
 import type { Sexo } from "../../domain/enums/sexo.enum.js";
 import type { UnitOfWork } from "../interfaces/unit-of-work.interface.js";
 import type { FileStorageService } from "../interfaces/file-storage.interface.js";
+import type { UsuarioAutenticado } from "../types/authenticated-user.type.js";
 import { cpfEhValido } from "@oreon/utils/cpf";
+import { Aluno } from "../../domain/entities/aluno.entity.js";
+import { Matricula } from "../../domain/entities/matricula.entity.js";
+import { Result } from "../../domain/shared/result.js";
 
 export type CriarMatriculaRequest = {
+  readonly usuarioAutenticado: UsuarioAutenticado;
   readonly cpf: string;
   readonly nome: string;
   readonly sexo: Sexo;
@@ -39,63 +46,51 @@ export class CriarMatriculaUseCase {
     private readonly uow: UnitOfWork
   ) {}
 
-  async executar(request: CriarMatriculaRequest) {
-    // Validate CPF format
-    if (!cpfEhValido(request.cpf)) {
-      throw ValidationError.semantico([
-        { propriedade: "cpf", mensagem: `O CPF ${request.cpf} é invalido!` },
-      ]);
+  async executar(request: CriarMatriculaRequest): Promise<Result<number, ValidationError | NotFoundError | ForbiddenError | ConflictError>> {
+    const unidade = await this.unidadeEscolarRepository.obterUnidadePorId(request.unidadeId);
+
+    if (!unidade) {
+      return Result.fail(new NotFoundError(`Unidade com ID ${request.unidadeId} não encontrada`));
     }
 
-    // Validate birthDate (age between 3 and 100 years)
-    const idade = this.calcularIdade(request.dataDeNascimento);
-    if (idade < 3 || idade > 100) {
-      throw ValidationError.semantico([
-        { propriedade: "dataDeNascimento", mensagem: "Data de nascimento inválida" },
-      ]);
+    if (unidade.escolaId !== request.usuarioAutenticado.escolaId) {
+      return Result.fail(new ForbiddenError("Você não tem permissão para criar matrículas nesta unidade"));
     }
 
-    // Parallel validation of unit and school period existence
-    const [unidadeExiste, periodoLetivoExiste] = await Promise.all([
-      this.unidadeEscolarRepository.existeComId(request.unidadeId),
-      this.anoLetivoRepository.existe(request.periodoLetivoId),
-    ]);
-
-    // Collect validation errors
-    const erros = [];
-
-    if (!unidadeExiste) {
-      erros.push({
-        propriedade: "unidadeId",
-        mensagem: `Unidade escolar com id ${request.unidadeId} não existe`,
-      });
-    }
+    const periodoLetivoExiste = await this.anoLetivoRepository.existe(request.periodoLetivoId);
 
     if (!periodoLetivoExiste) {
-      erros.push({
-        propriedade: "periodoLetivoId",
-        mensagem: `Período letivo com id ${request.periodoLetivoId} não existe`,
-      });
+      return Result.fail(
+        ValidationError.semantico([
+          {
+            propriedade: "periodoLetivoId",
+            mensagem: `Período letivo com id ${request.periodoLetivoId} não existe`,
+          },
+        ])
+      );
     }
 
-    // Throw validation error if any validations failed
-    if (erros.length > 0) {
-      throw ValidationError.semantico(erros);
-    }
-
-    // Execute transaction to create/retrieve student and create matriculation
     return this.uow.transact(async () => {
-      // Check if student exists by CPF
       let aluno = await this.alunoRepository.obterAlunoPorCpf(request.cpf);
 
-      // If student doesn't exist, create new one
       if (!aluno) {
-        aluno = await this.alunoRepository.criarAluno({
+        const alunoResult = Aluno.criar({
+          id: await this.alunoRepository.obterProximoId(),
           nome: request.nome,
           cpf: request.cpf,
           dataDeNascimento: request.dataDeNascimento,
           sexo: request.sexo,
+          // TODO
+          escolaId: -1,
         });
+
+        if (Result.isFailure(alunoResult)) {
+          return alunoResult;
+        }
+
+        await this.alunoRepository.salvar(alunoResult.value);
+
+        aluno = alunoResult.value;
       }
 
       // Check for existing matriculation
@@ -105,7 +100,7 @@ export class CriarMatriculaUseCase {
       );
 
       if (matriculaExistente) {
-        throw new ConflictError("Já existe uma matrícula para este aluno neste período letivo");
+        return Result.fail(new ConflictError("Já existe uma matrícula para este aluno neste período letivo"));
       }
 
       // Create comprovante de residência document with content (status: em-processamento)
@@ -135,7 +130,8 @@ export class CriarMatriculaUseCase {
       });
 
       // Create the matriculation with "Ativa" status
-      const matricula = await this.matriculaRepository.criarMatricula({
+      const matricula = Matricula.criar({
+        id: await this.matriculaRepository.obterProximoId(),
         unidadeId: request.unidadeId,
         estudanteId: aluno.id,
         periodoLetivoId: request.periodoLetivoId,
@@ -145,7 +141,13 @@ export class CriarMatriculaUseCase {
         historicoEscolarId: historicoEscolarDoc.id,
       });
 
-      return matricula.id;
+      if (Result.isFailure(matricula)) {
+        return matricula;
+      }
+
+      await this.matriculaRepository.salvar(matricula.value);
+
+      return Result.ok(matricula.value.id);
     });
   }
 

@@ -12,6 +12,9 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 
+const EMAIL_COLUMN = varchar({ length: 100 });
+const PHONE_COLUMN = varchar({ length: 11 });
+
 export const modalidadeTable = pgTable("modalities", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 20 }).notNull(),
@@ -41,7 +44,7 @@ export const etapaRelations = relations(etapaTable, ({ one, many }) => ({
 export const escolaTable = pgTable("institutions", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 100 }).notNull(),
-  email: varchar({ length: 100 }).notNull(),
+  email: EMAIL_COLUMN.notNull(),
   createdAt: timestamp().notNull().defaultNow(),
 });
 
@@ -120,36 +123,45 @@ export const usuarioTable = pgTable("users", {
   name: varchar({ length: 100 }).notNull(),
   login: varchar({ length: 100 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull(),
-  escolaId: integer("school_id").references(() => escolaTable.id),
+  schoolId: integer().references(() => escolaTable.id),
   createdAt: timestamp().notNull().defaultNow(),
   isAdmin: boolean().notNull().default(false),
   isRoot: boolean().notNull().default(false),
 });
 
-export const usuarioRelations = relations(usuarioTable, ({ one }) => ({
-  escola: one(escolaTable, {
-    fields: [usuarioTable.escolaId],
-    references: [escolaTable.id],
-  }),
-}));
+export const genderEnum = pgEnum("gender_enum", ["male", "female"]);
 
-export const anoLetivoTable = pgTable("school_periods", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  year: integer().notNull(),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  schoolId: integer("school_id")
-    .notNull()
-    .references(() => escolaTable.id),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+export const pessoasTable = pgTable(
+  "persons",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: varchar({ length: 100 }).notNull(),
+    cpf: varchar({ length: 11 }).notNull().unique(),
+    email: EMAIL_COLUMN.unique(),
+    phone: PHONE_COLUMN,
+    gender: genderEnum(),
+    birthDate: date().notNull(),
+    schoolId: integer()
+      .notNull()
+      .references(() => escolaTable.id),
+  },
+  (table) => [unique("persons_table_unique_idx").on(table.cpf, table.schoolId)]
+);
 
-export const anoLetivoRelations = relations(anoLetivoTable, ({ one }) => ({
-  escola: one(escolaTable, {
-    fields: [anoLetivoTable.schoolId],
-    references: [escolaTable.id],
-  }),
-}));
+export const anoLetivoTable = pgTable(
+  "school_periods",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    year: integer().notNull(),
+    startDate: timestamp().notNull(),
+    endDate: timestamp().notNull(),
+    schoolId: integer()
+      .notNull()
+      .references(() => escolaTable.id),
+    createdAt: timestamp().notNull().defaultNow(),
+  },
+  (table) => [unique("school_periods_unique_idx").on(table.year, table.schoolId)]
+);
 
 export const shiftsEnum = pgEnum("shifts", ["day", "afternoom", "night"]);
 
@@ -161,7 +173,7 @@ export const turmaTable = pgTable("classes", {
   modalityId: integer()
     .notNull()
     .references(() => modalidadeTable.id),
-  etapaId: integer("step_id")
+  stepId: integer()
     .notNull()
     .references(() => etapaTable.id),
   schoolPeriodId: integer()
@@ -184,11 +196,12 @@ export const cargosTable = pgTable("occupations", {
 
 export const colaboradoresTable = pgTable("employees", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  cpf: varchar({ length: 11 }).notNull(),
-  email: varchar({ length: 100 }).notNull(),
-  phone: varchar({ length: 11 }).notNull(),
-  userId: integer()
+  personId: integer()
+    .unique()
     .notNull()
+    .references(() => pessoasTable.id),
+  userId: integer()
+    .unique()
     .references(() => usuarioTable.id),
   createdAt: timestamp().notNull().defaultNow(),
 });
@@ -208,12 +221,12 @@ export const contratosTable = pgTable(
     unitId: integer("institution_unit_id")
       .notNull()
       .references(() => unidadeTable.id),
-    registrationNumber: varchar("registration_number", { length: 50 }),
-    startDate: date("start_date").notNull(),
-    endDate: date("end_date"),
+    registrationNumber: varchar({ length: 50 }),
+    startDate: date().notNull(),
+    endDate: date(),
     status: statusContratoEnum().default("unactive"),
     salary: decimal({ precision: 10, scale: 2 }).notNull(),
-    createdAt: timestamp("created_at").defaultNow(),
+    createdAt: timestamp().defaultNow(),
   },
   (table) => [
     index("contracts_employee_id_idx").on(table.employeeId),
@@ -241,15 +254,15 @@ export const contratoProfessorDisciplinaTable = pgTable(
   ]
 );
 
-export const sexEnum = pgEnum("sex_enum", ["male", "female"]);
-
 export const estudantesTable = pgTable("students", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  userId: integer().references(() => usuarioTable.id),
-  cpf: varchar({ length: 11 }).notNull(),
-  name: varchar({ length: 100 }).notNull(),
-  sex: sexEnum().notNull(),
-  birthDate: date().notNull(),
+  personId: integer()
+    .notNull()
+    .unique()
+    .references(() => pessoasTable.id),
+  userId: integer()
+    .unique()
+    .references(() => usuarioTable.id),
 });
 
 export const documentsTable = pgTable("documents", {
@@ -259,79 +272,90 @@ export const documentsTable = pgTable("documents", {
   status: varchar(),
 });
 
-export const matriculasTable = pgTable("matriculations", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  unitId: integer()
-    .notNull()
-    .references(() => unidadeTable.id),
-  studentId: integer()
-    .notNull()
-    .references(() => estudantesTable.id),
-  schoolPeriodId: integer()
-    .notNull()
-    .references(() => anoLetivoTable.id),
-  status: varchar().notNull(),
-  createdDate: date().notNull(),
-  proofOfResidenceId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
-  scholarHistoryId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
-});
-
-export const responsaveisTable = pgTable("responsibles", {
-  id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  // TODO: Verificar possibilidade de extrair informações para tabela "personal_infos"
-  name: varchar({ length: 100 }).notNull(),
-  cpf: varchar({ length: 11 }).notNull().unique(),
-  email: varchar({ length: 100 }).unique().notNull(),
-  birthDate: date().notNull(),
-  phone: varchar({ length: 11 }).notNull(),
-  userId: integer()
-    .unique()
-    .references(() => usuarioTable.id),
-});
+export const matriculasTable = pgTable(
+  "matriculations",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    unitId: integer()
+      .notNull()
+      .references(() => unidadeTable.id),
+    studentId: integer()
+      .notNull()
+      .references(() => estudantesTable.id),
+    schoolPeriodId: integer()
+      .notNull()
+      .references(() => anoLetivoTable.id),
+    status: varchar().notNull(),
+    createdDate: date().notNull(),
+    proofOfResidenceId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+    scholarHistoryId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+  },
+  (table) => [
+    index("matriculations_unit_id_school_period_id_idx").on(table.unitId, table.schoolPeriodId),
+    index("matriculations_student_id_idx").on(table.studentId),
+  ]
+);
 
 export const responsabilityRelationsTable = pgTable("responsibility_relations", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 20 }).notNull(),
-  slug: varchar({ length: 20 }).notNull(),
+  slug: varchar({ length: 20 }).notNull().unique(),
 });
 
-export const solicitacoesMatriculaTable = pgTable("matriculation_requests", {
+export const statusSolicitacaoMatriculaTable = pgTable("matriculation_request_statuses", {
   id: integer().primaryKey().generatedByDefaultAsIdentity(),
-  unitId: integer()
-    .notNull()
-    .references(() => unidadeTable.id),
-  studentId: integer()
-    .notNull()
-    .references(() => estudantesTable.id),
-  responsibleId: integer()
-    .notNull()
-    .references(() => responsaveisTable.id),
-  schoolPeriodId: integer()
-    .notNull()
-    .references(() => anoLetivoTable.id),
-  stepId: integer()
-    .notNull()
-    .references(() => etapaTable.id),
-  responsibilityRelationId: integer()
-    .notNull()
-    .references(() => responsabilityRelationsTable.id),
-  status: varchar().notNull(),
-  createdDate: date().notNull(),
-  observations: varchar({ length: 255 }),
-  proofOfResidenceId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
-  scholarHistoryId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
-  studentDocumentId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
-  responsibleDocumentId: integer()
-    .notNull()
-    .references(() => documentsTable.id),
+  name: varchar({ length: 25 }).notNull(),
+  slug: varchar({ length: 25 }).notNull(),
 });
+
+export const solicitacoesMatriculaTable = pgTable(
+  "matriculation_requests",
+  {
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
+    unitId: integer()
+      .notNull()
+      .references(() => unidadeTable.id),
+    studentId: integer()
+      .notNull()
+      .references(() => estudantesTable.id),
+    responsibleId: integer()
+      .notNull()
+      .references(() => pessoasTable.id),
+    schoolPeriodId: integer()
+      .notNull()
+      .references(() => anoLetivoTable.id),
+    stepId: integer()
+      .notNull()
+      .references(() => etapaTable.id),
+    responsibilityRelationId: integer()
+      .notNull()
+      .references(() => responsabilityRelationsTable.id),
+    statusId: integer()
+      .notNull()
+      .references(() => statusSolicitacaoMatriculaTable.id),
+    createdDate: date().notNull(),
+    observations: varchar({ length: 255 }),
+    proofOfResidenceId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+    scholarHistoryId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+    studentDocumentId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+    responsibleDocumentId: integer()
+      .notNull()
+      .references(() => documentsTable.id),
+  },
+  (table) => [
+    index("matriculation_requests_unit_id_school_period_id_idx").on(table.unitId, table.schoolPeriodId),
+    index("matriculation_requests_status_id_idx").on(table.statusId),
+    index("matriculation_requests_student_id_idx").on(table.studentId),
+    index("matriculation_requests_step_id_idx").on(table.stepId),
+  ]
+);

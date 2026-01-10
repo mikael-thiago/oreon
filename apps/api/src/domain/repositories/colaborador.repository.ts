@@ -1,10 +1,13 @@
 import { Colaborador } from "../entities/colaborador.entity.js";
 
 export type CriarColaboradorData = {
+  readonly nome: string;
   readonly cpf: string;
   readonly email: string;
   readonly usuarioId: number;
   readonly telefone: string;
+  readonly escolaId: number;
+  readonly dataDeNascimento: Date;
 
   // Contrato
   readonly cargoId: number;
@@ -20,10 +23,10 @@ export type CriarProfessorRequest = CriarColaboradorData & {
 };
 
 export abstract class ColaboradorRepository {
+  abstract obterProximoId(): Promise<number>;
   abstract obterColaboradorPorId(id: number): Promise<Colaborador | null>;
   abstract obterColaboradorPorCpf(cpf: string): Promise<Colaborador | null>;
   abstract obterColaboradorPorEmail(email: string): Promise<Colaborador | null>;
   abstract obterColaboradorPorUsuarioId(usuarioId: number): Promise<Colaborador | null>;
-  abstract criarColaborador(data: CriarColaboradorData): Promise<Colaborador>;
-  abstract criarProfessor(data: CriarProfessorRequest): Promise<Colaborador>;
+  abstract adicionar(colaborador: Colaborador): Promise<Colaborador>;
 }

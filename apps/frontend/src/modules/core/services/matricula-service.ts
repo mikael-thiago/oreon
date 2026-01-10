@@ -72,14 +72,39 @@ export type ListarSolicitacoesResponse = {
   };
 }[];
 
+export type ResumoSolicitacoesResponse = {
+  readonly total: number;
+  readonly statuses: {
+    readonly status: string;
+    readonly quantidade: number;
+  }[];
+};
+
 export interface IMatriculaService {
   criar(data: CriarMatriculaRequest): Promise<CriarMatriculaResponse>;
   listar(unidadeId: number, periodoLetivoId: number): Promise<ListarMatriculasResponse>;
   solicitar(data: SolicitarMatriculaRequest): Promise<SolicitarMatriculaResponse>;
-  listarSolicitacoes(unidadeId: number, periodoLetivoId: number): Promise<ListarSolicitacoesResponse>;
+  listarSolicitacoes(unidadeId: number, periodoLetivoId: number, modalidadeId: number): Promise<ListarSolicitacoesResponse>;
+  obterResumoSolicitacoes(unidadeId: number, periodoLetivoId: number): Promise<ResumoSolicitacoesResponse>;
 }
 
 export class MatriculaService implements IMatriculaService {
+  async obterResumoSolicitacoes(unidadeId: number, periodoLetivoId: number): Promise<ResumoSolicitacoesResponse> {
+    const response = await fetch(
+      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/solicitacoes/resumo`,
+      {
+        credentials: "include",
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw error;
+    }
+
+    return response.json();
+  }
+
   async criar(data: CriarMatriculaRequest): Promise<CriarMatriculaResponse> {
     const formData = new FormData();
 
@@ -111,7 +136,7 @@ export class MatriculaService implements IMatriculaService {
 
   async listar(unidadeId: number, periodoLetivoId: number): Promise<ListarMatriculasResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/periodoLetivo/${periodoLetivoId}/matriculas`,
+      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/matriculas`,
       {
         credentials: "include",
       }
@@ -156,9 +181,9 @@ export class MatriculaService implements IMatriculaService {
     return response.json();
   }
 
-  async listarSolicitacoes(unidadeId: number, periodoLetivoId: number): Promise<ListarSolicitacoesResponse> {
+  async listarSolicitacoes(unidadeId: number, periodoLetivoId: number, modalidadeId: number): Promise<ListarSolicitacoesResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/periodoLetivo/${periodoLetivoId}/solicitacoes`,
+      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/modalidade/${modalidadeId}/solicitacoes`,
       {
         credentials: "include",
       }

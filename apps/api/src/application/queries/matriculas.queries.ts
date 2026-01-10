@@ -24,6 +24,7 @@ export type ListarMatriculasResponse = {
 export type ListarSolicitacoesRequest = {
   readonly unidadeId: number;
   readonly periodoLetivoId: number;
+  readonly modalidadeId: number;
 };
 
 export type ListarSolicitacoesResponse = {
@@ -81,8 +82,17 @@ export type ObterDetalhesSolicitacaoResponse = {
   };
 };
 
+export type ResumoSolicitacoesResponse = {
+  readonly total: number;
+  readonly statuses: {
+    readonly status: string;
+    readonly quantidade: number;
+  }[];
+}
+
 export abstract class MatriculasQueries {
   abstract listarMatriculas(request: ListarMatriculasRequest): Promise<ListarMatriculasResponse[]>;
   abstract listarSolicitacoes(request: ListarSolicitacoesRequest): Promise<ListarSolicitacoesResponse[]>;
   abstract obterDetalhesSolicitacao(id: number): Promise<ObterDetalhesSolicitacaoResponse | null>;
+  abstract obterResumoSolicitacoesPorUnidadeEAnoLetivo(unidadeId: number, anoLetivoId: number): Promise<ResumoSolicitacoesResponse>;
 }

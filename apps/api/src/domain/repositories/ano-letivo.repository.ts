@@ -1,13 +1,7 @@
 import { AnoLetivo } from "../entities/ano-letivo.entity.js";
 
-export type CriarAnoLetivoRequest = {
-  readonly anoReferencia: number;
-  readonly dataInicio: Date;
-  readonly dataFim: Date;
-  readonly escolaId: number;
-};
-
 export abstract class AnoLetivoRepository {
+  abstract obterProximoId(): Promise<number>;
   abstract existe(id: number): Promise<boolean>;
   abstract obterAnoLetivoPorAno(
     escolaId: number,
@@ -18,5 +12,5 @@ export abstract class AnoLetivoRepository {
     dataInicio: Date,
     dataFim: Date
   ): Promise<AnoLetivo | null>;
-  abstract criarAnoLetivo(request: CriarAnoLetivoRequest): Promise<AnoLetivo>;
+  abstract salvar(anoLetivo: AnoLetivo): Promise<AnoLetivo>;
 }

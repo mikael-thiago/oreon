@@ -5,6 +5,7 @@ import { createSigner, createVerifier } from "fast-jwt";
 import type {
   FileStorageService,
   SignUrlRequest,
+  SignedUrl,
   UploadFileRequest,
   UploadFileResponse,
   VerifyTokenResponse,
@@ -62,6 +63,17 @@ export class LocalFileStorageService implements FileStorageService {
       type: "download",
     });
     return `${this.baseUrl}/documents/${request.documentId}/download?token=${token}`;
+  }
+
+  async signUrlsBatch(documentIds: number[]): Promise<SignedUrl[]> {
+    const signedUrls = await Promise.all(
+      documentIds.map(async (documentId) => {
+        const url = await this.signUrl({ documentId });
+        return { documentId, url };
+      })
+    );
+
+    return signedUrls;
   }
 
   async verifyToken(token: string): Promise<VerifyTokenResponse | null> {

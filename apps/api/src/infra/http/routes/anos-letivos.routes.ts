@@ -4,6 +4,7 @@ import z from "zod";
 import { AnoLetivoQueries } from "../../../application/queries/ano-letivo.queries.js";
 import { CadastrarAnoLetivoUseCase } from "../../../application/usecases/cadastrar-ano-letivo.usecase.js";
 import { container } from "../../di/di.js";
+import { Result } from "../../../domain/shared/result.js";
 
 const cadastrarAnoLetivoSchema = z.object({
   anoReferencia: z
@@ -45,11 +46,11 @@ export async function anosLetivosRoutes(fastify: FastifyInstance) {
       { schema: { body: cadastrarAnoLetivoSchema }, onRequest: [fastify.authenticate] },
       async function handle(request, reply) {
         const usecase = container.get(CadastrarAnoLetivoUseCase);
-        const anoLetivo = await usecase.executar({
+        const result = await usecase.executar({
           ...request.body,
           usuario: request.user,
         });
-        reply.status(201).send(anoLetivo);
+        reply.replyResult(result, 201);
       }
     );
 }

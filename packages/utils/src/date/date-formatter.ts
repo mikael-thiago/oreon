@@ -51,7 +51,7 @@ export class DateFormatter {
       //   return this.formatShortBrazilianDate(date);
 
 
-      // case "YYYY-MM-DD HH:mm:ss":
+      // case "yyyy-MM-dd HH:mm:ss":
       // case "database":
       //   return this.formatISODateTime(date);
 

@@ -1,4 +1,4 @@
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq, isNull, or, sql } from "drizzle-orm";
 import { Disciplina } from "../../../domain/entities/disciplina.entity.js";
 import type {
   DisciplinaRepository,
@@ -10,6 +10,14 @@ import { disciplinasTable } from "./schema.js";
 
 export class DrizzleDisciplinaRepository implements DisciplinaRepository {
   constructor(private readonly drizzleUow: DrizzleService) {}
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzleUow
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('disciplines_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async obterOuCriarNaEscola(request: ObterOuCriarDisciplinaRequest): Promise<Disciplina> {
     const slug = slugify(request.nome);

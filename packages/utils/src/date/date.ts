@@ -13,7 +13,7 @@ import { DateFormatEnum, type DateFormat } from "./date-format.enum.js";
  * // Servidor no fuso horário GMT-3
  * // Sem correção de fuso: "2024-12-27" -> 2024-12-26T21:00:00.000Z (subtrai 3 horas)
  * // Com correção de fuso: "2024-12-27" -> 2024-12-27T00:00:00.000Z (correto)
- * const date = parseDate("2024-12-27", "YYYY-MM-DD");
+ * const date = parseDate("2024-12-27", "yyyy-MM-dd");
  */
 export function parseDateIgnoringTimezone(value: string, format: DateFormat): Date {
   switch (format) {
@@ -36,4 +36,20 @@ export function parseDateIgnoringTimezone(value: string, format: DateFormat): Da
       throw new Error(`[parseDateIgnoringTimezone] Formato inválido: ${format}`);
     }
   }
+}
+
+export class DateUnit {
+  static Days = {
+    diff(a: Date, b: Date): number {
+      let dias = b.getFullYear() - a.getFullYear();
+      const mesAtual = b.getMonth();
+      const mesNascimento = a.getMonth();
+
+      if (mesAtual < mesNascimento || (mesAtual === mesNascimento && b.getDate() < a.getDate())) {
+        dias--;
+      }
+
+      return dias;
+    },
+  };
 }

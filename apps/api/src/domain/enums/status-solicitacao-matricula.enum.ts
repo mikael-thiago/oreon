@@ -1,7 +1,8 @@
 export const StatusSolicitacaoMatriculaEnum = {
   EmAndamento: "em-andamento",
   Aprovada: "aprovada",
-  Rejeitada: "rejeitada",
+  Cancelada: "cancelada",
+  AguardandoPagamento: "aguardando-pagamento",
 } as const;
 
 export type StatusSolicitacaoMatricula =

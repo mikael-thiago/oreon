@@ -1,32 +1,16 @@
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react";
+import { ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import {
-  useAuthContext,
-  type UsuarioLogado,
-} from "@/modules/auth/context/auth-context";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import { useAuthContext, type UsuarioLogado } from "@/modules/auth/context/auth-context";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useRouter } from "@tanstack/react-router";
 
@@ -108,11 +92,7 @@ export function NavUser(props: UsuarioLogado) {
               </DropdownMenuItem>
             </DropdownMenuGroup> */}
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleLogout()}
-              disabled={isPending}
-              className="cursor-pointer"
-            >
+            <DropdownMenuItem onClick={() => handleLogout()} disabled={isPending} className="cursor-pointer">
               <LogOut />
               {isPending ? "Saindo..." : "Sair"}
             </DropdownMenuItem>

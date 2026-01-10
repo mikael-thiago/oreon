@@ -25,6 +25,7 @@ import { AnoLetivoRepository } from "../../domain/repositories/ano-letivo.reposi
 import { BaseCurricularRepository } from "../../domain/repositories/base-curricular.repository.js";
 import { CargoRepository } from "../../domain/repositories/cargo.repository.js";
 import { ColaboradorRepository } from "../../domain/repositories/colaborador.repository.js";
+import { ContratoRepository } from "../../domain/repositories/contrato.repository.js";
 import { EscolaRepository } from "../../domain/repositories/escola.repository.js";
 import { TurmaRepository } from "../../domain/repositories/turma.repository.js";
 import { UnidadeEscolarRepository } from "../../domain/repositories/unidade-escola.repository.js";
@@ -40,6 +41,7 @@ import { DrizzleAnoLetivoRepository } from "../repositories/drizzle/drizzle-ano-
 import { DrizzleBaseRepository } from "../repositories/drizzle/drizzle-base.repository.js";
 import { DrizzleCargoRepository } from "../repositories/drizzle/drizzle-cargo.repository.js";
 import { DrizzleColaboradorRepository } from "../repositories/drizzle/drizzle-colaborador.repository.js";
+import { DrizzleContratoRepository } from "../repositories/drizzle/drizzle-contrato.repository.js";
 import { DrizzleEscolaRepository } from "../repositories/drizzle/drizzle-escola.repository.js";
 import { DrizzleService } from "../repositories/drizzle/drizzle.service.js";
 import { DrizzleTurmaRepository } from "../repositories/drizzle/drizzle-turma.repository.js";
@@ -68,15 +70,24 @@ import { DrizzleSolicitacaoMatriculaRepository } from "../repositories/drizzle/d
 import { DocumentoQueries } from "../../application/queries/documento.queries.js";
 import { DrizzleDocumentoQueries } from "../queries/drizzle-documento.queries.js";
 import { ListarSolicitacoesUseCase } from "../../application/usecases/listar-solicitacoes.usecase.js";
+import { ListarResumoSolicitacoesUseCase } from "../../application/usecases/listar-resumo-solicitacoes.usecase.js";
 import { ObterDetalhesSolicitacaoUseCase } from "../../application/usecases/obter-detalhes-solicitacao.usecase.js";
 
 const container = new Container({ defaultScope: bindingScopeValues.Singleton });
 
 const DRIZZLE_IDENTIFIER: ServiceIdentifier<ReturnType<typeof drizzle>> = Symbol("drizzle");
 
-container
-  .bind(DRIZZLE_IDENTIFIER)
-  .toConstantValue(drizzle({ connection: process.env.DATABASE_URL!, casing: "snake_case" }));
+container.bind(DRIZZLE_IDENTIFIER).toConstantValue(
+  drizzle({
+    connection: process.env.DATABASE_URL!,
+    casing: "snake_case",
+    logger: {
+      logQuery(query, params) {
+        console.log(query, params);
+      },
+    },
+  })
+);
 
 container
   .bind(DrizzleService)
@@ -141,9 +152,13 @@ container
       UnitOfWork,
       ModalidadesQueries,
     ]
-  );
+  )
+  .inTransientScope();
 
-container.bind(ObterMeusDadosUseCase).toResolvedValue((repo) => new ObterMeusDadosUseCase(repo), [UsuarioRepository]);
+container
+  .bind(ObterMeusDadosUseCase)
+  .toResolvedValue((repo) => new ObterMeusDadosUseCase(repo), [UsuarioRepository])
+  .inTransientScope();
 
 container
   .bind(CadastarEscolaUseCase)
@@ -151,11 +166,14 @@ container
     (usuarioRepo, repo, criptografiaService, uow) =>
       new CadastarEscolaUseCase(usuarioRepo, repo, criptografiaService, uow),
     [UsuarioRepository, EscolaRepository, CriptografiaService, UnitOfWork]
-  );
+  )
+  .inTransientScope();
 
 container.bind(UsuarioRepository).toResolvedValue((db) => new DrizzleUsuarioRepository(db), [DrizzleService]);
 
 container.bind(ColaboradorRepository).toResolvedValue((db) => new DrizzleColaboradorRepository(db), [DrizzleService]);
+
+container.bind(ContratoRepository).toResolvedValue((db) => new DrizzleContratoRepository(db), [DrizzleService]);
 
 container.bind(CriptografiaService).toConstantValue(new Argon2CriptografiaService());
 
@@ -166,20 +184,23 @@ container
   .toResolvedValue(
     (usuarioRepo, criptoService, jwtService) => new LoginUseCase(usuarioRepo, criptoService, jwtService),
     [UsuarioRepository, CriptografiaService, JwtService]
-  );
+  )
+  .inTransientScope();
 
 container
   .bind(CadastrarUsuarioUseCase)
   .toResolvedValue(
     (usuarioRepo, escolaRepo, criptoService) => new CadastrarUsuarioUseCase(usuarioRepo, escolaRepo, criptoService),
     [UsuarioRepository, EscolaRepository, CriptografiaService]
-  );
+  )
+  .inTransientScope();
 
 container.bind(AnoLetivoRepository).toResolvedValue((db) => new DrizzleAnoLetivoRepository(db), [DrizzleService]);
 
 container
   .bind(CadastrarAnoLetivoUseCase)
-  .toResolvedValue((anoLetivoRepo) => new CadastrarAnoLetivoUseCase(anoLetivoRepo), [AnoLetivoRepository]);
+  .toResolvedValue((anoLetivoRepo) => new CadastrarAnoLetivoUseCase(anoLetivoRepo), [AnoLetivoRepository])
+  .inTransientScope();
 
 container
   .bind(CadastrarTurmaUseCase)
@@ -187,22 +208,32 @@ container
     (anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo) =>
       new CadastrarTurmaUseCase(anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo),
     [AnoLetivoRepository, BaseCurricularRepository, TurmaRepository, UnidadeEscolarRepository]
-  );
+  )
+  .inTransientScope();
 
 container
   .bind(CadastrarColaboradorUseCase)
   .toResolvedValue(
-    (uow, usuarioRepo, colaboradorRepo, criptoService, cargoRepository) =>
-      new CadastrarColaboradorUseCase(uow, usuarioRepo, colaboradorRepo, cargoRepository, criptoService),
-    [UnitOfWork, UsuarioRepository, ColaboradorRepository, CriptografiaService, CargoRepository]
-  );
+    (uow, usuarioRepo, colaboradorRepo, criptoService, cargoRepository, contratoRepository) =>
+      new CadastrarColaboradorUseCase(
+        uow,
+        usuarioRepo,
+        colaboradorRepo,
+        contratoRepository,
+        cargoRepository,
+        criptoService
+      ),
+    [UnitOfWork, UsuarioRepository, ColaboradorRepository, CriptografiaService, CargoRepository, ContratoRepository]
+  )
+  .inTransientScope();
 
 container
   .bind(ListarColaboradoresUseCase)
   .toResolvedValue(
     (usuarioRepo, colaboradoresQueries) => new ListarColaboradoresUseCase(usuarioRepo, colaboradoresQueries),
     [UsuarioRepository, ColaboradoresQueries]
-  );
+  )
+  .inTransientScope();
 
 container.bind(AlunoRepository).toResolvedValue((db) => new DrizzleAlunoRepository(db), [DrizzleService]);
 
@@ -210,7 +241,9 @@ container.bind(MatriculaRepository).toResolvedValue((db) => new DrizzleMatricula
 
 container.bind(DocumentoRepository).toResolvedValue((db) => new DrizzleDocumentoRepository(db), [DrizzleService]);
 
-container.bind(FileStorageService).toConstantValue(new LocalFileStorageService("./uploads", process.env.DOWNLOAD_TOKEN_SECRET!, process.env.BASE_URL!));
+container
+  .bind(FileStorageService)
+  .toConstantValue(new LocalFileStorageService("./uploads", process.env.DOWNLOAD_TOKEN_SECRET!, process.env.BASE_URL!));
 
 container
   .bind(MatriculasQueries)
@@ -225,15 +258,7 @@ container
   .bind(CriarMatriculaUseCase)
   .toResolvedValue(
     (alunoRepo, unidadeRepo, anoLetivoRepo, matriculaRepo, documentoRepo, fileStorage, uow) =>
-      new CriarMatriculaUseCase(
-        alunoRepo,
-        unidadeRepo,
-        anoLetivoRepo,
-        matriculaRepo,
-        documentoRepo,
-        fileStorage,
-        uow
-      ),
+      new CriarMatriculaUseCase(alunoRepo, unidadeRepo, anoLetivoRepo, matriculaRepo, documentoRepo, fileStorage, uow),
     [
       AlunoRepository,
       UnidadeEscolarRepository,
@@ -243,7 +268,8 @@ container
       FileStorageService,
       UnitOfWork,
     ]
-  );
+  )
+  .inTransientScope();
 
 container.bind(ResponsavelRepository).toResolvedValue((db) => new DrizzleResponsavelRepository(db), [DrizzleService]);
 
@@ -275,14 +301,16 @@ container
       FileStorageService,
       UnitOfWork,
     ]
-  );
+  )
+  .inTransientScope();
 
 container
   .bind(ListarSolicitacoesUseCase)
   .toResolvedValue(
     (unidadeRepo, matriculasQueries) => new ListarSolicitacoesUseCase(unidadeRepo, matriculasQueries),
     [UnidadeEscolarRepository, MatriculasQueries]
-  );
+  )
+  .inTransientScope();
 
 container
   .bind(ObterDetalhesSolicitacaoUseCase)
@@ -290,6 +318,15 @@ container
     (solicitacaoRepo, unidadeRepo, matriculasQueries) =>
       new ObterDetalhesSolicitacaoUseCase(solicitacaoRepo, unidadeRepo, matriculasQueries),
     [SolicitacaoMatriculaRepository, UnidadeEscolarRepository, MatriculasQueries]
-  );
+  )
+  .inTransientScope();
+
+container
+  .bind(ListarResumoSolicitacoesUseCase)
+  .toResolvedValue(
+    (unidadeRepo, matriculasQueries) => new ListarResumoSolicitacoesUseCase(unidadeRepo, matriculasQueries),
+    [UnidadeEscolarRepository, MatriculasQueries]
+  )
+  .inTransientScope();
 
 export { container };

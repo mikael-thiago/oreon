@@ -1,11 +1,19 @@
-import { and, count, eq, gte, lte } from "drizzle-orm";
+import { and, count, eq, gte, lte, sql } from "drizzle-orm";
 import { AnoLetivo } from "../../../domain/entities/ano-letivo.entity.js";
-import type { AnoLetivoRepository, CriarAnoLetivoRequest } from "../../../domain/repositories/ano-letivo.repository.js";
+import type { AnoLetivoRepository } from "../../../domain/repositories/ano-letivo.repository.js";
 import type { DrizzleService } from "./drizzle.service.js";
 import { anoLetivoTable } from "./schema.js";
 
 export class DrizzleAnoLetivoRepository implements AnoLetivoRepository {
   constructor(private readonly drizzleDb: DrizzleService) {}
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzleDb
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('school_periods_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async existe(id: number): Promise<boolean> {
     const [res] = await this.drizzleDb
@@ -63,28 +71,23 @@ export class DrizzleAnoLetivoRepository implements AnoLetivoRepository {
     });
   }
 
-  async criarAnoLetivo(request: CriarAnoLetivoRequest): Promise<AnoLetivo> {
+  async salvar(anoLetivo: AnoLetivo): Promise<AnoLetivo> {
     const [anoLetivoModel] = await this.drizzleDb
       .getTransaction()
       .insert(anoLetivoTable)
       .values({
-        year: request.anoReferencia,
-        startDate: request.dataInicio,
-        endDate: request.dataFim,
-        schoolId: request.escolaId,
+        id: anoLetivo.id,
+        year: anoLetivo.ano,
+        startDate: anoLetivo.dataInicio,
+        endDate: anoLetivo.dataFim,
+        schoolId: anoLetivo.escolaId,
       })
-      .returning();
+      .returning({ id: anoLetivoTable.id });
 
     if (!anoLetivoModel) {
       throw new Error("Falha ao criar ano letivo");
     }
 
-    return new AnoLetivo({
-      id: anoLetivoModel.id,
-      anoReferencia: anoLetivoModel.year,
-      dataInicio: anoLetivoModel.startDate,
-      dataFim: anoLetivoModel.endDate,
-      escolaId: anoLetivoModel.schoolId,
-    });
+    return anoLetivo;
   }
 }

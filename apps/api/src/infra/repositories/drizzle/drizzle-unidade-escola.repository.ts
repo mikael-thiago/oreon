@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import type { UnidadeEscolarRepository } from "../../../domain/repositories/unidade-escola.repository.js";
 import type { DrizzleService } from "./drizzle.service.js";
 import { escolaTable, unidadeTable } from "./schema.js";
@@ -6,6 +6,14 @@ import { UnidadeEscolar } from "../../../domain/entities/unidade-escolar.entity.
 
 export class DrizzleUnidadeEscolaRepository implements UnidadeEscolarRepository {
   constructor(private readonly drizzle: DrizzleService) {}
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzle
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('institution_unit_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async existeComId(id: number): Promise<boolean> {
     const [res] = await this.drizzle

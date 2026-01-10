@@ -1,5 +1,5 @@
 {
-  "id": "a26eefb4-3901-498b-978e-e383d6748425",
+  "id": "0fc45f36-6003-4f4c-970e-77aaa97104ce",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -74,7 +74,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "school_periods_unique_idx": {
+          "name": "school_periods_unique_idx",
+          "nullsNotDistinct": false,
+          "columns": [
+            "year",
+            "school_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -309,11 +318,17 @@
             "cycle": false
           }
         },
+        "person_id": {
+          "name": "person_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -325,6 +340,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "employees_person_id_persons_id_fk": {
+          "name": "employees_person_id_persons_id_fk",
+          "tableFrom": "employees",
+          "tableTo": "persons",
+          "columnsFrom": [
+            "person_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "employees_user_id_users_id_fk": {
           "name": "employees_user_id_users_id_fk",
           "tableFrom": "employees",
@@ -340,7 +368,22 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "employees_personId_unique": {
+          "name": "employees_personId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "person_id"
+          ]
+        },
+        "employees_userId_unique": {
+          "name": "employees_userId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -811,33 +854,34 @@
             "cycle": false
           }
         },
+        "person_id": {
+          "name": "person_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
         "user_id": {
           "name": "user_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
-        },
-        "cpf": {
-          "name": "cpf",
-          "type": "varchar(11)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "birth_date": {
-          "name": "birth_date",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
+        "students_person_id_persons_id_fk": {
+          "name": "students_person_id_persons_id_fk",
+          "tableFrom": "students",
+          "tableTo": "persons",
+          "columnsFrom": [
+            "person_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "students_user_id_users_id_fk": {
           "name": "students_user_id_users_id_fk",
           "tableFrom": "students",
@@ -853,7 +897,22 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "students_personId_unique": {
+          "name": "students_personId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "person_id"
+          ]
+        },
+        "students_userId_unique": {
+          "name": "students_userId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1094,8 +1153,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.responsibles": {
-      "name": "responsibles",
+    "public.persons": {
+      "name": "persons",
       "schema": "",
       "columns": {
         "id": {
@@ -1105,7 +1164,7 @@
           "notNull": true,
           "identity": {
             "type": "byDefault",
-            "name": "responsibles_id_seq",
+            "name": "persons_id_seq",
             "schema": "public",
             "increment": "1",
             "startWith": "1",
@@ -1133,33 +1192,40 @@
           "primaryKey": false,
           "notNull": true
         },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(11)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "gender_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
         "birth_date": {
           "name": "birth_date",
           "type": "date",
           "primaryKey": false,
           "notNull": true
         },
-        "phone": {
-          "name": "phone",
-          "type": "varchar(11)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "user_id": {
-          "name": "user_id",
+        "school_id": {
+          "name": "school_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "responsibles_user_id_users_id_fk": {
-          "name": "responsibles_user_id_users_id_fk",
-          "tableFrom": "responsibles",
-          "tableTo": "users",
+        "persons_school_id_institutions_id_fk": {
+          "name": "persons_school_id_institutions_id_fk",
+          "tableFrom": "persons",
+          "tableTo": "institutions",
           "columnsFrom": [
-            "user_id"
+            "school_id"
           ],
           "columnsTo": [
             "id"
@@ -1170,28 +1236,71 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "responsibles_cpf_unique": {
-          "name": "responsibles_cpf_unique",
+        "persons_cpf_unique": {
+          "name": "persons_cpf_unique",
           "nullsNotDistinct": false,
           "columns": [
             "cpf"
           ]
         },
-        "responsibles_email_unique": {
-          "name": "responsibles_email_unique",
+        "persons_email_unique": {
+          "name": "persons_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
           ]
         },
-        "responsibles_userId_unique": {
-          "name": "responsibles_userId_unique",
+        "persons_table_unique_idx": {
+          "name": "persons_table_unique_idx",
           "nullsNotDistinct": false,
           "columns": [
-            "user_id"
+            "cpf",
+            "school_id"
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.responsibility_relations": {
+      "name": "responsibility_relations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "responsibility_relations_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1241,9 +1350,21 @@
           "primaryKey": false,
           "notNull": true
         },
-        "status": {
-          "name": "status",
-          "type": "varchar",
+        "step_id": {
+          "name": "step_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsibility_relation_id": {
+          "name": "responsibility_relation_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status_id": {
+          "name": "status_id",
+          "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
@@ -1253,6 +1374,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "observations": {
+          "name": "observations",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "proof_of_residence_id": {
           "name": "proof_of_residence_id",
           "type": "integer",
@@ -1261,6 +1388,18 @@
         },
         "scholar_history_id": {
           "name": "scholar_history_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "student_document_id": {
+          "name": "student_document_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responsible_document_id": {
+          "name": "responsible_document_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -1294,10 +1433,10 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "matriculation_requests_responsible_id_responsibles_id_fk": {
-          "name": "matriculation_requests_responsible_id_responsibles_id_fk",
+        "matriculation_requests_responsible_id_persons_id_fk": {
+          "name": "matriculation_requests_responsible_id_persons_id_fk",
           "tableFrom": "matriculation_requests",
-          "tableTo": "responsibles",
+          "tableTo": "persons",
           "columnsFrom": [
             "responsible_id"
           ],
@@ -1313,6 +1452,45 @@
           "tableTo": "school_periods",
           "columnsFrom": [
             "school_period_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "matriculation_requests_step_id_steps_id_fk": {
+          "name": "matriculation_requests_step_id_steps_id_fk",
+          "tableFrom": "matriculation_requests",
+          "tableTo": "steps",
+          "columnsFrom": [
+            "step_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "matriculation_requests_responsibility_relation_id_responsibility_relations_id_fk": {
+          "name": "matriculation_requests_responsibility_relation_id_responsibility_relations_id_fk",
+          "tableFrom": "matriculation_requests",
+          "tableTo": "responsibility_relations",
+          "columnsFrom": [
+            "responsibility_relation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "matriculation_requests_status_id_matriculation_request_statuses_id_fk": {
+          "name": "matriculation_requests_status_id_matriculation_request_statuses_id_fk",
+          "tableFrom": "matriculation_requests",
+          "tableTo": "matriculation_request_statuses",
+          "columnsFrom": [
+            "status_id"
           ],
           "columnsTo": [
             "id"
@@ -1345,8 +1523,76 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "matriculation_requests_student_document_id_documents_id_fk": {
+          "name": "matriculation_requests_student_document_id_documents_id_fk",
+          "tableFrom": "matriculation_requests",
+          "tableTo": "documents",
+          "columnsFrom": [
+            "student_document_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "matriculation_requests_responsible_document_id_documents_id_fk": {
+          "name": "matriculation_requests_responsible_document_id_documents_id_fk",
+          "tableFrom": "matriculation_requests",
+          "tableTo": "documents",
+          "columnsFrom": [
+            "responsible_document_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.matriculation_request_statuses": {
+      "name": "matriculation_request_statuses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "byDefault",
+            "name": "matriculation_request_statuses_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "2147483647",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(25)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(25)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1724,6 +1970,14 @@
     }
   },
   "enums": {
+    "public.gender_enum": {
+      "name": "gender_enum",
+      "schema": "public",
+      "values": [
+        "male",
+        "female"
+      ]
+    },
     "public.shifts": {
       "name": "shifts",
       "schema": "public",

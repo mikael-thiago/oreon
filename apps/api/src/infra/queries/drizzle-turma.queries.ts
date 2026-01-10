@@ -23,7 +23,7 @@ export class DrizzleTurmaQueries implements TurmaQueries {
         },
       })
       .from(turmaTable)
-      .innerJoin(etapaTable, eq(turmaTable.etapaId, etapaTable.id))
+      .innerJoin(etapaTable, eq(turmaTable.stepId, etapaTable.id))
       .innerJoin(unidadeTable, eq(turmaTable.unitId, unidadeTable.id))
       .innerJoin(
         baseCurricularTable,

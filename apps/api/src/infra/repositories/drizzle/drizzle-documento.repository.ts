@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { Documento } from "../../../domain/entities/documento.entity.js";
 import type {
   AtualizarDocumentoRequest,
@@ -11,6 +11,14 @@ import { documentsTable } from "./schema.js";
 
 export class DrizzleDocumentoRepository implements DocumentoRepository {
   constructor(private readonly drizzle: DrizzleService) {}
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzle
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('documents_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async criarDocumento(request: CriarDocumentoRequest): Promise<Documento> {
     const [documentoModel] = await this.drizzle

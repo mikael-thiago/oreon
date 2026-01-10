@@ -8,6 +8,7 @@ import { CadastrarUsuarioUseCase } from "../../../application/usecases/cadastrar
 import { LoginUseCase } from "../../../application/usecases/login.usecase.js";
 import { ObterMeusDadosUseCase } from "../../../application/usecases/obter-meus-dados.usecase.js";
 import { container } from "../../di/di.js";
+import { Result } from "../../../domain/shared/result.js";
 
 const loginSchema = z.object({
   email: z
@@ -53,14 +54,17 @@ export async function authRoutes(fastify: FastifyInstance) {
       const usecase = container.get(LoginUseCase);
       const resultado = await usecase.executar(request.body);
 
-      reply.setCookie("token", resultado.token, {
-        httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        sameSite: "strict",
-        secure: false,
-      });
-
-      reply.status(200).send(resultado.usuario);
+      if (Result.isOk(resultado)) {
+        reply.setCookie("token", resultado.value.token, {
+          httpOnly: true,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+          sameSite: "strict",
+          secure: false,
+        });
+        reply.replyResult(Result.ok(resultado.value.usuario), 200);
+      } else {
+        reply.replyResult(resultado);
+      }
     });
 
   fastify.withTypeProvider<ZodTypeProvider>().post("/logout", function handle(_, reply) {
@@ -72,21 +76,22 @@ export async function authRoutes(fastify: FastifyInstance) {
     .withTypeProvider<ZodTypeProvider>()
     .post("/usuarios", { schema: { body: cadastrarUsuarioSchema } }, async function handle(request, reply) {
       const usecase = container.get(CadastrarUsuarioUseCase);
-      const usuario = await usecase.executar(request.body);
-      reply.status(201).send(usuario);
+      const result = await usecase.executar(request.body);
+      reply.replyResult(result, 201);
     });
 
   fastify.get("/me", async function handle(request, reply) {
     try {
       const usuario = await request.jwtVerify<UsuarioAutenticado>();
-
-      return container.get(ObterMeusDadosUseCase).executar(usuario);
+      const result = await container.get(ObterMeusDadosUseCase).executar(usuario);
+      reply.replyResult(result);
     } catch {
       return null;
     }
   });
 
-  fastify.post("/admin", function handle(request) {
-    return new _CadastrarAdminUseCase(container.get(CriptografiaService)).executar(request.body as any);
+  fastify.post("/admin", async function handle(request, reply) {
+    const result = await new _CadastrarAdminUseCase(container.get(CriptografiaService)).executar(request.body as any);
+    reply.replyResult(result, 201);
   });
 }

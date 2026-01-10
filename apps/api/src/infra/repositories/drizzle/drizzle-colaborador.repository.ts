@@ -1,17 +1,54 @@
-import { and, eq } from "drizzle-orm";
-import { Colaborador } from "../../../domain/entities/colaborador.entity.js";
-import { StatusContratoEnum } from "../../../domain/enums/status-contrato.enum.js";
-import type {
-  ColaboradorRepository,
-  CriarColaboradorData,
-  CriarProfessorRequest,
-} from "../../../domain/repositories/colaborador.repository.js";
 import { DateFormatter } from "@oreon/utils/date-formatter";
+import { and, eq, sql } from "drizzle-orm";
+import { Colaborador } from "../../../domain/entities/colaborador.entity.js";
+import type { ColaboradorRepository } from "../../../domain/repositories/colaborador.repository.js";
 import type { DrizzleService } from "./drizzle.service.js";
-import { colaboradoresTable, contratoProfessorDisciplinaTable, contratosTable, usuarioTable } from "./schema.js";
+import { colaboradoresTable, contratosTable, pessoasTable, usuarioTable } from "./schema.js";
 
 export class DrizzleColaboradorRepository implements ColaboradorRepository {
   constructor(private readonly drizzle: DrizzleService) {}
+
+  async adicionar(colaborador: Colaborador): Promise<Colaborador> {
+    const [pessoa] = await this.drizzle
+      .getTransaction()
+      .insert(pessoasTable)
+      .values({
+        name: colaborador.nome.getValor(),
+        cpf: colaborador.cpf.getValor(),
+        email: colaborador.email.getValor(),
+        birthDate: DateFormatter.format(new Date(), "yyyy-MM-dd"),
+        gender: "male",
+        schoolId: colaborador.escolaId,
+      })
+      .returning();
+
+    if (!pessoa) {
+      throw new Error("Falha ao criar registro de pessoa");
+    }
+
+    const [employeeModel] = await this.drizzle
+      .getTransaction()
+      .insert(colaboradoresTable)
+      .values({
+        personId: pessoa.id,
+        userId: colaborador.usuario.id,
+      })
+      .returning();
+
+    if (!employeeModel) {
+      throw new Error("Falha ao criar colaborador");
+    }
+
+    return colaborador;
+  }
+
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzle
+      .getTransaction()
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('employees_id_seq') AS "id"`);
+
+    return res.rows[0]!.id;
+  }
 
   async obterColaboradorPorId(id: number): Promise<Colaborador | null> {
     const [result] = await this.drizzle
@@ -19,8 +56,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .select({
         // Employee fields
         id: colaboradoresTable.id,
-        cpf: usuarioTable.cpf,
-        email: usuarioTable.email,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        email: pessoasTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -31,11 +69,11 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         salario: contratosTable.salary,
         // User fields
         usuarioId: usuarioTable.id,
-        usuarioNome: usuarioTable.name,
-        usuarioEmail: usuarioTable.email,
+        usuarioEmail: usuarioTable.login,
         usuarioSenha: usuarioTable.password,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(contratosTable, and(eq(contratosTable.employeeId, colaboradoresTable.id)))
       .where(eq(colaboradoresTable.id, id));
@@ -44,24 +82,15 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       return null;
     }
 
-    return new Colaborador({
+    return Colaborador.reconstituir({
       id: result.id,
-      cpf: result.cpf!,
-      email: result.email,
-      unidadeId: result.unidadeId,
-      ultimoContrato: {
-        id: result.contratoId,
-        dataInicio: new Date(result.dataInicio),
-        dataFim: result.dataFim ? new Date(result.dataFim) : null,
-        cargoId: result.cargoId,
-        status: result.status === "active" ? StatusContratoEnum.Ativo : StatusContratoEnum.Inativo,
-        salario: Number(result.salario),
-      },
+      nome: result.nome,
+      cpf: result.cpf,
+      email: result.email!,
+      escolaId: result.unidadeId,
       usuario: {
         id: result.usuarioId,
-        nome: result.usuarioNome,
         email: result.usuarioEmail,
-        senha: result.usuarioSenha,
       },
     });
   }
@@ -72,8 +101,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .select({
         // Employee fields
         id: colaboradoresTable.id,
-        cpf: usuarioTable.cpf,
-        email: usuarioTable.email,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        email: pessoasTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -84,40 +114,31 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         salario: contratosTable.salary,
         // User fields
         usuarioId: usuarioTable.id,
-        usuarioNome: usuarioTable.name,
-        usuarioEmail: usuarioTable.email,
+        usuarioEmail: usuarioTable.login,
         usuarioSenha: usuarioTable.password,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
         and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
-      .where(eq(usuarioTable.cpf, cpf));
+      .where(eq(pessoasTable.cpf, cpf));
 
     if (!result) {
       return null;
     }
 
-    return new Colaborador({
+    return Colaborador.reconstituir({
       id: result.id,
-      cpf: result.cpf!,
-      email: result.email,
-      unidadeId: result.unidadeId,
-      ultimoContrato: {
-        id: result.contratoId,
-        dataInicio: new Date(result.dataInicio),
-        dataFim: result.dataFim ? new Date(result.dataFim) : null,
-        cargoId: result.cargoId,
-        status: result.status === "active" ? StatusContratoEnum.Ativo : StatusContratoEnum.Inativo,
-        salario: Number(result.salario),
-      },
+      cpf: result.cpf,
+      nome: result.nome,
+      email: result.email!,
+      escolaId: result.unidadeId,
       usuario: {
         id: result.usuarioId,
-        nome: result.usuarioNome,
         email: result.usuarioEmail,
-        senha: result.usuarioSenha,
       },
     });
   }
@@ -128,8 +149,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .select({
         // Employee fields
         id: colaboradoresTable.id,
-        cpf: usuarioTable.cpf,
-        email: usuarioTable.email,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        email: pessoasTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -140,40 +162,31 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         salario: contratosTable.salary,
         // User fields
         usuarioId: usuarioTable.id,
-        usuarioNome: usuarioTable.name,
-        usuarioEmail: usuarioTable.email,
+        usuarioEmail: usuarioTable.login,
         usuarioSenha: usuarioTable.password,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
         and(eq(contratosTable.employeeId, colaboradoresTable.id), eq(contratosTable.status, "active"))
       )
-      .where(eq(usuarioTable.email, email));
+      .where(eq(pessoasTable.email, email));
 
     if (!result) {
       return null;
     }
 
-    return new Colaborador({
+    return Colaborador.reconstituir({
       id: result.id,
-      cpf: result.cpf!,
-      email: result.email,
-      unidadeId: result.unidadeId,
-      ultimoContrato: {
-        id: result.contratoId,
-        dataInicio: new Date(result.dataInicio),
-        dataFim: result.dataFim ? new Date(result.dataFim) : null,
-        cargoId: result.cargoId,
-        status: result.status === "active" ? StatusContratoEnum.Ativo : StatusContratoEnum.Inativo,
-        salario: Number(result.salario),
-      },
+      nome: result.nome,
+      cpf: result.cpf,
+      email: result.email!,
+      escolaId: result.unidadeId,
       usuario: {
         id: result.usuarioId,
-        nome: result.usuarioNome,
         email: result.usuarioEmail,
-        senha: result.usuarioSenha,
       },
     });
   }
@@ -184,8 +197,9 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .select({
         // Employee fields
         id: colaboradoresTable.id,
-        cpf: usuarioTable.cpf,
-        email: usuarioTable.email,
+        nome: pessoasTable.name,
+        cpf: pessoasTable.cpf,
+        email: pessoasTable.email,
         unidadeId: contratosTable.unitId,
         // Contract fields
         contratoId: contratosTable.id,
@@ -196,11 +210,11 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
         salario: contratosTable.salary,
         // User fields
         usuarioId: usuarioTable.id,
-        usuarioNome: usuarioTable.name,
-        usuarioEmail: usuarioTable.email,
+        usuarioEmail: usuarioTable.login,
         usuarioSenha: usuarioTable.password,
       })
       .from(colaboradoresTable)
+      .innerJoin(pessoasTable, eq(colaboradoresTable.personId, pessoasTable.id))
       .innerJoin(usuarioTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .innerJoin(
         contratosTable,
@@ -212,93 +226,16 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       return null;
     }
 
-    return new Colaborador({
+    return Colaborador.reconstituir({
       id: result.id,
-      cpf: result.cpf!,
-      email: result.email,
-      unidadeId: result.unidadeId,
-      ultimoContrato: {
-        id: result.contratoId,
-        dataInicio: new Date(result.dataInicio),
-        dataFim: result.dataFim ? new Date(result.dataFim) : null,
-        cargoId: result.cargoId,
-        status: result.status === "active" ? StatusContratoEnum.Ativo : StatusContratoEnum.Inativo,
-        salario: Number(result.salario),
-      },
+      nome: result.nome,
+      cpf: result.cpf,
+      email: result.email!,
+      escolaId: result.unidadeId,
       usuario: {
         id: result.usuarioId,
-        nome: result.usuarioNome,
         email: result.usuarioEmail,
-        senha: result.usuarioSenha,
       },
     });
-  }
-
-  async criarColaborador(data: CriarColaboradorData): Promise<Colaborador> {
-    const [employeeModel] = await this.drizzle
-      .getTransaction()
-      .insert(colaboradoresTable)
-      .values({
-        userId: data.usuarioId,
-      })
-      .returning();
-
-    if (!employeeModel) {
-      throw new Error("Falha ao criar colaborador");
-    }
-
-    await this.drizzle
-      .getTransaction()
-      .update(usuarioTable)
-      .set({
-        cpf: data.cpf,
-        email: data.email,
-        phone: data.telefone,
-      })
-      .where(eq(usuarioTable.id, data.usuarioId));
-
-    const [contractModel] = await this.drizzle
-      .getTransaction()
-      .insert(contratosTable)
-      .values({
-        employeeId: employeeModel.id,
-        occupationId: data.cargoId,
-        unitId: data.unidadeId,
-        registrationNumber: data.numeroMatricula,
-        startDate: DateFormatter.format(data.dataInicio, "YYYY-MM-DD"),
-        endDate: data.dataFim ? DateFormatter.format(data.dataFim, "YYYY-MM-DD") : null,
-        salary: String(data.salario),
-        status: "unactive",
-      })
-      .returning({ id: contratosTable.id });
-
-    if (!contractModel) {
-      throw new Error("Falha ao criar contrato do colaborador");
-    }
-
-    const colaborador = await this.obterColaboradorPorId(employeeModel.id);
-
-    if (!colaborador) {
-      throw new Error("Colaborador criado mas não foi possível obter os dados completos");
-    }
-
-    return colaborador;
-  }
-
-  async criarProfessor(data: CriarProfessorRequest): Promise<Colaborador> {
-    const colaborador = await this.criarColaborador(data);
-
-    const values: { contractId: number; disciplineId: number; etapaId: number }[] = data.disciplinasPermitidas
-      .map((disciplina) => disciplina.etapasIds.map((etapaId) => [disciplina.disciplinaId, etapaId] as const))
-      .flat()
-      .map(([disciplinaId, etapaId]) => ({
-        contractId: colaborador.ultimoContrato.id,
-        disciplineId: disciplinaId,
-        etapaId: etapaId,
-      }));
-
-    await this.drizzle.getTransaction().insert(contratoProfessorDisciplinaTable).values(values);
-
-    return colaborador;
   }
 }

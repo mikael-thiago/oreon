@@ -17,7 +17,7 @@ export const solicitarMatriculaSchema = z.object({
     .string({ message: "A data de nascimento do aluno é obrigatória" })
     .regex(
       /^\d{4}-\d{2}-\d{2}$/,
-      "A data de nascimento do aluno deve estar no formato YYYY-MM-DD"
+      "A data de nascimento do aluno deve estar no formato yyyy-MM-dd"
     ),
   sexo: z
     .enum(["masculino", "feminino"], {
@@ -55,7 +55,7 @@ export const solicitarMatriculaSchema = z.object({
     .string({ message: "A data de nascimento do responsável é obrigatória" })
     .regex(
       /^\d{4}-\d{2}-\d{2}$/,
-      "A data de nascimento do responsável deve estar no formato YYYY-MM-DD"
+      "A data de nascimento do responsável deve estar no formato yyyy-MM-dd"
     ),
   relacaoResponsabilidade: z
     .enum(["mae", "pai", "avo", "tio", "tia", "irmao", "irma", "outro"], {

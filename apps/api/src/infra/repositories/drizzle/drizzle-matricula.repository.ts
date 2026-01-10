@@ -1,46 +1,21 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Matricula } from "../../../domain/entities/matricula.entity.js";
-import type {
-  CriarMatriculaRequest,
-  MatriculaRepository,
-} from "../../../domain/repositories/matricula.repository.js";
+import type { MatriculaRepository } from "../../../domain/repositories/matricula.repository.js";
 import type { StatusMatricula } from "../../../domain/enums/status-matricula.enum.js";
 import { DateFormatter } from "@oreon/utils/date-formatter";
 import type { DrizzleService } from "./drizzle.service.js";
 import { matriculasTable } from "./schema.js";
+import { DateFormatEnum } from "@oreon/utils/date-format";
 
 export class DrizzleMatriculaRepository implements MatriculaRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
-  async criarMatricula(request: CriarMatriculaRequest): Promise<Matricula> {
-    const [matriculaModel] = await this.drizzle
+  async obterProximoId(): Promise<number> {
+    const res = await this.drizzle
       .getTransaction()
-      .insert(matriculasTable)
-      .values({
-        unitId: request.unidadeId,
-        studentId: request.estudanteId,
-        schoolPeriodId: request.periodoLetivoId,
-        status: request.status,
-        createdDate: DateFormatter.format(request.dataCriacao, "YYYY-MM-DD"),
-        proofOfResidenceId: request.comprovanteResidenciaId,
-        scholarHistoryId: request.historicoEscolarId,
-      })
-      .returning();
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('matriculations_id_seq') AS "id"`);
 
-    if (!matriculaModel) {
-      throw new Error("Falha ao criar matrícula");
-    }
-
-    return new Matricula({
-      id: matriculaModel.id,
-      unidadeId: matriculaModel.unitId,
-      estudanteId: matriculaModel.studentId,
-      periodoLetivoId: matriculaModel.schoolPeriodId,
-      status: matriculaModel.status as StatusMatricula,
-      dataCriacao: new Date(matriculaModel.createdDate),
-      comprovanteResidenciaId: matriculaModel.proofOfResidenceId,
-      historicoEscolarId: matriculaModel.scholarHistoryId,
-    });
+    return res.rows[0]!.id;
   }
 
   async obterMatriculaPorEstudanteEPeriodoLetivo(
@@ -62,7 +37,7 @@ export class DrizzleMatriculaRepository implements MatriculaRepository {
       return null;
     }
 
-    return new Matricula({
+    return Matricula.reconstituir({
       id: matriculaModel.id,
       unidadeId: matriculaModel.unitId,
       estudanteId: matriculaModel.studentId,
@@ -72,5 +47,28 @@ export class DrizzleMatriculaRepository implements MatriculaRepository {
       comprovanteResidenciaId: matriculaModel.proofOfResidenceId,
       historicoEscolarId: matriculaModel.scholarHistoryId,
     });
+  }
+
+  async salvar(matricula: Matricula): Promise<Matricula> {
+    const [matriculaModel] = await this.drizzle
+      .getTransaction()
+      .insert(matriculasTable)
+      .values({
+        id: matricula.id,
+        unitId: matricula.unidadeId,
+        studentId: matricula.estudanteId,
+        schoolPeriodId: matricula.periodoLetivoId,
+        status: matricula.status,
+        createdDate: DateFormatter.format(matricula.dataCriacao, DateFormatEnum.ISO_DATE),
+        proofOfResidenceId: matricula.comprovanteResidenciaId,
+        scholarHistoryId: matricula.historicoEscolarId,
+      })
+      .returning({ id: matriculasTable.id });
+
+    if (!matriculaModel) {
+      throw new Error("Falha ao criar matrícula");
+    }
+
+    return matricula;
   }
 }

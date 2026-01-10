@@ -6,6 +6,7 @@ import { IllegalArgumentError } from "../../domain/errors/illegal-argument.error
 import { UnauthorizedError } from "../../domain/errors/unauthorized.error.js";
 import { ForbiddenError } from "../../domain/errors/forbidden.error.js";
 import { ValidationError } from "../../domain/errors/validation.error.js";
+import { NotFoundError } from "../../domain/errors/not-found.error.js";
 
 function isNoAuthorizationTokenInHeaderError(err: unknown): err is FastifyError {
   return typeof err === "object" && err !== null && "code" in err && err.code === "FST_JWT_NO_AUTHORIZATION_IN_HEADER";
@@ -20,7 +21,6 @@ function isTokenExpired(err: unknown): err is FastifyError {
 }
 
 export function handleError(
-  this: FastifyInstance,
   err: unknown,
   req: FastifyRequest,
   reply: FastifyReply
@@ -52,6 +52,14 @@ export function handleError(
   }
 
   if (err instanceof ConflictError) {
+    return reply.status(err.status).send({
+      type: err.type,
+      status: err.status,
+      mensagem: err.message,
+    });
+  }
+
+  if (err instanceof NotFoundError) {
     return reply.status(err.status).send({
       type: err.type,
       status: err.status,

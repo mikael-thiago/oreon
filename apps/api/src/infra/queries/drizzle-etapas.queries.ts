@@ -1,15 +1,42 @@
-import { eq, sql } from "drizzle-orm";
+import { and, count, eq, sql } from "drizzle-orm";
 import type { drizzle } from "drizzle-orm/node-postgres";
 import type {
   EtapaResponse,
+  ModalidadeComMatriculaResponse,
   ModalidadeResponse,
   ModalidadesQueries,
 } from "../../application/queries/modalidades.queries.js";
-import { etapaTable, modalidadeTable } from "../repositories/drizzle/schema.js";
+import {
+  etapaTable,
+  matriculasTable,
+  modalidadeTable,
+  solicitacoesMatriculaTable,
+} from "../repositories/drizzle/schema.js";
 import type { DrizzleService } from "../repositories/drizzle/drizzle.service.js";
 
 export class DrizzleModalidadesQueries implements ModalidadesQueries {
   constructor(private readonly db: DrizzleService) {}
+
+  obterModalidadesComMatriculas(unidadeId: number, anoLetivoId: number): Promise<ModalidadeComMatriculaResponse[]> {
+    return this.db
+      .getTransaction()
+      .select({
+        id: modalidadeTable.id,
+        nome: modalidadeTable.name,
+        quantidadeSolicitacoes: count(solicitacoesMatriculaTable.id),
+      })
+      .from(modalidadeTable)
+      .innerJoin(etapaTable, eq(etapaTable.modalityId, modalidadeTable.id))
+      .leftJoin(
+        solicitacoesMatriculaTable,
+        and(
+          eq(solicitacoesMatriculaTable.stepId, etapaTable.id),
+          eq(solicitacoesMatriculaTable.unitId, unidadeId),
+          eq(solicitacoesMatriculaTable.schoolPeriodId, anoLetivoId)
+        )
+      )
+      .groupBy(modalidadeTable.id, modalidadeTable.name);
+  }
 
   async obterModalidadePorId(id: number): Promise<ModalidadeResponse | null> {
     const [row] = await this.db

@@ -2,6 +2,7 @@ import { CriptografiaService } from "../interfaces/criptografia.service.js";
 import { JwtService } from "../interfaces/jwt.service.js";
 import { UnauthorizedError } from "../../domain/errors/unauthorized.error.js";
 import { UsuarioRepository } from "../../domain/repositories/usuario.repository.js";
+import { Result } from "../../domain/shared/result.js";
 
 export type LoginRequest = {
     readonly email: string;
@@ -34,11 +35,11 @@ export class LoginUseCase {
         this.jwtService = jwtService;
     }
 
-    async executar(request: LoginRequest): Promise<LoginResponse> {
+    async executar(request: LoginRequest): Promise<Result<LoginResponse, UnauthorizedError>> {
         const usuario = await this.usuarioRepository.obterUsuarioPorEmail(request.email);
 
         if (!usuario) {
-            throw new UnauthorizedError("Email ou senha inválidos");
+            return Result.fail(new UnauthorizedError("Email ou senha inválidos"));
         }
 
         const senhaValida = await this.criptografiaService.verificar(
@@ -47,7 +48,7 @@ export class LoginUseCase {
         );
 
         if (!senhaValida) {
-            throw new UnauthorizedError("Email ou senha inválidos");
+            return Result.fail(new UnauthorizedError("Email ou senha inválidos"));
         }
 
         const token = await this.jwtService.gerarToken({
@@ -56,7 +57,7 @@ export class LoginUseCase {
             escolaId: usuario.escolaId,
         });
 
-        return {
+        return Result.ok({
             token,
             usuario: {
                 id: usuario.id,
@@ -64,6 +65,6 @@ export class LoginUseCase {
                 email: usuario.login,
                 escolaId: usuario.escolaId,
             },
-        };
+        });
     }
 }

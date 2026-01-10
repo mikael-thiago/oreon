@@ -27,7 +27,7 @@ export class DrizzleUnidadeEscolarQueries implements UnidadeEscolarQueries {
       })
       .from(unidadeTable)
       .innerJoin(escolaTable, eq(unidadeTable.institutionId, escolaTable.id))
-      .innerJoin(usuarioTable, eq(usuarioTable.escolaId, escolaTable.id))
+      .innerJoin(usuarioTable, eq(usuarioTable.schoolId, escolaTable.id))
       .leftJoin(colaboradoresTable, eq(colaboradoresTable.userId, usuarioTable.id))
       .leftJoin(
         contratosTable,
@@ -37,7 +37,7 @@ export class DrizzleUnidadeEscolarQueries implements UnidadeEscolarQueries {
         and(
           eq(usuarioTable.id, usuarioId),
           or(
-            and(eq(usuarioTable.isRoot, true), eq(unidadeTable.institutionId, usuarioTable.escolaId)),
+            and(eq(usuarioTable.isRoot, true), eq(unidadeTable.institutionId, usuarioTable.schoolId)),
             and(eq(contratosTable.unitId, unidadeTable.id))
           )
         )

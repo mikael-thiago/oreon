@@ -6,5 +6,6 @@ export type ObterOuCriarDisciplinaRequest = {
 }
 
 export abstract class DisciplinaRepository {
+    abstract obterProximoId(): Promise<number>;
     abstract obterOuCriarNaEscola(request: ObterOuCriarDisciplinaRequest): Promise<Disciplina>;
 }
