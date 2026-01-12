@@ -43,6 +43,7 @@ export type CadastrarColaboradorRequest = {
   readonly cpf: string;
   readonly telefone: string;
   readonly email: string;
+  readonly dataDeNascimento: Date;
   readonly unidadeId: number;
   readonly contrato: {
     readonly cargoId: number;
@@ -70,7 +71,7 @@ export class ColaboradorService implements IColaboradorService {
       searchParams.append('unidadeId', String(unidadeId));
     }
 
-    const response = await fetch(`http://localhost:4000/colaboradores?${searchParams.toString()}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/colaboradores?${searchParams.toString()}`, {
       credentials: "include",
     });
 
@@ -83,7 +84,7 @@ export class ColaboradorService implements IColaboradorService {
   }
 
   async obterDetalhes(unidadeId: number, colaboradorId: number): Promise<DetalhesColaboradorResponse> {
-    const response = await fetch(`http://localhost:4000/unidades/${unidadeId}/colaboradores/${colaboradorId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/unidades/${unidadeId}/colaboradores/${colaboradorId}`, {
       credentials: "include",
     });
 
@@ -96,7 +97,7 @@ export class ColaboradorService implements IColaboradorService {
   }
 
   async cadastrar(data: CadastrarColaboradorRequest): Promise<void> {
-    const response = await fetch(`http://localhost:4000/colaboradores`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/colaboradores`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -107,6 +108,7 @@ export class ColaboradorService implements IColaboradorService {
         cpf: data.cpf,
         telefone: data.telefone,
         email: data.email,
+        dataDeNascimento: data.dataDeNascimento.toISOString().split("T")[0],
         unidadeId: data.unidadeId,
         contrato: {
           cargoId: data.contrato.cargoId,

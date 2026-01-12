@@ -12,9 +12,6 @@ export * from "./test-data.js";
 // Assertions
 export * from "./assertions.js";
 
-// Entity builders
-export * from "./entity-builders.js";
-
 // Mock services
 export * from "./mock-services.js";
 

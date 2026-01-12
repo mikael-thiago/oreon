@@ -10,6 +10,7 @@ export interface Contrato {
   readonly dataFim: Date | null;
   readonly cargoId: number;
   readonly unidadeId: number;
+  readonly colaboradorId: number;
   readonly matricula: string;
   readonly salario: Dinheiro;
   readonly status: StatusContrato;
@@ -21,6 +22,7 @@ export type ContratoComumProps = {
   readonly dataFim: Date | null;
   readonly cargoId: number;
   readonly unidadeId: number;
+  readonly colaboradorId: number;
   readonly matricula: string;
   readonly status: StatusContrato;
   readonly salario: Dinheiro;
@@ -32,6 +34,7 @@ export type CriarContratoComumDTO = {
   readonly dataFim?: Date | null;
   readonly cargoId: number;
   readonly unidadeId: number;
+  readonly colaboradorId: number;
   readonly matricula: string;
   readonly status: StatusContrato;
   readonly salario: number;
@@ -71,12 +74,12 @@ export class ContratoComum implements Contrato {
       });
     }
 
-    if (dados.dataInicio > new Date()) {
-      erros.push({
-        propriedade: "dataInicio",
-        mensagem: "Data de início não pode ser no futuro",
-      });
-    }
+    // if (dados.dataInicio > new Date()) {
+    //   erros.push({
+    //     propriedade: "dataInicio",
+    //     mensagem: "Data de início não pode ser no futuro",
+    //   });
+    // }
 
     if (erros.length > 0) {
       return Result.fail(ValidationError.semantico(erros));
@@ -89,6 +92,7 @@ export class ContratoComum implements Contrato {
         dataFim: dados.dataFim ?? null,
         cargoId: dados.cargoId,
         unidadeId: dados.unidadeId,
+        colaboradorId: dados.colaboradorId,
         matricula: dados.matricula,
         status: dados.status,
         salario: salarioResult.value,
@@ -107,6 +111,7 @@ export class ContratoComum implements Contrato {
     readonly dataFim: Date | null;
     readonly cargoId: number;
     readonly unidadeId: number;
+    readonly colaboradorId: number;
     readonly matricula: string;
     readonly status: StatusContrato;
     readonly salario: number;
@@ -153,6 +158,10 @@ export class ContratoComum implements Contrato {
   get salarioFormatado(): string {
     return this.props.salario.formatar();
   }
+
+  get colaboradorId(): number {
+    return this.props.colaboradorId;
+  }
 }
 
 export type ContratoProfessorProps = {
@@ -161,6 +170,7 @@ export type ContratoProfessorProps = {
   readonly dataFim: Date | null;
   readonly cargoId: number;
   readonly unidadeId: number;
+  readonly colaboradorId: number;
   readonly matricula: string;
   readonly status: StatusContrato;
   readonly salario: Dinheiro;
@@ -173,6 +183,7 @@ export type CriarContratoProfessorDTO = {
   readonly dataFim?: Date | null;
   readonly cargoId: number;
   readonly unidadeId: number;
+  readonly colaboradorId: number;
   readonly matricula: string;
   readonly status: StatusContrato;
   readonly salario: number;
@@ -213,12 +224,12 @@ export class ContratoProfessor implements Contrato {
       });
     }
 
-    if (dados.dataInicio > new Date()) {
-      erros.push({
-        propriedade: "dataInicio",
-        mensagem: "Data de início não pode ser no futuro",
-      });
-    }
+    // if (dados.dataInicio > new Date()) {
+    //   erros.push({
+    //     propriedade: "dataInicio",
+    //     mensagem: "Data de início não pode ser no futuro",
+    //   });
+    // }
 
     // Validar disciplinas
     if (dados.disciplinas.length === 0) {
@@ -239,6 +250,7 @@ export class ContratoProfessor implements Contrato {
         dataFim: dados.dataFim ?? null,
         cargoId: dados.cargoId,
         unidadeId: dados.unidadeId,
+        colaboradorId: dados.colaboradorId,
         matricula: dados.matricula,
         status: dados.status,
         salario: salarioResult.value,
@@ -258,6 +270,7 @@ export class ContratoProfessor implements Contrato {
     readonly dataFim: Date | null;
     readonly cargoId: number;
     readonly unidadeId: number;
+    readonly colaboradorId: number;
     readonly matricula: string;
     readonly status: StatusContrato;
     readonly salario: number;
@@ -308,5 +321,9 @@ export class ContratoProfessor implements Contrato {
 
   get disciplinas(): { readonly disciplinaId: number; readonly etapaId: number }[] {
     return this.props.disciplinas;
+  }
+
+  get colaboradorId(): number {
+    return this.props.colaboradorId;
   }
 }

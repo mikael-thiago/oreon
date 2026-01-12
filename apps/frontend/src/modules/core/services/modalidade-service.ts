@@ -20,7 +20,7 @@ export class ModalidadeService implements IModalidadeService {
     anoLetivoId: number
   ): Promise<ModalidadeComMatriculaResponse[]> {
     const response = await fetch(
-      `http://localhost:4000/unidades/${unidadeId}/ano-letivo/${anoLetivoId}/modalidades-com-matriculas`,
+      `${import.meta.env.VITE_API_URL}/unidades/${unidadeId}/ano-letivo/${anoLetivoId}/modalidades-com-matriculas`,
       {
         credentials: "include",
       }
@@ -30,7 +30,7 @@ export class ModalidadeService implements IModalidadeService {
   }
 
   async obterModalidades(): Promise<ModalidadeResponse[]> {
-    const response = await fetch(`http://localhost:4000/modalidades`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/modalidades`, {
       credentials: "include",
     });
 

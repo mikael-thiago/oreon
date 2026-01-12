@@ -10,7 +10,7 @@ export interface IEtapaService {
 
 export class EtapaService implements IEtapaService {
   async obterEtapas(): Promise<EtapaResponse[]> {
-    const response = await fetch(`http://localhost:4000/etapas`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/etapas`, {
       credentials: "include",
     });
 
@@ -21,7 +21,7 @@ export class EtapaService implements IEtapaService {
     modalidadeId: number
   ): Promise<EtapaResponse[]> {
     const response = await fetch(
-      `http://localhost:4000/modalidades/${modalidadeId}/etapas`,
+      `${import.meta.env.VITE_API_URL}/modalidades/${modalidadeId}/etapas`,
       {
         credentials: "include",
       }

@@ -54,6 +54,8 @@ export async function authRoutes(fastify: FastifyInstance) {
       const usecase = container.get(LoginUseCase);
       const resultado = await usecase.executar(request.body);
 
+      console.log(reply.replyResult);
+
       if (Result.isOk(resultado)) {
         reply.setCookie("token", resultado.value.token, {
           httpOnly: true,

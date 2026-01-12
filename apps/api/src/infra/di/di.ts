@@ -205,9 +205,9 @@ container
 container
   .bind(CadastrarTurmaUseCase)
   .toResolvedValue(
-    (anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo) =>
-      new CadastrarTurmaUseCase(anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo),
-    [AnoLetivoRepository, BaseCurricularRepository, TurmaRepository, UnidadeEscolarRepository]
+    (anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo, modalidadesQueries) =>
+      new CadastrarTurmaUseCase(anoLetivoRepo, baseRepo, turmaRepo, unidadeRepo, modalidadesQueries),
+    [AnoLetivoRepository, BaseCurricularRepository, TurmaRepository, UnidadeEscolarRepository, ModalidadesQueries]
   )
   .inTransientScope();
 

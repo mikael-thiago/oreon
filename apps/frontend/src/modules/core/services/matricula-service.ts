@@ -91,7 +91,7 @@ export interface IMatriculaService {
 export class MatriculaService implements IMatriculaService {
   async obterResumoSolicitacoes(unidadeId: number, periodoLetivoId: number): Promise<ResumoSolicitacoesResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/solicitacoes/resumo`,
+      `${import.meta.env.VITE_API_URL}/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/solicitacoes/resumo`,
       {
         credentials: "include",
       }
@@ -119,7 +119,7 @@ export class MatriculaService implements IMatriculaService {
     formData.append("comprovanteResidencia", data.comprovanteResidencia);
     formData.append("historicoEscolar", data.historicoEscolar);
 
-    const response = await fetch(`http://localhost:4000/matriculas`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/matriculas`, {
       method: "POST",
       credentials: "include",
       body: formData,
@@ -136,7 +136,7 @@ export class MatriculaService implements IMatriculaService {
 
   async listar(unidadeId: number, periodoLetivoId: number): Promise<ListarMatriculasResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/matriculas`,
+      `${import.meta.env.VITE_API_URL}/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/matriculas`,
       {
         credentials: "include",
       }
@@ -167,7 +167,7 @@ export class MatriculaService implements IMatriculaService {
     formData.append("documentoResponsavel", data.documentoResponsavel);
     formData.append("documentoAluno", data.documentoAluno);
 
-    const response = await fetch(`http://localhost:4000/unidades/${data.unidadeId}/solicitar-matricula`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/unidades/${data.unidadeId}/solicitar-matricula`, {
       method: "POST",
       credentials: "include",
       body: formData,
@@ -183,7 +183,7 @@ export class MatriculaService implements IMatriculaService {
 
   async listarSolicitacoes(unidadeId: number, periodoLetivoId: number, modalidadeId: number): Promise<ListarSolicitacoesResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/modalidade/${modalidadeId}/solicitacoes`,
+      `${import.meta.env.VITE_API_URL}/unidade/${unidadeId}/periodo-letivo/${periodoLetivoId}/modalidade/${modalidadeId}/solicitacoes`,
       {
         credentials: "include",
       }

@@ -37,7 +37,7 @@ export interface IBaseCurricularService {
 
 export class BaseCurricularService implements IBaseCurricularService {
   async obterBasePorId(id: number): Promise<ObterBaseResponse> {
-    const response = await fetch(`http://localhost:4000/bases/${id}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/bases/${id}`, {
       credentials: "include",
     });
 
@@ -50,7 +50,7 @@ export class BaseCurricularService implements IBaseCurricularService {
   ): Promise<
     { readonly id: number; readonly etapa: string; readonly codigo: string }[]
   > {
-    const url = `http://localhost:4000/unidade/${unidadeId}/bases`;
+    const url = `${import.meta.env.VITE_API_URL}/unidade/${unidadeId}/bases`;
 
     const search = new URLSearchParams();
 
@@ -66,7 +66,7 @@ export class BaseCurricularService implements IBaseCurricularService {
   async obterTodas(): Promise<
     { readonly id: number; readonly etapa: string; readonly codigo: string }[]
   > {
-    const response = await fetch(`http://localhost:4000/bases`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/bases`, {
       credentials: "include",
     });
 
@@ -74,7 +74,7 @@ export class BaseCurricularService implements IBaseCurricularService {
   }
 
   async cadastrar(data: CadastrarBaseCurricularRequest): Promise<void> {
-    const response = await fetch(`http://localhost:4000/bases`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/bases`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

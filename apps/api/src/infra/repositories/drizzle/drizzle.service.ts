@@ -17,7 +17,11 @@ export class DrizzleService implements UnitOfWork {
       const result = await fn();
 
       if (Result.isResult(result) && Result.isFailure(result)) {
-        this.als.getStore()?.rollback();
+        try {
+          this.als.getStore()?.rollback();
+        } catch (err) {
+          console.debug('Rollback de transação', err);
+        }
       }
 
       return result;
@@ -28,7 +32,13 @@ export class DrizzleService implements UnitOfWork {
         const result = await fn();
 
         if (Result.isResult(result) && Result.isFailure(result)) {
-          this.als.getStore()?.rollback();
+          console.error(result.erro);
+
+          try {
+            tx.rollback();
+          } catch (err) {
+            console.debug('Rollback de transação', err);
+          }
         }
 
         return result;

@@ -42,6 +42,7 @@ export function CadastrarColaborador() {
     mutationFn: (data: CadastrarColaboradorFormData) => {
       return colaboradorService.cadastrar({
         ...data,
+        dataDeNascimento: new Date(data.dataDeNascimento),
         contrato: {
           cargoId: data.contrato.cargoId,
           salario: data.contrato.salario,

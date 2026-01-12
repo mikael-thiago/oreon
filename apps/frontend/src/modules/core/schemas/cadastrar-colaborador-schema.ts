@@ -22,6 +22,12 @@ export const cadastrarColaboradorSchema = z
       error: (issue) =>
         !issue.input ? "O email é obrigatório" : "O email deve ser válido",
     }),
+    dataDeNascimento: z.iso.date({
+      error: (issue) =>
+        issue.input
+          ? "A data de nascimento é obrigatória"
+          : "A data deve estar no formato yyyy-MM-dd",
+    }),
     unidadeId: z
       .number({
         message: "O ID da unidade é obrigatório",

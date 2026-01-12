@@ -71,6 +71,18 @@ export function DadosPessoais({
           <FieldError errors={[errors.email]} />
         </FieldContent>
       </Field>
+      <Field data-invalid={!!errors.dataDeNascimento}>
+        <FieldLabel htmlFor="dataDeNascimento">Data de Nascimento</FieldLabel>
+        <FieldContent>
+          <Input
+            id="dataDeNascimento"
+            type="date"
+            {...register("dataDeNascimento")}
+            aria-invalid={!!errors.dataDeNascimento}
+          />
+          <FieldError errors={[errors.dataDeNascimento]} />
+        </FieldContent>
+      </Field>
       <Field data-invalid={!!errors.telefone}>
         <FieldLabel htmlFor="telefone">Telefone</FieldLabel>
         <FieldContent>

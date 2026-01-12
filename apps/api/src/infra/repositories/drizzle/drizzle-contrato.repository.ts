@@ -18,6 +18,47 @@ export class DrizzleContratoRepository implements ContratoRepository {
     return res.rows[0]!.id;
   }
 
+  async adicionar<TContrato extends Contrato>(contrato: TContrato): Promise<TContrato> {
+    const [inserted] = await this.drizzle
+      .getTransaction()
+      .insert(contratosTable)
+      .values({
+        id: contrato.id,
+        employeeId: contrato.colaboradorId,
+        occupationId: contrato.cargoId,
+        unitId: contrato.unidadeId,
+        registrationNumber: contrato.matricula,
+        startDate: DateFormatter.format(contrato.dataInicio, "yyyy-MM-dd"),
+        endDate: contrato.dataFim ? DateFormatter.format(contrato.dataFim, "yyyy-MM-dd") : null,
+        status: this.mapStatusToDb(contrato.status),
+        salary: String(contrato.salario.getValor()),
+      })
+      .returning();
+
+    if (!inserted) {
+      throw new Error("Falha ao adicionar contrato");
+    }
+
+    if (contrato instanceof ContratoProfessor) {
+      const professor = contrato as ContratoProfessor;
+
+      if (professor.disciplinas.length > 0) {
+        await this.drizzle
+          .getTransaction()
+          .insert(contratoProfessorDisciplinaTable)
+          .values(
+            professor.disciplinas.map((d) => ({
+              contractId: contrato.id,
+              disciplineId: d.disciplinaId,
+              etapaId: d.etapaId,
+            }))
+          );
+      }
+    }
+
+    return contrato;
+  }
+
   async salvar<TContrato extends Contrato>(contrato: TContrato): Promise<TContrato> {
     const [updated] = await this.drizzle
       .getTransaction()
@@ -88,6 +129,7 @@ export class DrizzleContratoRepository implements ContratoRepository {
         dataFim: contrato.endDate ? new Date(contrato.endDate) : null,
         cargoId: contrato.occupationId,
         unidadeId: contrato.unitId,
+        colaboradorId: contrato.employeeId,
         matricula: contrato.registrationNumber!,
         salario: Number(contrato.salary),
         status: this.mapStatusFromDb(contrato.status!),
@@ -104,6 +146,7 @@ export class DrizzleContratoRepository implements ContratoRepository {
       dataFim: contrato.endDate ? new Date(contrato.endDate) : null,
       cargoId: contrato.occupationId,
       unidadeId: contrato.unitId,
+      colaboradorId: contrato.employeeId,
       salario: Number(contrato.salary),
       matricula: contrato.registrationNumber!,
       status: this.mapStatusFromDb(contrato.status!),

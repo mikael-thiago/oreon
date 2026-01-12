@@ -30,7 +30,7 @@ export class TurmaService implements ITurmaService {
     anoLetivoId: number
   ): Promise<ListarTurmasResponse> {
     const response = await fetch(
-      `http://localhost:4000/unidade/${unidadeId}/anoLetivo/${anoLetivoId}/turmas`,
+      `${import.meta.env.VITE_API_URL}/unidade/${unidadeId}/anoLetivo/${anoLetivoId}/turmas`,
       {
         credentials: "include",
       }
@@ -40,7 +40,7 @@ export class TurmaService implements ITurmaService {
   }
 
   async cadastrar(data: CadastrarTurmaRequest): Promise<void> {
-    const response = await fetch(`http://localhost:4000/turmas`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/turmas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

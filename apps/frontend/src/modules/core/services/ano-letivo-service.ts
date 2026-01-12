@@ -18,7 +18,7 @@ export interface IAnoLetivoService {
 
 export class AnoLetivoService implements IAnoLetivoService {
   async obterAnosLetivos(): Promise<AnoLetivoResponse[]> {
-    const response = await fetch(`http://localhost:4000/anos-letivos`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/anos-letivos`, {
       credentials: "include",
     });
 
@@ -26,7 +26,7 @@ export class AnoLetivoService implements IAnoLetivoService {
   }
 
   async cadastrar(data: CadastrarAnoLetivoRequest): Promise<void> {
-    const response = await fetch(`http://localhost:4000/anos-letivos`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/anos-letivos`, {
       method: "POST",
       credentials: "include",
       headers: {

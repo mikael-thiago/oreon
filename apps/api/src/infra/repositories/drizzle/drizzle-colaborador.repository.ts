@@ -30,6 +30,7 @@ export class DrizzleColaboradorRepository implements ColaboradorRepository {
       .getTransaction()
       .insert(colaboradoresTable)
       .values({
+        id: colaborador.id,
         personId: pessoa.id,
         userId: colaborador.usuario.id,
       })

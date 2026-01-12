@@ -7,6 +7,7 @@ import { BaseCurricularRepository } from "../../domain/repositories/base-curricu
 import { TurmaRepository } from "../../domain/repositories/turma.repository.js";
 import type { UnidadeEscolarRepository } from "../../domain/repositories/unidade-escola.repository.js";
 import { Result } from "../../domain/shared/result.js";
+import type { ModalidadesQueries } from "../queries/modalidades.queries.js";
 
 export type CadastrarTurmaRequest = {
   readonly anoLetivoId: number;
@@ -21,7 +22,8 @@ export class CadastrarTurmaUseCase {
     private readonly anoLetivoRepository: AnoLetivoRepository,
     private readonly baseRepository: BaseCurricularRepository,
     private readonly turmaRepository: TurmaRepository,
-    private readonly unidadeEscolarRepository: UnidadeEscolarRepository
+    private readonly unidadeEscolarRepository: UnidadeEscolarRepository,
+    private readonly modalidadesQueries: ModalidadesQueries
   ) {}
 
   async executar(
@@ -49,6 +51,8 @@ export class CadastrarTurmaUseCase {
       return Result.fail(new ConflictError("Já existe uma turma com essa letra cadastrada nesse ano letivo!"));
     }
 
+    const etapa = (await this.modalidadesQueries.obterEtapaPorId(base.etapaId))!;
+
     const turmaResult = Turma.criar({
       id: await this.turmaRepository.obterProximoId(),
       anoLetivoId: request.anoLetivoId,
@@ -57,7 +61,7 @@ export class CadastrarTurmaUseCase {
       etapaId: base.etapaId,
       limiteDeAlunos: request.limiteDeAlunos,
       unidadeId: request.unidadeId,
-      modalidadeId: 0,
+      modalidadeId: etapa.modalidadeId,
     });
 
     if (Result.isFailure(turmaResult)) {

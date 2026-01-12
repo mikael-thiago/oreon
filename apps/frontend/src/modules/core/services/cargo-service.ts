@@ -10,7 +10,7 @@ export interface ICargoService {
 
 export class CargoService implements ICargoService {
   async obterCargos(): Promise<CargoResponse[]> {
-    const response = await fetch(`http://localhost:4000/cargos`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/cargos`, {
       credentials: "include",
     });
 

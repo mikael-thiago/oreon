@@ -13,7 +13,7 @@ export class DrizzleAlunoRepository implements AlunoRepository {
   async obterProximoId(): Promise<number> {
     const res = await this.drizzleDb
       .getTransaction()
-      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('students_id_seq') AS "id"`);
+      .execute<{ readonly id: number }>(sql`SELECT NEXTVAL('persons_id_seq') AS "id"`);
 
     return res.rows[0]!.id;
   }

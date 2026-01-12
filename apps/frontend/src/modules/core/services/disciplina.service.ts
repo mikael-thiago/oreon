@@ -12,7 +12,7 @@ export interface IDisciplinaService {
 export class DisciplinaService implements IDisciplinaService {
   async obterDisciplinas(unidadeId: number): Promise<DisciplinaListItem[]> {
     const response = await fetch(
-      `http://localhost:4000/unidades/${unidadeId}/disciplinas`,
+      `${import.meta.env.VITE_API_URL}/unidades/${unidadeId}/disciplinas`,
       { credentials: "include" }
     );
 

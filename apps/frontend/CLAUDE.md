@@ -17,7 +17,7 @@ npm run preview      # Visualizar build de produção
 ```
 
 ### API Backend
-O frontend conecta a uma API backend em `http://localhost:4000`. O backend está localizado no diretório `../api`.
+O frontend conecta a uma API backend em `${import.meta.env.VITE_API_URL}`. O backend está localizado no diretório `../api`.
 
 ## Arquitetura
 

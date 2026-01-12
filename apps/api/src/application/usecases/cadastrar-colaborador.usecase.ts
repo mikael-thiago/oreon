@@ -143,7 +143,7 @@ export class CadastrarColaboradorUseCase {
         ]));
       }
 
-      const colaborador = Colaborador.criar({
+      const colaboradorResult = Colaborador.criar({
         id: await this.colaboradorRepository.obterProximoId(),
         cpf: request.cpf,
         email: request.email,
@@ -155,28 +155,29 @@ export class CadastrarColaboradorUseCase {
         },
       });
 
-      if (Result.isFailure(colaborador)) {
-        return colaborador;
+      if (Result.isFailure(colaboradorResult)) {
+        return colaboradorResult;
       }
 
-      await this.colaboradorRepository.adicionar(colaborador.value);
+      await this.colaboradorRepository.adicionar(colaboradorResult.value);
 
-      const contrato = await this.criarContratoColaborador(request, cargo);
+      const contratoResult = await this.criarContratoColaborador(request, cargo, colaboradorResult.value.id);
 
-      if (Result.isFailure(contrato)) {
-        return contrato;
+      if (Result.isFailure(contratoResult)) {
+        return contratoResult;
       }
 
-      await this.contratoRepository.salvar(contrato.value);
+      await this.contratoRepository.adicionar(contratoResult.value);
 
       // TODO: Enviar email informando os dados de login do colaborador
-      return Result.ok(new CadastrarColaboradorResponse(colaborador.value, contrato.value, usuario.login, senha));
+      return Result.ok(new CadastrarColaboradorResponse(colaboradorResult.value, contratoResult.value, usuario.login, senha));
     });
   }
 
   private async criarContratoColaborador(
     request: CadastrarContratoComumRequest | CadastrarContratoProfessorRequest,
-    cargo: Cargo
+    cargo: Cargo,
+    colaboradorId: number
   ): Promise<Result<Contrato, ValidationError>> {
     if (!cargo.podeEnsinar) {
       return ContratoComum.criar({
@@ -184,6 +185,7 @@ export class CadastrarColaboradorUseCase {
         cargoId: request.contrato.cargoId,
         dataInicio: request.contrato.dataInicio,
         dataFim: request.contrato.dataFim ?? null,
+        colaboradorId,
         matricula: "",
         status: StatusContratoEnum.Inativo,
         unidadeId: request.unidadeId,
@@ -220,6 +222,7 @@ export class CadastrarColaboradorUseCase {
       cargoId: request.contrato.cargoId,
       dataInicio: request.contrato.dataInicio,
       dataFim: request.contrato.dataFim ?? null,
+      colaboradorId,
       matricula: "",
       status: StatusContratoEnum.Inativo,
       unidadeId: request.unidadeId,
