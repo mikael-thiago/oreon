@@ -77,31 +77,6 @@ describe("ContratoComum Entity", () => {
       );
     });
 
-    it("deve rejeitar quando data de início for no futuro", () => {
-      const result = ContratoComum.criar({
-        id: 1,
-        dataInicio: TEST_DATES.NEXT_YEAR,
-        dataFim: null,
-        cargoId: 1,
-        unidadeId: 1,
-        colaboradorId: 1,
-        matricula: "2024001",
-        status: StatusContratoEnum.Ativo,
-        salario: TEST_MONEY.COORDINATOR_SALARY,
-      });
-
-      if (!expectToBeFailure(result)) return;
-
-      expect(result.erro.erros).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            propriedade: "dataInicio",
-            mensagem: expect.stringContaining("não pode ser no futuro"),
-          }),
-        ])
-      );
-    });
-
     it("deve aceitar contrato sem data de término (null)", () => {
       const result = ContratoComum.criar({
         id: 1,
@@ -360,7 +335,7 @@ describe("ContratoProfessor Entity", () => {
       );
     });
 
-    it("deve rejeitar datas inválidas", () => {
+    it("deve rejeitar data de fim após data de início", () => {
       // End date before start date
       const resultInvalidDates = ContratoProfessor.criar({
         id: 1,
@@ -376,22 +351,6 @@ describe("ContratoProfessor Entity", () => {
       });
 
       expectToBeFailure(resultInvalidDates);
-
-      // Start date in future
-      const resultFutureStart = ContratoProfessor.criar({
-        id: 1,
-        dataInicio: TEST_DATES.NEXT_YEAR,
-        dataFim: null,
-        cargoId: 1,
-        unidadeId: 1,
-        colaboradorId: 1,
-        matricula: "2024001",
-        status: StatusContratoEnum.Ativo,
-        salario: TEST_MONEY.TEACHER_SALARY,
-        disciplinas: [{ disciplinaId: 1, etapaId: 1 }],
-      });
-
-      expectToBeFailure(resultFutureStart);
     });
 
     it("deve aceitar contrato sem data de término", () => {

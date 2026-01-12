@@ -18,7 +18,6 @@ import {
   InMemoryDocumentoRepository,
   MockFileStorageService,
   MockUnitOfWork,
-  ResponsavelBuilder,
   VALID_CPFS,
   INVALID_CPFS,
   VALID_NAMES,
@@ -29,6 +28,7 @@ import {
 import type { UsuarioAutenticado } from "../../../application/types/authenticated-user.type.js";
 import { ValidationError } from "../../../domain/errors/validation.error.js";
 import { Aluno } from "../../../domain/entities/aluno.entity.js";
+import { Responsavel } from "../../../domain/entities/responsavel.entity.js";
 import { ConflictError } from "../../../domain/errors/conflict.error.js";
 
 describe("SolicitarMatriculaUseCase", () => {
@@ -228,11 +228,19 @@ describe("SolicitarMatriculaUseCase", () => {
   describe("Sucesso - Responsável existente", () => {
     it("deve criar solicitação reutilizando responsável existente pelo CPF", async () => {
       // Arrange: Criar responsável existente
-      const responsavelExistente = new ResponsavelBuilder()
-        .withCpf(VALID_CPFS.CPF_2)
-        .withNome("Responsável Existente")
-        .withEscolaId(usuarioAutenticado.escolaId)
-        .buildValid();
+      const responsavelExistenteResult = Responsavel.criar({
+        id: await responsavelRepository.obterProximoId(),
+        cpf: VALID_CPFS.CPF_2,
+        nome: "Responsável Existente",
+        escolaId: usuarioAutenticado.escolaId,
+        telefone: VALID_PHONES.MOBILE_SP,
+        email: VALID_EMAILS.EMAIL_1,
+        dataDeNascimento: TEST_DATES.RESPONSIBLE_AGE_40,
+      });
+
+      if (!expectToBeOk(responsavelExistenteResult)) return;
+
+      const responsavelExistente = responsavelExistenteResult.value;
       await responsavelRepository.salvar(responsavelExistente);
 
       const request = {

@@ -244,6 +244,11 @@ export class InMemoryContratoRepository implements ContratoRepository {
     return contrato;
   }
 
+  async adicionar<TContrato extends Contrato>(contrato: TContrato): Promise<TContrato> {
+    this.contratos.push(contrato);
+    return contrato;
+  }
+
   async obterContratoAtivoColaborador(colaboradorId: number): Promise<Contrato | null> {
     // Note: This is a simplified implementation
     // In real implementation, you'd need to join with colaborador table

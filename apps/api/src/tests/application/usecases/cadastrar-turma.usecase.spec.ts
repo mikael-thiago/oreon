@@ -3,6 +3,7 @@ import { CadastrarTurmaUseCase } from "../../../application/usecases/cadastrar-t
 import { AnoLetivo } from "../../../domain/entities/ano-letivo.entity.js";
 import { BaseCurricular } from "../../../domain/entities/base-curricular.entity.js";
 import { UnidadeEscolar } from "../../../domain/entities/unidade-escolar.entity.js";
+import { Turma } from "../../../domain/entities/turma.entity.js";
 import {
   expectToBeFailure,
   expectToBeOk,
@@ -11,10 +12,53 @@ import {
   InMemoryTurmaRepository,
   InMemoryUnidadeEscolarRepository,
   TEST_DATES,
-  TurmaBuilder,
   VALID_PHONES,
 } from "../../helpers/index.js";
 import { ValidationError } from "../../../domain/errors/validation.error.js";
+import type {
+  ModalidadesQueries,
+  EtapaResponse,
+  ModalidadeResponse,
+  ModalidadeComMatriculaResponse,
+} from "../../../application/queries/modalidades.queries.js";
+
+class MockModalidadesQueries implements ModalidadesQueries {
+  async listarModalidades(): Promise<ModalidadeResponse[]> {
+    return [{ id: 1, nome: "Ensino Fundamental" }];
+  }
+
+  async listarEtapas(modalidadeId: number): Promise<EtapaResponse[]> {
+    return [
+      { id: 1, numero: 1, nome: "1º Ano" },
+      { id: 2, numero: 2, nome: "2º Ano" },
+    ];
+  }
+
+  async listarTodasEtapas(): Promise<(EtapaResponse & { readonly modalidadeId: number })[]> {
+    return [
+      { id: 1, numero: 1, nome: "1º Ano", modalidadeId: 1 },
+      { id: 2, numero: 2, nome: "2º Ano", modalidadeId: 1 },
+    ];
+  }
+
+  async obterModalidadePorId(id: number): Promise<ModalidadeResponse | null> {
+    if (id === 1) return { id: 1, nome: "Ensino Fundamental" };
+    return null;
+  }
+
+  async obterEtapaPorId(id: number): Promise<(EtapaResponse & { readonly modalidadeId: number }) | null> {
+    if (id === 1) return { id: 1, numero: 1, nome: "1º Ano", modalidadeId: 1 };
+    if (id === 2) return { id: 2, numero: 2, nome: "2º Ano", modalidadeId: 1 };
+    return null;
+  }
+
+  async obterModalidadesComMatriculas(
+    unidadeId: number,
+    anoLetivoId: number
+  ): Promise<ModalidadeComMatriculaResponse[]> {
+    return [];
+  }
+}
 
 describe("CadastrarTurmaUseCase", () => {
   let useCase: CadastrarTurmaUseCase;
@@ -22,6 +66,7 @@ describe("CadastrarTurmaUseCase", () => {
   let baseCurricularRepository: InMemoryBaseCurricularRepository;
   let turmaRepository: InMemoryTurmaRepository;
   let unidadeEscolarRepository: InMemoryUnidadeEscolarRepository;
+  let modalidadesQueries: MockModalidadesQueries;
   let unidadeId: number;
   let anoLetivoId: number;
 
@@ -30,12 +75,14 @@ describe("CadastrarTurmaUseCase", () => {
     baseCurricularRepository = new InMemoryBaseCurricularRepository();
     turmaRepository = new InMemoryTurmaRepository();
     unidadeEscolarRepository = new InMemoryUnidadeEscolarRepository();
+    modalidadesQueries = new MockModalidadesQueries();
 
     useCase = new CadastrarTurmaUseCase(
       anoLetivoRepository,
       baseCurricularRepository,
       turmaRepository,
-      unidadeEscolarRepository
+      unidadeEscolarRepository,
+      modalidadesQueries
     );
 
     // Seed ano letivo
@@ -158,12 +205,20 @@ describe("CadastrarTurmaUseCase", () => {
   describe("Falha - Letra duplicada", () => {
     it("deve retornar ConflictError quando já existe turma com a mesma letra no mesmo ano e etapa", async () => {
       // Arrange: Criar turma A
-      const turmaExistente = new TurmaBuilder()
-        .withAnoLetivoId(anoLetivoId)
-        .withEtapaId(1)
-        .withLetra("A")
-        .withUnidadeId(unidadeId)
-        .buildValid();
+      const turmaExistenteResult = Turma.criar({
+        id: await turmaRepository.obterProximoId(),
+        anoLetivoId: anoLetivoId,
+        letra: "A",
+        baseId: 1,
+        modalidadeId: 1,
+        etapaId: 1,
+        limiteDeAlunos: 30,
+        unidadeId: unidadeId,
+      });
+
+      if (!expectToBeOk(turmaExistenteResult)) return;
+
+      const turmaExistente = turmaExistenteResult.value;
       await turmaRepository.salvar(turmaExistente);
 
       const request = {
@@ -186,11 +241,20 @@ describe("CadastrarTurmaUseCase", () => {
 
     it("deve permitir mesma letra em anos letivos diferentes", async () => {
       // Arrange: Criar turma A no ano atual
-      const turmaExistente = new TurmaBuilder()
-        .withAnoLetivoId(anoLetivoId)
-        .withEtapaId(1)
-        .withLetra("A")
-        .buildValid();
+      const turmaExistenteResult = Turma.criar({
+        id: await turmaRepository.obterProximoId(),
+        anoLetivoId: anoLetivoId,
+        letra: "A",
+        baseId: 1,
+        modalidadeId: 1,
+        etapaId: 1,
+        limiteDeAlunos: 30,
+        unidadeId: unidadeId,
+      });
+
+      if (!expectToBeOk(turmaExistenteResult)) return;
+
+      const turmaExistente = turmaExistenteResult.value;
       await turmaRepository.salvar(turmaExistente);
 
       // Criar outro ano letivo
@@ -239,11 +303,20 @@ describe("CadastrarTurmaUseCase", () => {
 
     it("deve permitir mesma letra em etapas diferentes", async () => {
       // Arrange: Criar turma A na etapa 1
-      const turmaExistente = new TurmaBuilder()
-        .withAnoLetivoId(anoLetivoId)
-        .withEtapaId(1)
-        .withLetra("A")
-        .buildValid();
+      const turmaExistenteResult = Turma.criar({
+        id: await turmaRepository.obterProximoId(),
+        anoLetivoId: anoLetivoId,
+        letra: "A",
+        baseId: 1,
+        modalidadeId: 1,
+        etapaId: 1,
+        limiteDeAlunos: 30,
+        unidadeId: unidadeId,
+      });
+
+      if (!expectToBeOk(turmaExistenteResult)) return;
+
+      const turmaExistente = turmaExistenteResult.value;
       await turmaRepository.salvar(turmaExistente);
 
       // Criar base curricular para etapa 2
