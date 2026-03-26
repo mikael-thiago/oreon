@@ -4,481 +4,475 @@ import { TEST_MONEY } from "../../helpers/test-data.js";
 import { expectToBeOk, expectToBeFailure } from "../../helpers/assertions.js";
 
 describe("Dinheiro Value Object", () => {
-	describe("Creation", () => {
-		it("should create valid monetary amount", () => {
-			const result = Dinheiro.criar(100.5);
+  describe("Creation", () => {
+    it("should create valid monetary amount", () => {
+      const result = Dinheiro.criar(100.5);
 
-			expectToBeOk(result);
-			expect(result.value.getValor()).toBe(100.5);
-		});
+      if (!expectToBeOk(result)) return;
 
-		it("should create zero amount", () => {
-			const result = Dinheiro.criar(0);
+      expect(result.value.getValor()).toBe(100.5);
+    });
 
-			expectToBeOk(result);
-			expect(result.value.getValor()).toBe(0);
-			expect(result.value.isZero()).toBe(true);
-		});
+    it("should create zero amount", () => {
+      const result = Dinheiro.criar(0);
 
-		it("should create Dinheiro with different currencies", () => {
-			const resultBRL = Dinheiro.criar(100, Moeda.BRL);
-			const resultUSD = Dinheiro.criar(100, Moeda.USD);
-			const resultEUR = Dinheiro.criar(100, Moeda.EUR);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(resultBRL);
-			expectToBeOk(resultUSD);
-			expectToBeOk(resultEUR);
+      expect(result.value.getValor()).toBe(0);
+      expect(result.value.isZero()).toBe(true);
+    });
 
-			expect(resultBRL.value.getMoeda()).toBe(Moeda.BRL);
-			expect(resultUSD.value.getMoeda()).toBe(Moeda.USD);
-			expect(resultEUR.value.getMoeda()).toBe(Moeda.EUR);
-		});
+    it("should create Dinheiro with different currencies", () => {
+      const resultBRL = Dinheiro.criar(100, Moeda.BRL);
+      const resultUSD = Dinheiro.criar(100, Moeda.USD);
+      const resultEUR = Dinheiro.criar(100, Moeda.EUR);
 
-		it("should reject negative amount", () => {
-			const result = Dinheiro.criar(-100);
+      if (!expectToBeOk(resultBRL) || !expectToBeOk(resultUSD) || !expectToBeOk(resultEUR)) return;
 
-			expectToBeFailure(result);
-		});
+      expect(resultBRL.value.getMoeda()).toBe(Moeda.BRL);
+      expect(resultUSD.value.getMoeda()).toBe(Moeda.USD);
+      expect(resultEUR.value.getMoeda()).toBe(Moeda.EUR);
+    });
 
-		it("should reject NaN", () => {
-			const result = Dinheiro.criar(NaN);
+    it("should reject negative amount", () => {
+      const result = Dinheiro.criar(-100);
 
-			expectToBeFailure(result);
-		});
+      expectToBeFailure(result);
+    });
 
-		it("should reject Infinity", () => {
-			const result = Dinheiro.criar(Infinity);
+    it("should reject NaN", () => {
+      const result = Dinheiro.criar(NaN);
 
-			expectToBeFailure(result);
-		});
+      expectToBeFailure(result);
+    });
 
-		it("should reject negative Infinity", () => {
-			const result = Dinheiro.criar(-Infinity);
+    it("should reject Infinity", () => {
+      const result = Dinheiro.criar(Infinity);
 
-			expectToBeFailure(result);
-		});
+      expectToBeFailure(result);
+    });
 
-		it("should round to 2 decimal places on creation", () => {
-			const result = Dinheiro.criar(100.999);
+    it("should reject negative Infinity", () => {
+      const result = Dinheiro.criar(-Infinity);
 
-			expectToBeOk(result);
-			expect(result.value.getValor()).toBe(101);
-		});
+      expectToBeFailure(result);
+    });
 
-		it("should round to 2 decimal places with banker's rounding", () => {
-			const result1 = Dinheiro.criar(100.125);
-			const result2 = Dinheiro.criar(100.135);
+    it("should round to 2 decimal places on creation", () => {
+      const result = Dinheiro.criar(100.999);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(result)) return;
 
-			expect(result1.value.getValor()).toBe(100.13);
-			expect(result2.value.getValor()).toBe(100.14);
-		});
-	});
+      expect(result.value.getValor()).toBe(101);
+    });
 
-	describe("Operations - Addition", () => {
-		it("should add two monetary amounts correctly", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(50);
+    it("should round to 2 decimal places with banker's rounding", () => {
+      const result1 = Dinheiro.criar(100.125);
+      const result2 = Dinheiro.criar(100.135);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			const resultado = result1.value.somar(result2.value);
+      expect(result1.value.getValor()).toBe(100.13);
+      expect(result2.value.getValor()).toBe(100.14);
+    });
+  });
 
-			expect(resultado.getValor()).toBe(150);
-		});
+  describe("Operations - Addition", () => {
+    it("should add two monetary amounts correctly", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(50);
 
-		it("should add zero correctly", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			const zero = Dinheiro.zero();
-			const resultado = result.value.somar(zero);
+      const resultado = result1.value.somar(result2.value);
 
-			expect(resultado.getValor()).toBe(100);
-		});
+      expect(resultado.getValor()).toBe(150);
+    });
 
-		it("should handle decimal addition correctly", () => {
-			const result1 = Dinheiro.criar(100.55);
-			const result2 = Dinheiro.criar(50.45);
+    it("should add zero correctly", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      const zero = Dinheiro.zero();
+      const resultado = result.value.somar(zero);
 
-			const resultado = result1.value.somar(result2.value);
+      expect(resultado.getValor()).toBe(100);
+    });
 
-			expect(resultado.getValor()).toBe(151);
-		});
-	});
+    it("should handle decimal addition correctly", () => {
+      const result1 = Dinheiro.criar(100.55);
+      const result2 = Dinheiro.criar(50.45);
 
-	describe("Operations - Subtraction", () => {
-		it("should subtract two monetary amounts correctly", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(50);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      const resultado = result1.value.somar(result2.value);
 
-			const resultado = result1.value.subtrair(result2.value);
+      expect(resultado.getValor()).toBe(151);
+    });
+  });
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(50);
-		});
+  describe("Operations - Subtraction", () => {
+    it("should subtract two monetary amounts correctly", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(50);
 
-		it("should subtract to zero", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(100);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      const resultado = result1.value.subtrair(result2.value);
 
-			const resultado = result1.value.subtrair(result2.value);
+      if (!expectToBeOk(resultado)) return;
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(0);
-			expect(resultado.value.isZero()).toBe(true);
-		});
+      expect(resultado.value.getValor()).toBe(50);
+    });
 
-		it("should reject subtraction that results in negative", () => {
-			const result1 = Dinheiro.criar(50);
-			const result2 = Dinheiro.criar(100);
+    it("should subtract to zero", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(100);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			const resultado = result1.value.subtrair(result2.value);
+      const resultado = result1.value.subtrair(result2.value);
 
-			expectToBeFailure(resultado);
-		});
+      if (!expectToBeOk(resultado)) return;
 
-		it("should handle decimal subtraction correctly", () => {
-			const result1 = Dinheiro.criar(100.75);
-			const result2 = Dinheiro.criar(50.25);
+      expect(resultado.value.getValor()).toBe(0);
+      expect(resultado.value.isZero()).toBe(true);
+    });
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+    it("should reject subtraction that results in negative", () => {
+      const result1 = Dinheiro.criar(50);
+      const result2 = Dinheiro.criar(100);
 
-			const resultado = result1.value.subtrair(result2.value);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(50.5);
-		});
-	});
+      const resultado = result1.value.subtrair(result2.value);
 
-	describe("Operations - Multiplication", () => {
-		it("should multiply correctly", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      expectToBeFailure(resultado);
+    });
 
-			const resultado = result.value.multiplicar(2);
+    it("should handle decimal subtraction correctly", () => {
+      const result1 = Dinheiro.criar(100.75);
+      const result2 = Dinheiro.criar(50.25);
 
-			expect(resultado.getValor()).toBe(200);
-		});
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-		it("should multiply by zero", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      const resultado = result1.value.subtrair(result2.value);
 
-			const resultado = result.value.multiplicar(0);
+      if (!expectToBeOk(resultado)) return;
 
-			expect(resultado.getValor()).toBe(0);
-			expect(resultado.isZero()).toBe(true);
-		});
+      expect(resultado.value.getValor()).toBe(50.5);
+    });
+  });
 
-		it("should multiply by decimal factor", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+  describe("Operations - Multiplication", () => {
+    it("should multiply correctly", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			const resultado = result.value.multiplicar(1.5);
+      const resultado = result.value.multiplicar(2);
 
-			expect(resultado.getValor()).toBe(150);
-		});
+      expect(resultado.getValor()).toBe(200);
+    });
 
-		it("should round multiplication result to 2 decimals", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+    it("should multiply by zero", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			const resultado = result.value.multiplicar(0.333);
+      const resultado = result.value.multiplicar(0);
 
-			expect(resultado.getValor()).toBe(33.3);
-		});
-	});
+      expect(resultado.getValor()).toBe(0);
+      expect(resultado.isZero()).toBe(true);
+    });
 
-	describe("Operations - Division", () => {
-		it("should divide correctly", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+    it("should multiply by decimal factor", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			const resultado = result.value.dividir(2);
+      const resultado = result.value.multiplicar(1.5);
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(50);
-		});
+      expect(resultado.getValor()).toBe(150);
+    });
 
-		it("should reject division by zero", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+    it("should round multiplication result to 2 decimals", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			const resultado = result.value.dividir(0);
+      const resultado = result.value.multiplicar(0.333);
 
-			expectToBeFailure(resultado);
-		});
+      expect(resultado.getValor()).toBe(33.3);
+    });
+  });
 
-		it("should handle decimal division", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+  describe("Operations - Division", () => {
+    it("should divide correctly", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			const resultado = result.value.dividir(3);
+      const resultado = result.value.dividir(2);
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(33.33);
-		});
+      if (!expectToBeOk(resultado)) return;
 
-		it("should round division result to 2 decimals", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      expect(resultado.value.getValor()).toBe(50);
+    });
 
-			const resultado = result.value.dividir(7);
+    it("should reject division by zero", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(resultado);
-			expect(resultado.value.getValor()).toBe(14.29);
-		});
-	});
+      const resultado = result.value.dividir(0);
 
-	describe("Operations - Percentage", () => {
-		it("should calculate percentage correctly", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      expectToBeFailure(resultado);
+    });
 
-			const resultado = result.value.porcentagem(10);
+    it("should handle decimal division", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expect(resultado.getValor()).toBe(10);
-		});
+      const resultado = result.value.dividir(3);
 
-		it("should calculate percentage with decimals", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      if (!expectToBeOk(resultado)) return;
 
-			const resultado = result.value.porcentagem(15.5);
+      expect(resultado.value.getValor()).toBe(33.33);
+    });
 
-			expect(resultado.getValor()).toBe(15.5);
-		});
+    it("should round division result to 2 decimals", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-		it("should calculate zero percentage", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+      const resultado = result.value.dividir(7);
 
-			const resultado = result.value.porcentagem(0);
+      if (!expectToBeOk(resultado)) return;
 
-			expect(resultado.getValor()).toBe(0);
-			expect(resultado.isZero()).toBe(true);
-		});
-	});
+      expect(resultado.value.getValor()).toBe(14.29);
+    });
+  });
 
-	describe("Currency Validation", () => {
-		it("should prevent addition with different currencies", () => {
-			const resultBRL = Dinheiro.criar(100, Moeda.BRL);
-			const resultUSD = Dinheiro.criar(100, Moeda.USD);
+  describe("Operations - Percentage", () => {
+    it("should calculate percentage correctly", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(resultBRL);
-			expectToBeOk(resultUSD);
+      const resultado = result.value.porcentagem(10);
 
-			expect(() => resultBRL.value.somar(resultUSD.value)).toThrow();
-		});
+      expect(resultado.getValor()).toBe(10);
+    });
 
-		it("should prevent subtraction with different currencies", () => {
-			const resultBRL = Dinheiro.criar(100, Moeda.BRL);
-			const resultUSD = Dinheiro.criar(100, Moeda.USD);
+    it("should calculate percentage with decimals", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(resultBRL);
-			expectToBeOk(resultUSD);
+      const resultado = result.value.porcentagem(15.5);
 
-			expect(() => resultBRL.value.subtrair(resultUSD.value)).toThrow();
-		});
+      expect(resultado.getValor()).toBe(15.5);
+    });
 
-		it("should prevent comparison with different currencies", () => {
-			const resultBRL = Dinheiro.criar(100, Moeda.BRL);
-			const resultUSD = Dinheiro.criar(100, Moeda.USD);
+    it("should calculate zero percentage", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expectToBeOk(resultBRL);
-			expectToBeOk(resultUSD);
+      const resultado = result.value.porcentagem(0);
 
-			expect(() => resultBRL.value.isMaiorQue(resultUSD.value)).toThrow();
-			expect(() => resultBRL.value.isMenorQue(resultUSD.value)).toThrow();
-		});
-	});
+      expect(resultado.getValor()).toBe(0);
+      expect(resultado.isZero()).toBe(true);
+    });
+  });
 
-	describe("Comparison", () => {
-		it("should compare equal amounts correctly", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(100);
+  describe("Currency Validation", () => {
+    it("should prevent addition with different currencies", () => {
+      const resultBRL = Dinheiro.criar(100, Moeda.BRL);
+      const resultUSD = Dinheiro.criar(100, Moeda.USD);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(resultBRL) || !expectToBeOk(resultUSD)) return;
 
-			expect(result1.value.equals(result2.value)).toBe(true);
-		});
+      expect(() => resultBRL.value.somar(resultUSD.value)).toThrow();
+    });
 
-		it("should compare different amounts correctly", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(50);
+    it("should prevent subtraction with different currencies", () => {
+      const resultBRL = Dinheiro.criar(100, Moeda.BRL);
+      const resultUSD = Dinheiro.criar(100, Moeda.USD);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(resultBRL) || !expectToBeOk(resultUSD)) return;
 
-			expect(result1.value.equals(result2.value)).toBe(false);
-		});
+      expect(() => resultBRL.value.subtrair(resultUSD.value)).toThrow();
+    });
 
-		it("should compare greater than correctly", () => {
-			const result1 = Dinheiro.criar(100);
-			const result2 = Dinheiro.criar(50);
+    it("should prevent comparison with different currencies", () => {
+      const resultBRL = Dinheiro.criar(100, Moeda.BRL);
+      const resultUSD = Dinheiro.criar(100, Moeda.USD);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(resultBRL) || !expectToBeOk(resultUSD)) return;
 
-			expect(result1.value.isMaiorQue(result2.value)).toBe(true);
-			expect(result2.value.isMaiorQue(result1.value)).toBe(false);
-		});
+      expect(() => resultBRL.value.isMaiorQue(resultUSD.value)).toThrow();
+      expect(() => resultBRL.value.isMenorQue(resultUSD.value)).toThrow();
+    });
+  });
 
-		it("should compare less than correctly", () => {
-			const result1 = Dinheiro.criar(50);
-			const result2 = Dinheiro.criar(100);
+  describe("Comparison", () => {
+    it("should compare equal amounts correctly", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(100);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-			expect(result1.value.isMenorQue(result2.value)).toBe(true);
-			expect(result2.value.isMenorQue(result1.value)).toBe(false);
-		});
+      expect(result1.value.equals(result2.value)).toBe(true);
+    });
 
-		it("should identify zero correctly", () => {
-			const zero = Dinheiro.zero();
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+    it("should compare different amounts correctly", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(50);
 
-			expect(zero.isZero()).toBe(true);
-			expect(result.value.isZero()).toBe(false);
-		});
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-		it("should not equal amounts with different currencies", () => {
-			const resultBRL = Dinheiro.criar(100, Moeda.BRL);
-			const resultUSD = Dinheiro.criar(100, Moeda.USD);
+      expect(result1.value.equals(result2.value)).toBe(false);
+    });
 
-			expectToBeOk(resultBRL);
-			expectToBeOk(resultUSD);
+    it("should compare greater than correctly", () => {
+      const result1 = Dinheiro.criar(100);
+      const result2 = Dinheiro.criar(50);
 
-			expect(resultBRL.value.equals(resultUSD.value)).toBe(false);
-		});
-	});
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-	describe("Formatting", () => {
-		it("should format BRL correctly", () => {
-			const result = Dinheiro.criar(1234.56, Moeda.BRL);
-			expectToBeOk(result);
+      expect(result1.value.isMaiorQue(result2.value)).toBe(true);
+      expect(result2.value.isMaiorQue(result1.value)).toBe(false);
+    });
 
-			const formatted = result.value.formatar();
+    it("should compare less than correctly", () => {
+      const result1 = Dinheiro.criar(50);
+      const result2 = Dinheiro.criar(100);
 
-			expect(formatted).toContain("1.234,56");
-		});
+      if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
-		it("should format USD correctly", () => {
-			const result = Dinheiro.criar(1234.56, Moeda.USD);
-			expectToBeOk(result);
+      expect(result1.value.isMenorQue(result2.value)).toBe(true);
+      expect(result2.value.isMenorQue(result1.value)).toBe(false);
+    });
 
-			const formatted = result.value.formatar();
+    it("should identify zero correctly", () => {
+      const zero = Dinheiro.zero();
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expect(formatted).toContain("1,234.56");
-		});
+      expect(zero.isZero()).toBe(true);
+      expect(result.value.isZero()).toBe(false);
+    });
 
-		it("should format EUR correctly", () => {
-			const result = Dinheiro.criar(1234.56, Moeda.EUR);
-			expectToBeOk(result);
+    it("should not equal amounts with different currencies", () => {
+      const resultBRL = Dinheiro.criar(100, Moeda.BRL);
+      const resultUSD = Dinheiro.criar(100, Moeda.USD);
 
-			const formatted = result.value.formatar();
+      if (!expectToBeOk(resultBRL) || !expectToBeOk(resultUSD)) return;
 
-			expect(formatted).toContain("1.234,56");
-		});
+      expect(resultBRL.value.equals(resultUSD.value)).toBe(false);
+    });
+  });
 
-		it("should format zero correctly", () => {
-			const zero = Dinheiro.zero();
+  describe("Formatting", () => {
+    it("should format BRL correctly", () => {
+      const result = Dinheiro.criar(1234.56, Moeda.BRL);
+      if (!expectToBeOk(result)) return;
 
-			const formatted = zero.formatar();
+      const formatted = result.value.formatar();
 
-			expect(formatted).toBeTruthy();
-		});
+      expect(formatted).toContain("1.234,56");
+    });
 
-		it("should toString return formatted value", () => {
-			const result = Dinheiro.criar(100);
-			expectToBeOk(result);
+    it("should format USD correctly", () => {
+      const result = Dinheiro.criar(1234.56, Moeda.USD);
+      if (!expectToBeOk(result)) return;
 
-			const str = result.value.toString();
+      const formatted = result.value.formatar();
 
-			expect(str).toBe(result.value.formatar());
-		});
-	});
+      expect(formatted).toContain("1,234.56");
+    });
 
-	describe("Reconstitution", () => {
-		it("should reconstitute Dinheiro from database without validation", () => {
-			const dinheiro = Dinheiro.reconstituir(100.5);
+    it("should format EUR correctly", () => {
+      const result = Dinheiro.criar(1234.56, Moeda.EUR);
+      if (!expectToBeOk(result)) return;
 
-			expect(dinheiro).toBeInstanceOf(Dinheiro);
-			expect(dinheiro.getValor()).toBe(100.5);
-		});
+      const formatted = result.value.formatar();
 
-		it("should reconstitute with specific currency", () => {
-			const dinheiro = Dinheiro.reconstituir(100, Moeda.USD);
+      expect(formatted).toContain("1.234,56");
+    });
 
-			expect(dinheiro.getMoeda()).toBe(Moeda.USD);
-			expect(dinheiro.getValor()).toBe(100);
-		});
+    it("should format zero correctly", () => {
+      const zero = Dinheiro.zero();
 
-		it("should round on reconstitution", () => {
-			const dinheiro = Dinheiro.reconstituir(100.999);
+      const formatted = zero.formatar();
 
-			expect(dinheiro.getValor()).toBe(101);
-		});
-	});
+      expect(formatted).toBeTruthy();
+    });
 
-	describe("Factory Methods", () => {
-		it("should create zero with factory method", () => {
-			const zero = Dinheiro.zero();
+    it("should toString return formatted value", () => {
+      const result = Dinheiro.criar(100);
+      if (!expectToBeOk(result)) return;
 
-			expect(zero.getValor()).toBe(0);
-			expect(zero.isZero()).toBe(true);
-			expect(zero.getMoeda()).toBe(Moeda.BRL);
-		});
+      const str = result.value.toString();
 
-		it("should create zero with specific currency", () => {
-			const zeroUSD = Dinheiro.zero(Moeda.USD);
-			const zeroEUR = Dinheiro.zero(Moeda.EUR);
+      expect(str).toBe(result.value.formatar());
+    });
+  });
 
-			expect(zeroUSD.getMoeda()).toBe(Moeda.USD);
-			expect(zeroEUR.getMoeda()).toBe(Moeda.EUR);
-		});
-	});
+  describe("Reconstitution", () => {
+    it("should reconstitute Dinheiro from database without validation", () => {
+      const dinheiro = Dinheiro.reconstituir(100.5);
 
-	describe("Edge Cases", () => {
-		it("should handle very small amounts", () => {
-			const result = Dinheiro.criar(0.01);
+      expect(dinheiro).toBeInstanceOf(Dinheiro);
+      expect(dinheiro.getValor()).toBe(100.5);
+    });
 
-			expectToBeOk(result);
-			expect(result.value.getValor()).toBe(0.01);
-		});
+    it("should reconstitute with specific currency", () => {
+      const dinheiro = Dinheiro.reconstituir(100, Moeda.USD);
 
-		it("should handle large amounts", () => {
-			const result = Dinheiro.criar(999999999.99);
+      expect(dinheiro.getMoeda()).toBe(Moeda.USD);
+      expect(dinheiro.getValor()).toBe(100);
+    });
 
-			expectToBeOk(result);
-			expect(result.value.getValor()).toBe(999999999.99);
-		});
+    it("should round on reconstitution", () => {
+      const dinheiro = Dinheiro.reconstituir(100.999);
 
-		it("should validate all test money values", () => {
-			Object.values(TEST_MONEY).forEach((valor) => {
-				const result = Dinheiro.criar(valor);
-				expectToBeOk(result);
-			});
-		});
-	});
+      expect(dinheiro.getValor()).toBe(101);
+    });
+  });
+
+  describe("Factory Methods", () => {
+    it("should create zero with factory method", () => {
+      const zero = Dinheiro.zero();
+
+      expect(zero.getValor()).toBe(0);
+      expect(zero.isZero()).toBe(true);
+      expect(zero.getMoeda()).toBe(Moeda.BRL);
+    });
+
+    it("should create zero with specific currency", () => {
+      const zeroUSD = Dinheiro.zero(Moeda.USD);
+      const zeroEUR = Dinheiro.zero(Moeda.EUR);
+
+      expect(zeroUSD.getMoeda()).toBe(Moeda.USD);
+      expect(zeroEUR.getMoeda()).toBe(Moeda.EUR);
+    });
+  });
+
+  describe("Edge Cases", () => {
+    it("should handle very small amounts", () => {
+      const result = Dinheiro.criar(0.01);
+
+      if (!expectToBeOk(result)) return;
+
+      expect(result.value.getValor()).toBe(0.01);
+    });
+
+    it("should handle large amounts", () => {
+      const result = Dinheiro.criar(999999999.99);
+
+      if (!expectToBeOk(result)) return;
+
+      expect(result.value.getValor()).toBe(999999999.99);
+    });
+
+    it("should validate all test money values", () => {
+      Object.values(TEST_MONEY).forEach((valor) => {
+        const result = Dinheiro.criar(valor);
+        if (!expectToBeOk(result)) return;
+      });
+    });
+  });
 });

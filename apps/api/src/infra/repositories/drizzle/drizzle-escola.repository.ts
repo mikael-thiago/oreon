@@ -7,6 +7,16 @@ import { escolaTable, unidadeTable } from "./schema.js";
 export class DrizzleEscolaRepository implements EscolaRepository {
   constructor(private readonly drizzle: DrizzleService) {}
 
+  async existeComCnpj(cnpj: string): Promise<boolean> {
+    const [res] = await this.drizzle
+      .getTransaction()
+      .select({ count: count() })
+      .from(unidadeTable)
+      .where(eq(unidadeTable.cnpj, cnpj));
+
+    return !res || res.count > 0;
+  }
+
   async obterProximoId(): Promise<number> {
     const res = await this.drizzle
       .getTransaction()

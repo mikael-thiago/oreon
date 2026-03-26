@@ -68,7 +68,7 @@ describe("Nome Value Object", () => {
 	describe("Name Extraction", () => {
 		it("should extract first name correctly", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const primeiroNome = result.value.getPrimeiroNome();
 
@@ -77,7 +77,7 @@ describe("Nome Value Object", () => {
 
 		it("should extract first name from simple name", () => {
 			const result = Nome.criar(VALID_NAMES.SIMPLE);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const primeiroNome = result.value.getPrimeiroNome();
 
@@ -86,7 +86,7 @@ describe("Nome Value Object", () => {
 
 		it("should extract surname correctly", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const sobrenome = result.value.getSobrenome();
 
@@ -95,7 +95,7 @@ describe("Nome Value Object", () => {
 
 		it("should extract surname from simple name", () => {
 			const result = Nome.criar(VALID_NAMES.SIMPLE);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const sobrenome = result.value.getSobrenome();
 
@@ -104,7 +104,7 @@ describe("Nome Value Object", () => {
 
 		it("should return empty string for surname when single name", () => {
 			const result = Nome.criar("João");
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const sobrenome = result.value.getSobrenome();
 
@@ -113,7 +113,7 @@ describe("Nome Value Object", () => {
 
 		it("should extract surname from long name", () => {
 			const result = Nome.criar(VALID_NAMES.LONG);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const sobrenome = result.value.getSobrenome();
 
@@ -124,7 +124,7 @@ describe("Nome Value Object", () => {
 	describe("Name Formatting", () => {
 		it("should return full name with getValor", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const valor = result.value.getValor();
 
@@ -133,7 +133,7 @@ describe("Nome Value Object", () => {
 
 		it("should return full name with toString", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const str = result.value.toString();
 
@@ -142,7 +142,7 @@ describe("Nome Value Object", () => {
 
 		it("should get abbreviated name correctly", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const abreviado = result.value.getAbreviado();
 
@@ -151,7 +151,7 @@ describe("Nome Value Object", () => {
 
 		it("should get abbreviated name from simple name", () => {
 			const result = Nome.criar(VALID_NAMES.SIMPLE);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const abreviado = result.value.getAbreviado();
 
@@ -160,7 +160,7 @@ describe("Nome Value Object", () => {
 
 		it("should get abbreviated name from single name", () => {
 			const result = Nome.criar("João");
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const abreviado = result.value.getAbreviado();
 
@@ -169,7 +169,7 @@ describe("Nome Value Object", () => {
 
 		it("should get initials correctly", () => {
 			const result = Nome.criar(VALID_NAMES.FULL_NAME);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const iniciais = result.value.getIniciais();
 
@@ -178,7 +178,7 @@ describe("Nome Value Object", () => {
 
 		it("should get initials from simple name", () => {
 			const result = Nome.criar(VALID_NAMES.SIMPLE);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const iniciais = result.value.getIniciais();
 
@@ -187,7 +187,7 @@ describe("Nome Value Object", () => {
 
 		it("should get initials from single name", () => {
 			const result = Nome.criar("João");
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const iniciais = result.value.getIniciais();
 
@@ -198,8 +198,8 @@ describe("Nome Value Object", () => {
 	describe("Trimming and Normalization", () => {
 		it("should trim whitespace from name", () => {
 			const result = Nome.criar("  Maria Silva  ");
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getValor()).toBe("Maria Silva");
 		});
 
@@ -213,8 +213,8 @@ describe("Nome Value Object", () => {
 
 		it("should handle leading and trailing spaces", () => {
 			const result = Nome.criar("   João Silva   ");
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getValor()).toBe("João Silva");
 		});
 	});
@@ -222,8 +222,8 @@ describe("Nome Value Object", () => {
 	describe("Accented Characters", () => {
 		it("should accept name with accents", () => {
 			const result = Nome.criar(VALID_NAMES.WITH_ACCENTS);
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getValor()).toBe("José da Conceição");
 		});
 
@@ -250,15 +250,15 @@ describe("Nome Value Object", () => {
 	describe("Special Characters", () => {
 		it("should accept name with hyphen", () => {
 			const result = Nome.criar(VALID_NAMES.WITH_HYPHEN);
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getValor()).toBe("Ana-Paula Costa");
 		});
 
 		it("should accept name with apostrophe", () => {
 			const result = Nome.criar(VALID_NAMES.WITH_APOSTROPHE);
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getValor()).toBe("D'Angelo Oliveira");
 		});
 
@@ -292,8 +292,8 @@ describe("Nome Value Object", () => {
 			const result1 = Nome.criar(VALID_NAMES.FULL_NAME);
 			const result2 = Nome.criar(VALID_NAMES.FULL_NAME);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1)) return;
+			if (!expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(true);
 		});
@@ -302,8 +302,8 @@ describe("Nome Value Object", () => {
 			const result1 = Nome.criar(VALID_NAMES.FULL_NAME);
 			const result2 = Nome.criar(VALID_NAMES.SIMPLE);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1)) return;
+			if (!expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(false);
 		});
@@ -312,8 +312,8 @@ describe("Nome Value Object", () => {
 			const result1 = Nome.criar("Maria Silva");
 			const result2 = Nome.criar("maria silva");
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1)) return;
+			if (!expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(false);
 		});
@@ -322,8 +322,8 @@ describe("Nome Value Object", () => {
 			const result1 = Nome.criar("Maria Silva");
 			const result2 = Nome.criar("  Maria Silva  ");
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1)) return;
+			if (!expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(true);
 		});
@@ -375,8 +375,8 @@ describe("Nome Value Object", () => {
 
 		it("should handle very long names", () => {
 			const result = Nome.criar(VALID_NAMES.LONG);
+			if (!expectToBeOk(result)) return;
 
-			expectToBeOk(result);
 			expect(result.value.getPrimeiroNome()).toBe("Pedro");
 		});
 

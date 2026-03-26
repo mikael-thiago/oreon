@@ -608,6 +608,11 @@ export class InMemoryEscolaRepository implements EscolaRepository {
     return this.escolas.some((e) => e.id === id);
   }
 
+  
+  async existeComCnpj(cnpj: string): Promise<boolean> {
+    return this.escolas.some((e) => e.matriz.cnpj === cnpj);
+  }
+
   async existeComEmail(email: string): Promise<boolean> {
     return this.escolas.some((e) => e.email.toLowerCase() === email.toLowerCase());
   }

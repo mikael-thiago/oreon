@@ -5,5 +5,6 @@ export default defineConfig({
 		globals: true,
 		environment: 'node',
 		setupFiles: ['./src/tests/helpers/result-matchers.ts'],
+		exclude: ['**\/dist/**']
 	},
 });

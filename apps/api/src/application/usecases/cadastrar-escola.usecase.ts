@@ -79,10 +79,19 @@ export class CadastarEscolaUseCase {
       );
     if (!usuario.admin) return Result.fail(new ForbiddenError("Operação permitida apenas para usuários admin"));
 
-    const existeComMesmoEmail = await this.escolaRepository.existeComEmail(request.escola.email);
+    const [existeComMesmoEmail, existeComMesmoCnpj] = await Promise.all([
+      this.escolaRepository.existeComEmail(request.escola.email),
+      this.escolaRepository.existeComCnpj(request.escola.cnpjMatriz),
+    ]);
 
     if (existeComMesmoEmail) {
       return Result.fail(new ConflictError(`Já existe uma escola cadastrada com o email '${request.escola.email}'`));
+    }
+
+    if (existeComMesmoCnpj) {
+      return Result.fail(
+        new ConflictError(`Já existe uma escola cadastrada com o CNPJ '${request.escola.cnpjMatriz}'`)
+      );
     }
 
     return this.uow.transact(async () => {

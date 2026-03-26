@@ -81,7 +81,7 @@ describe("Telefone Value Object", () => {
 	describe("Formatting", () => {
 		it("should format mobile phone correctly", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const formatted = result.value.formatar();
 
@@ -91,7 +91,7 @@ describe("Telefone Value Object", () => {
 
 		it("should format landline phone correctly", () => {
 			const result = Telefone.criar(VALID_PHONES.LANDLINE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const formatted = result.value.formatar();
 
@@ -101,7 +101,7 @@ describe("Telefone Value Object", () => {
 
 		it("should format mobile from unformatted input", () => {
 			const result = Telefone.criar("11987654321");
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const formatted = result.value.formatar();
 
@@ -110,7 +110,7 @@ describe("Telefone Value Object", () => {
 
 		it("should format landline from unformatted input", () => {
 			const result = Telefone.criar("1134567890");
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const formatted = result.value.formatar();
 
@@ -119,7 +119,7 @@ describe("Telefone Value Object", () => {
 
 		it("should return unformatted phone with toString", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const unformatted = result.value.toString();
 
@@ -129,7 +129,7 @@ describe("Telefone Value Object", () => {
 
 		it("should return unformatted phone with getValor", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const valor = result.value.getValor();
 
@@ -141,7 +141,7 @@ describe("Telefone Value Object", () => {
 	describe("DDD Extraction", () => {
 		it("should extract DDD from mobile phone", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const ddd = result.value.getDDD();
 
@@ -150,7 +150,7 @@ describe("Telefone Value Object", () => {
 
 		it("should extract DDD from landline phone", () => {
 			const result = Telefone.criar(VALID_PHONES.LANDLINE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			const ddd = result.value.getDDD();
 
@@ -162,9 +162,7 @@ describe("Telefone Value Object", () => {
 			const resultRJ = Telefone.criar(VALID_PHONES.MOBILE_RJ);
 			const resultMG = Telefone.criar(VALID_PHONES.MOBILE_MG);
 
-			expectToBeOk(resultSP);
-			expectToBeOk(resultRJ);
-			expectToBeOk(resultMG);
+			if (!expectToBeOk(resultSP) || !expectToBeOk(resultRJ) || !expectToBeOk(resultMG)) return;
 
 			expect(resultSP.value.getDDD()).toBe("11");
 			expect(resultRJ.value.getDDD()).toBe("21");
@@ -175,7 +173,8 @@ describe("Telefone Value Object", () => {
 	describe("Number Extraction", () => {
 		it("should extract number without DDD from mobile", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			
+			if (!expectToBeOk(result)) return;
 
 			const numero = result.value.getNumero();
 
@@ -185,7 +184,8 @@ describe("Telefone Value Object", () => {
 
 		it("should extract number without DDD from landline", () => {
 			const result = Telefone.criar(VALID_PHONES.LANDLINE_SP);
-			expectToBeOk(result);
+			
+			if (!expectToBeOk(result)) return;
 
 			const numero = result.value.getNumero();
 
@@ -197,14 +197,14 @@ describe("Telefone Value Object", () => {
 	describe("Phone Type Detection", () => {
 		it("should identify mobile phone correctly", () => {
 			const result = Telefone.criar(VALID_PHONES.MOBILE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			expect(result.value.isCelular()).toBe(true);
 		});
 
 		it("should identify landline phone correctly", () => {
 			const result = Telefone.criar(VALID_PHONES.LANDLINE_SP);
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
 
 			expect(result.value.isCelular()).toBe(false);
 		});
@@ -214,9 +214,7 @@ describe("Telefone Value Object", () => {
 			const resultRJ = Telefone.criar(VALID_PHONES.MOBILE_RJ);
 			const resultMG = Telefone.criar(VALID_PHONES.MOBILE_MG);
 
-			expectToBeOk(resultSP);
-			expectToBeOk(resultRJ);
-			expectToBeOk(resultMG);
+			if (!expectToBeOk(resultSP) || !expectToBeOk(resultRJ) || !expectToBeOk(resultMG)) return;
 
 			expect(resultSP.value.isCelular()).toBe(true);
 			expect(resultRJ.value.isCelular()).toBe(true);
@@ -228,9 +226,7 @@ describe("Telefone Value Object", () => {
 			const resultRJ = Telefone.criar(VALID_PHONES.LANDLINE_RJ);
 			const resultMG = Telefone.criar(VALID_PHONES.LANDLINE_MG);
 
-			expectToBeOk(resultSP);
-			expectToBeOk(resultRJ);
-			expectToBeOk(resultMG);
+			if (!expectToBeOk(resultSP) || !expectToBeOk(resultRJ) || !expectToBeOk(resultMG)) return;
 
 			expect(resultSP.value.isCelular()).toBe(false);
 			expect(resultRJ.value.isCelular()).toBe(false);
@@ -243,8 +239,7 @@ describe("Telefone Value Object", () => {
 			const result1 = Telefone.criar(VALID_PHONES.MOBILE_SP);
 			const result2 = Telefone.criar(VALID_PHONES.MOBILE_SP);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(true);
 		});
@@ -253,8 +248,7 @@ describe("Telefone Value Object", () => {
 			const result1 = Telefone.criar(VALID_PHONES.MOBILE_SP);
 			const result2 = Telefone.criar(VALID_PHONES.MOBILE_RJ);
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(false);
 		});
@@ -263,8 +257,7 @@ describe("Telefone Value Object", () => {
 			const result1 = Telefone.criar("(11) 98765-4321");
 			const result2 = Telefone.criar("11987654321");
 
-			expectToBeOk(result1);
-			expectToBeOk(result2);
+			if (!expectToBeOk(result1) || !expectToBeOk(result2)) return;
 
 			expect(result1.value.equals(result2.value)).toBe(true);
 		});
@@ -273,8 +266,7 @@ describe("Telefone Value Object", () => {
 			const resultMobile = Telefone.criar(VALID_PHONES.MOBILE_SP);
 			const resultLandline = Telefone.criar(VALID_PHONES.LANDLINE_SP);
 
-			expectToBeOk(resultMobile);
-			expectToBeOk(resultLandline);
+			if (!expectToBeOk(resultMobile) || !expectToBeOk(resultLandline)) return;
 
 			expect(resultMobile.value.equals(resultLandline.value)).toBe(false);
 		});
@@ -317,28 +309,32 @@ describe("Telefone Value Object", () => {
 		it("should remove all non-numeric characters", () => {
 			const result = Telefone.criar("(11) 98765-4321");
 
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
+
 			expect(result.value.getValor()).toBe("11987654321");
 		});
 
 		it("should handle phone with dots", () => {
 			const result = Telefone.criar("11.98765.4321");
 
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
+
 			expect(result.value.getValor()).toBe("11987654321");
 		});
 
 		it("should handle phone with spaces", () => {
 			const result = Telefone.criar("11 98765 4321");
 
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
+
 			expect(result.value.getValor()).toBe("11987654321");
 		});
 
 		it("should handle phone with mixed formatting", () => {
 			const result = Telefone.criar("(11) 9.8765-4321");
 
-			expectToBeOk(result);
+			if (!expectToBeOk(result)) return;
+
 			expect(result.value.getValor()).toBe("11987654321");
 		});
 	});
